@@ -11,10 +11,15 @@ import android.view.MenuItem;
 import android.widget.Adapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends Activity {
 
     private ListView mListView;
+
+    //********TEST
+    private ArrayList<Course> testArrayList = new ArrayList<Course>();
 
 
     @Override
@@ -25,6 +30,18 @@ public class MainActivity extends Activity {
         //ListView setup
         mListView = (ListView) findViewById(R.id.listView);
 
+
+
+        //*******TEST
+        Course c1 = new Course("First Course");
+        c1.addAssignment(new Assignment(1,20,15));
+        testArrayList.add(c1);
+
+
+
+
+        final CourseAdapter mCourseAdapter = new CourseAdapter(this, testArrayList);
+        mListView.setAdapter(mCourseAdapter);
 
     }
 

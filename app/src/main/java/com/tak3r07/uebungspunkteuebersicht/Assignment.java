@@ -1,6 +1,4 @@
-package tak3r07.uebungspunkteuebersicht;
-
-import android.util.Log;
+package com.tak3r07.uebungspunkteuebersicht;
 
 /**
  * Created by tak3r07 on 11/9/14.
@@ -19,17 +17,22 @@ public class Assignment {
     double achievedPoints;
 
     //Constructor
-    public Assignment(int index, double maxPoints, double achievedPoints){
+    public Assignment(int index, double maxPoints, double achievedPoints) {
         setIndex(index);
         setMaxPoints(maxPoints);
         setAchievedPoints(achievedPoints);
     }
 
     //Calculates and return the achieved percentage of max points of this assignment
-    public double getPercentage(){
-        try{
-            return Math.round(achievedPoints/maxPoints*1000)/1000;
-        } catch (Exception e){
+    public double getPercentage() {
+        try {
+            //Round on 4 digits
+            Double percentage = Math.round(achievedPoints / maxPoints * 1000) / 1000d;
+
+            return percentage;
+
+        } catch (Exception e) {
+
             e.printStackTrace();
             return 0;
         }

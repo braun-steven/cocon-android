@@ -1,4 +1,7 @@
-package tak3r07.uebungspunkteuebersicht;
+package com.tak3r07.uebungspunkteuebersicht;
+
+import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,7 +38,7 @@ public class Course {
     }
 
     //Calculate overall percentage
-    public double getOverAllPercentage() {
+    public Double getOverAllPercentage() {
         double overAllAchievedPoints = 0;
         double overAllMaxPoints = 0;
 
@@ -49,10 +52,12 @@ public class Course {
         }
 
         //Round on 4 digits
-        double overAllPercentage = Math.round(overAllAchievedPoints / overAllMaxPoints * 1000) / 1000;
+        double overAllPercentage = Math.round(overAllAchievedPoints / overAllMaxPoints * 1000) / 1000d;
+
 
         //return result
         return overAllPercentage;
+
     }
 
 
