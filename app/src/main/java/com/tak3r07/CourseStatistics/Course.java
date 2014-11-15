@@ -1,4 +1,4 @@
-package com.tak3r07.unihelper;
+package com.tak3r07.CourseStatistics;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.tak3r07.unihelper;
+package com.tak3r07.CourseStatistics;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -14,6 +14,8 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
 

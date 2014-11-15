@@ -1,4 +1,4 @@
-package com.tak3r07.unihelper;
+package com.tak3r07.CourseStatistics;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,6 +12,8 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.tak3r07.unihelper.R;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -297,5 +299,51 @@ public class MainActivity extends Activity {
         });
 
 
+    }
+
+    public void onClickRestore(MenuItem item){
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        alert.setTitle("Restore");
+        alert.setMessage("Do you want to restore data from storage?");
+
+
+        alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
+    }
+
+    public void onClickBackup(MenuItem item){
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        alert.setTitle("Backup");
+        alert.setMessage("Do you want to Backup data to storage?");
+
+
+        alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
     }
 }

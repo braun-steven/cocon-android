@@ -12,5 +12,7 @@
     <string name="button_add_assignment">Add Assignment</string>
     <string name="achieved_points_text">Achieved points:</string>
     <string name="max_points_text">Max. points:</string>
+    <string name="backup">Backup</string>
+    <string name="restore">Restore</string>
 
 </resources>

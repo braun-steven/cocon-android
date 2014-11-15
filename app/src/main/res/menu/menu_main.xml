@@ -11,4 +11,12 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings" />
+    <item android:id="@+id/backup"
+        android:orderInCategory="98"
+        android:showAsAction="never"
+        android:title="@string/backup" />
+    <item android:id="@+id/restore"
+        android:orderInCategory="99"
+        android:showAsAction="never"
+        android:title="@string/restore" />
 </menu>

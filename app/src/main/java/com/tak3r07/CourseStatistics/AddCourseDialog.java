@@ -1,10 +1,12 @@
-package com.tak3r07.unihelper;
+package com.tak3r07.CourseStatistics;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+
+import com.tak3r07.unihelper.R;
 
 /**
  * Created by tak3r07 on 11/11/14.
