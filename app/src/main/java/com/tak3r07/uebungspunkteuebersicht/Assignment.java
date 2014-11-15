@@ -1,9 +1,11 @@
 package com.tak3r07.uebungspunkteuebersicht;
 
+import java.io.Serializable;
+
 /**
  * Created by tak3r07 on 11/9/14.
  */
-public class Assignment {
+public class Assignment implements Serializable {
 
     String TAG = "UEBUNGSPUNKTE-Log";
 
@@ -24,17 +26,17 @@ public class Assignment {
     }
 
     //Calculates and return the achieved percentage of max points of this assignment
-    public double getPercentage() {
+    public Double getPercentage() {
         try {
             //Round on 4 digits
-            Double percentage = Math.round(achievedPoints / maxPoints * 1000) / 1000d;
+            Double percentage = Math.round(achievedPoints / maxPoints * 1000) / 10d;
 
             return percentage;
 
         } catch (Exception e) {
 
             e.printStackTrace();
-            return 0;
+            return 0.;
         }
 
     }

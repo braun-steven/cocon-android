@@ -3,13 +3,15 @@ package com.tak3r07.uebungspunkteuebersicht;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
  * Created by tak3r07 on 11/9/14.
  */
-public class Course {
+public class Course implements Serializable{
 
     public Course(String courseName) {
         setCourseName(courseName);
@@ -52,7 +54,7 @@ public class Course {
         }
 
         //Round on 4 digits
-        double overAllPercentage = Math.round(overAllAchievedPoints / overAllMaxPoints * 1000) / 1000d;
+        double overAllPercentage = Math.round(overAllAchievedPoints / overAllMaxPoints * 1000) / 10d;
 
 
         //return result
@@ -61,15 +63,16 @@ public class Course {
     }
 
 
-    public ArrayList<Assignment> getmAssignmentArrayList() {
-        return mAssignmentArrayList;
-    }
-
-    public String getCourseName() {
+     public String getCourseName() {
         return courseName;
     }
 
     public void setCourseName(String courseName) {
         this.courseName = courseName;
+    }
+
+    public ArrayList<Assignment> getAssignments(){ return mAssignmentArrayList;}
+    public void setAssignments(ArrayList<Assignment> newAssignments){
+        mAssignmentArrayList = newAssignments;
     }
 }

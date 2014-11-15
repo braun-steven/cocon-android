@@ -1,47 +1,71 @@
 package com.tak3r07.uebungspunkteuebersicht;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.system.Os;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Adapter;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 public class MainActivity extends Activity {
 
+    private final String COURSE_TAG = "COURSE_TAG";
+    private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";
+    private final String ARRAYLIST_SIZE = "ARRAYLIST_SIZE";
+    private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
+
+
     private ListView mListView;
 
-    //********TEST
-    private ArrayList<Course> testArrayList = new ArrayList<Course>();
 
+    private ArrayList<Course> mCourseArrayList = new ArrayList<Course>();
+    private CourseAdapter mCourseAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+        if (savedInstanceState != null) {
+
+            //Get back Course-Arraylist from savedInstanceState
+            mCourseArrayList = (ArrayList<Course>) savedInstanceState.getSerializable(COURSE_ARRAY_LIST);
+
+        }
+
         //ListView setup
-        mListView = (ListView) findViewById(R.id.listView);
+        mListView = (ListView) findViewById(R.id.listView_courses);
 
-
-
-        //*******TEST
-        Course c1 = new Course("First Course");
-        c1.addAssignment(new Assignment(1,20,15));
-        testArrayList.add(c1);
-
-
-
-
-        final CourseAdapter mCourseAdapter = new CourseAdapter(this, testArrayList);
+        //Add adapter to listview
+        mCourseAdapter = new CourseAdapter(this, mCourseArrayList);
         mListView.setAdapter(mCourseAdapter);
+
+        //Set onClick and onLongClick
+        setClickListener();
+
+        //If activity is freshly started (SavedInstanceState = null): restore data from storage
+        if (savedInstanceState == null) restore();
+
 
     }
 
@@ -66,5 +90,213 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onClickAddCourse(MenuItem item) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        alert.setTitle("New course");
+        alert.setMessage("Enter course name");
+
+        // Set an EditText view to get user input
+        final EditText input = new EditText(this);
+        alert.setView(input);
+
+        alert.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String value = input.getText().toString();
+                addCourse(value);
+
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
+    }
+
+    //Adds a new course to the mCourseArrayList
+    public void addCourse(String title) {
+        //Check if string is empty
+        if (!title.isEmpty()) {
+
+            //boolean to check if coursename already exists
+            boolean courseExists = false;
+
+            //Loop to check all coursenames
+            for (int i = 0; i < mCourseArrayList.size(); i++) {
+                if (title.replace(" ", "").equals(mCourseArrayList.get(i).getCourseName().replace(" ", "")))
+                    courseExists = true;
+            }
+
+            //Only create new course if "courseexists" is false
+            if (courseExists) {
+                //Notify user
+                Toast.makeText(getApplicationContext(), "A course with the same name already exists", Toast.LENGTH_LONG).show();
+            } else {
+                //Add course
+                Course course = new Course(title);
+                mCourseAdapter.addCourse(course);
+                Toast.makeText(getApplicationContext(), "Course: " + title + " has been added", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            //Notify about empty string
+            Toast.makeText(getApplicationContext(), "Abort: No title set", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current state
+        // Save array list
+        savedInstanceState.putSerializable(COURSE_ARRAY_LIST, mCourseArrayList);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+
+        //Get course and old course position
+        Course course = (Course) data.getExtras().getSerializable(COURSE_TAG);
+        int oldCoursePosition = data.getExtras().getInt(COURSE_TAG_POSITION);
+
+        //update the course at its old position
+        updateCourse(course, oldCoursePosition);
+
+        //Update adapter data
+        mCourseAdapter.notifyDataSetChanged();
+
+
+        super.onActivityResult(requestCode,resultCode,data);
+
+    }
+
+    //Updates a specific course at "position"
+    public void updateCourse(Course updatedCourse, int position) {
+
+        //Overwrite its assignments
+        mCourseArrayList.get(position).setAssignments(updatedCourse.getAssignments());
+    }
+    @Override
+    protected void onDestroy(){
+        save();
+
+        super.onPause();
+
+    }
+
+    public void save() {
+        //Store Data into InternalStorage
+        try {
+            FileOutputStream fos = getApplicationContext().openFileOutput("data", MODE_PRIVATE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(mCourseArrayList);
+            oos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void restore(){
+        //Restore data
+
+        try {
+            FileInputStream fis = getApplicationContext().openFileInput("data");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            ArrayList<Course> newArraylist = (ArrayList<Course>) ois.readObject();
+
+            //clear current arraylist to avoid double input
+            mCourseArrayList.clear();
+
+            //add each stored course item
+            for(Iterator<Course> it = newArraylist.iterator();it.hasNext();){
+                mCourseArrayList.add(it.next());
+            }
+
+            mCourseAdapter.notifyDataSetChanged();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setClickListener(){
+        //Listview onlclick and open Assignments-Activity
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Create new Intent
+                Intent intent = new Intent();
+                intent.setClass(getApplicationContext(), AssignmentsActivity.class);
+
+                //add  course
+                intent.putExtra(COURSE_TAG, mCourseArrayList.get(position));
+
+                //add course position to update assignments when result comes back
+                intent.putExtra(COURSE_TAG_POSITION, position);
+
+                startActivityForResult(intent, 0);
+
+            }
+        });
+
+
+        //On LONG click:
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                                           final int position, long id) {
+                //Open Alert dialog to delete item
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+
+                //Set title and message
+                alert.setTitle("Delete");
+                alert.setMessage("Do you want to delete " + mCourseArrayList.get(position).getCourseName()+ "?");
+
+                                alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        //Delete course and notify
+                        Toast.makeText(getApplicationContext(),mCourseArrayList.get(position).getCourseName()+ " deleted",Toast.LENGTH_LONG).show();
+                        mCourseArrayList.remove(position);
+
+                        //Update list
+                        mCourseAdapter.notifyDataSetChanged();
+                    }
+                });
+
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Canceled.
+                    }
+                });
+
+                alert.show();
+
+
+
+                return true;
+            }
+        });
+
+
     }
 }
