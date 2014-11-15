@@ -1,4 +1,4 @@
-package com.tak3r07.uebungspunkteuebersicht;
+package com.tak3r07.unihelper;
 
 import android.app.Activity;
 import android.app.AlertDialog;

@@ -1,11 +1,10 @@
-package com.tak3r07.uebungspunkteuebersicht;
+package com.tak3r07.unihelper;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.widget.Toast;
 
 /**
  * Created by tak3r07 on 11/11/14.

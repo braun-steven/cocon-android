@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tak3r07.uebungspunkteuebersicht" >
+    package="com.tak3r07.unihelper" >
 
     <application
         android:allowBackup="true"
@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.tak3r07.uebungspunkteuebersicht.MainActivity"
+            android:name="com.tak3r07.unihelper.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,9 +17,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.tak3r07.uebungspunkteuebersicht.AssignmentsActivity"
+            android:name="com.tak3r07.unihelper.AssignmentsActivity"
             android:label="@string/title_activity_course"
-            android:parentActivityName="com.tak3r07.uebungspunkteuebersicht.MainActivity" >
+            android:parentActivityName="com.tak3r07.unihelper.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tak3r07.uebungspunkteuebersicht.MainActivity" />

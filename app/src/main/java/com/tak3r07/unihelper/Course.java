@@ -1,10 +1,6 @@
-package com.tak3r07.uebungspunkteuebersicht;
-
-import android.util.Log;
-import android.widget.Toast;
+package com.tak3r07.unihelper;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 

@@ -1,4 +1,4 @@
-package com.tak3r07.uebungspunkteuebersicht;
+package com.tak3r07.unihelper;
 
 import java.io.Serializable;
 
