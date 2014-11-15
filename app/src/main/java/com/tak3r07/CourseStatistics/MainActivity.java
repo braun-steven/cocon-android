@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.tak3r07.unihelper.R;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -225,7 +227,7 @@ public class MainActivity extends Activity {
             for(Iterator<Course> it = newArraylist.iterator();it.hasNext();){
                 mCourseArrayList.add(it.next());
             }
-
+            ois.close();
             mCourseAdapter.notifyDataSetChanged();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -301,7 +303,7 @@ public class MainActivity extends Activity {
 
     }
 
-    public void onClickRestore(MenuItem item){
+    public void onClickMenuRestore(MenuItem item){
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
         alert.setTitle("Restore");
@@ -310,7 +312,40 @@ public class MainActivity extends Activity {
 
         alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
+                //check if external storage is readable
+                if (isExternalStorageReadable()){
+                    File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files");
+                    try {
+                        FileInputStream fis = new FileInputStream(myFilesDir.getPath() + "/data.backup");
+                        ObjectInputStream ois = new ObjectInputStream(fis);
 
+                        //New Arraylist
+                        ArrayList<Course> newArraylist = (ArrayList<Course>) ois.readObject();
+
+                        //clear current arraylist to avoid double input
+                        mCourseArrayList.clear();
+
+                        //add each stored course item
+                        for(Iterator<Course> it = newArraylist.iterator();it.hasNext();){
+                            mCourseArrayList.add(it.next());
+                        }
+                        ois.close();
+
+                        //Notify course adapter
+                        mCourseAdapter.notifyDataSetChanged();
+
+                        //Notify user about completed restore
+                        Toast.makeText(getApplicationContext(), "Restore complete", Toast.LENGTH_LONG).show();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (StreamCorruptedException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
 
             }
         });
@@ -324,7 +359,8 @@ public class MainActivity extends Activity {
         alert.show();
     }
 
-    public void onClickBackup(MenuItem item){
+    //Restore Button in Menu
+    public void onClickMenuBackup(MenuItem item){
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
         alert.setTitle("Backup");
@@ -334,6 +370,27 @@ public class MainActivity extends Activity {
         alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
+                //Check for RW permissions
+                if (isExternalStorageWritable()){
+                    File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files");
+                    myFilesDir.mkdirs();
+
+                    //Write Course-Array-List to storage
+                    try {
+                        FileOutputStream fos = new FileOutputStream(myFilesDir.getPath() + "/data.backup");
+                        ObjectOutputStream oos = new ObjectOutputStream(fos);
+                        oos.writeObject(mCourseArrayList);
+                        oos.close();
+
+                        //Notify user about completed backup
+                        Toast.makeText(getApplicationContext(), "Backup complete", Toast.LENGTH_LONG).show();
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
             }
         });
@@ -345,5 +402,24 @@ public class MainActivity extends Activity {
         });
 
         alert.show();
+    }
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
     }
 }
