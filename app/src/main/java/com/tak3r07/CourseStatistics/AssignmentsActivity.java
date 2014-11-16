@@ -163,6 +163,7 @@ public class AssignmentsActivity extends Activity {
 
     public void onBackPressed(){
 
+
         Intent data = new Intent();
         data.putExtra(COURSE_TAG_POSITION,coursePositionInArray);
         data.putExtra(COURSE_TAG, course);
