@@ -90,7 +90,7 @@ public class Course implements Serializable{
 
         //Round on 4 digits
 
-        double endPercentage = Math.round(overAllAchievedPoints/(reachablePointsPerAssignment*numberOfAssignments));
+        double endPercentage = Math.round(overAllAchievedPoints/(reachablePointsPerAssignment*numberOfAssignments)*1000)/10d;
 
         //return result
         return endPercentage;
