@@ -27,21 +27,5 @@
         android:layout_alignTop="@+id/textView"
         android:layout_toEndOf="@+id/textView" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/textView"
-        android:layout_alignRight="@+id/textView"
-        android:layout_below="@+id/textView"
-        android:text="@string/max_points_text"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <EditText
-        android:id="@+id/editText_maxPoints"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/textView2"
-        android:layout_toEndOf="@+id/textView"
-        android:layout_toRightOf="@+id/textView" />
 </RelativeLayout>

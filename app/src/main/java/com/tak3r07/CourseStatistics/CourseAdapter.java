@@ -47,11 +47,6 @@ public class CourseAdapter extends BaseAdapter implements View.OnClickListener {
         return 0;
     }
 
-    public static class ViewHolder {
-        public TextView first;
-        public TextView second;
-        public ImageView image;
-    }
 
     public View getView(int position, View convertView, ViewGroup parent) {
         if (getCount()<=0) return null;
@@ -61,6 +56,7 @@ public class CourseAdapter extends BaseAdapter implements View.OnClickListener {
         TextView mTextViewFirst = (TextView) rowView.findViewById(R.id.course_firstLine);
         TextView mTextViewSecond = (TextView) rowView.findViewById(R.id.course_secondLine);
         ImageView mImageView = (ImageView) rowView.findViewById(R.id.icon);
+        TextView mEndPercentageTextView = (TextView) rowView.findViewById(R.id.end_percentage_textview);
 
 
         //Set Icon
@@ -68,7 +64,8 @@ public class CourseAdapter extends BaseAdapter implements View.OnClickListener {
         mImageView.setImageResource(getLetterIconId(firstChar));
         //Set text
         mTextViewFirst.setText(courses.get(position).getCourseName());
-        mTextViewSecond.setText(courses.get(position).getOverAllPercentage().toString() + " %");
+        mTextViewSecond.setText("Total: " + courses.get(position).getOverAllPercentage().toString() + " %");
+        mEndPercentageTextView.setText(courses.get(position).getEndPercentage().toString() + " %");
 
         return rowView;
     }

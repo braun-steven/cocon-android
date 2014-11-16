@@ -14,5 +14,7 @@
     <string name="max_points_text">Max. points:</string>
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
+    <string name="course_name_textview">Name:</string>
+    <string name="max_points_textview">Max. points \nper Assignment:</string>
 
 </resources>

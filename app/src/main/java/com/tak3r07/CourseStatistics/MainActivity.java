@@ -2,10 +2,12 @@ package com.tak3r07.CourseStatistics;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -88,9 +90,11 @@ public class MainActivity extends Activity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
+        /* Uncomment to add Settings
         if (id == R.id.action_settings) {
             return true;
         }
+        */
 
         return super.onOptionsItemSelected(item);
     }
@@ -99,16 +103,35 @@ public class MainActivity extends Activity {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
         alert.setTitle("New course");
-        alert.setMessage("Enter course name");
+        alert.setMessage("Enter course name & Max. points per Assignment");
 
-        // Set an EditText view to get user input
-        final EditText input = new EditText(this);
-        alert.setView(input);
+        //Set dialog_add_course layout
+        final LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View view = View.inflate(this, R.layout.dialog_add_course, null);
+        alert.setView(view);
 
+        //Add Course Operation
         alert.setPositiveButton("Add", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                String value = input.getText().toString();
-                addCourse(value);
+                //Get views
+                EditText mCourseNameEditText = (EditText) view.findViewById(R.id.course_name_edittext);
+                EditText mReachablePointsEditText = (EditText) view.findViewById(R.id.max_reachable_points_edittext);
+
+                //Get values
+                String courseName = mCourseNameEditText.getText().toString();
+                String reachablePointsString = mReachablePointsEditText.getText().toString().replace(',','.');
+
+                //Convert
+                if (AssignmentsActivity.isNumeric(reachablePointsString)) {
+                    Double reachablePoints = Double.parseDouble(reachablePointsString);
+
+                    addCourse(courseName, reachablePoints);
+
+                } else {
+                    //If data was not numeric
+                    Toast.makeText(getApplicationContext(), "Invalid values", Toast.LENGTH_LONG).show();
+
+                }
 
             }
         });
@@ -123,7 +146,7 @@ public class MainActivity extends Activity {
     }
 
     //Adds a new course to the mCourseArrayList
-    public void addCourse(String title) {
+    public void addCourse(String title, Double reachablePointsPerAssignment) {
         //Check if string is empty
         if (!title.isEmpty()) {
 
@@ -143,6 +166,7 @@ public class MainActivity extends Activity {
             } else {
                 //Add course
                 Course course = new Course(title);
+                course.setReachablePointsPerAssignment(reachablePointsPerAssignment);
                 mCourseAdapter.addCourse(course);
                 Toast.makeText(getApplicationContext(), "Course: " + title + " has been added", Toast.LENGTH_SHORT).show();
             }

@@ -106,17 +106,14 @@ public class AssignmentsActivity extends Activity {
             public void onClick(DialogInterface dialog, int whichButton) {
                 //Get EditText views
                 EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
-                EditText mEditTextMaxPoints = (EditText) view.findViewById(R.id.editText_maxPoints);
 
                 //Get data from edittext
                 String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',','.');
-                String maxPointsString = mEditTextMaxPoints.getText().toString().replace(',','.');
 
                 //Check if the entered Values are numeric (doubles)
-                if (isNumeric(achievedPointsString) && isNumeric(maxPointsString)) {
+                if (isNumeric(achievedPointsString)) {
 
                     Double achievedPoints = Double.parseDouble(achievedPointsString);
-                    Double maxPoints = Double.parseDouble(maxPointsString);
 
 
                     // Index is arraylist size + 1 (so another item is added)
@@ -124,7 +121,7 @@ public class AssignmentsActivity extends Activity {
 
 
                     //Create new assignment from pulled data
-                    Assignment newAssignment = new Assignment(index, maxPoints, achievedPoints);
+                    Assignment newAssignment = new Assignment(index, course.getReachablePointsPerAssignment(), achievedPoints);
 
                     //add new assignment
                     addAssignment(newAssignment);

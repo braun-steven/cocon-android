@@ -8,16 +8,34 @@ import java.util.Iterator;
  * Created by tak3r07 on 11/9/14.
  */
 public class Course implements Serializable{
-
-    public Course(String courseName) {
-        setCourseName(courseName);
-    }
-
     //Coursename
     private String courseName;
 
     //List of the course assignments
     private ArrayList<Assignment> mAssignmentArrayList = new ArrayList<Assignment>();
+
+
+
+    //Number of how many assignments there are
+    private int numberOfAssignments;
+    private Double reachablePointsPerAssignment;
+
+
+    public Course(String courseName) {
+
+        //Sets course name
+        setCourseName(courseName);
+
+        //usually 13 assignments in one semester
+        numberOfAssignments = 13;
+
+        //Set reachablePointsPerAssignment
+        reachablePointsPerAssignment = 100d;
+
+    }
+
+
+
 
 
     //Constructor
@@ -35,7 +53,7 @@ public class Course implements Serializable{
         mAssignmentArrayList.add(assignment);
     }
 
-    //Calculate overall percentage
+    //Calculate overall percentage of current assignments
     public Double getOverAllPercentage() {
         double overAllAchievedPoints = 0;
         double overAllMaxPoints = 0;
@@ -58,6 +76,26 @@ public class Course implements Serializable{
 
     }
 
+    //calculate endpercentage: (all points of current assignments) / ((max number of point per assignment) * (number of assignments))
+    public Double getEndPercentage() {
+        double overAllAchievedPoints = 0;
+
+        //Iterate on the array and sum up all its max and achieved points
+        Assignment currentAssignment;
+        for (Iterator<Assignment> iterator = mAssignmentArrayList.iterator(); iterator.hasNext(); ) {
+
+            overAllAchievedPoints += iterator.next().getAchievedPoints();
+
+        }
+
+        //Round on 4 digits
+
+        double endPercentage = Math.round(overAllAchievedPoints/(reachablePointsPerAssignment*numberOfAssignments));
+
+        //return result
+        return endPercentage;
+    }
+
 
      public String getCourseName() {
         return courseName;
@@ -71,4 +109,22 @@ public class Course implements Serializable{
     public void setAssignments(ArrayList<Assignment> newAssignments){
         mAssignmentArrayList = newAssignments;
     }
+
+    public int getNumberOfAssignments() {
+        return numberOfAssignments;
+    }
+
+    public void setNumberOfAssignments(int numberOfAssignments) {
+        this.numberOfAssignments = numberOfAssignments;
+    }
+
+    public Double getReachablePointsPerAssignment() {
+        return reachablePointsPerAssignment;
+    }
+
+    public void setReachablePointsPerAssignment(Double reachablePointsPerAssignment) {
+        this.reachablePointsPerAssignment = reachablePointsPerAssignment;
+    }
+
+
 }
