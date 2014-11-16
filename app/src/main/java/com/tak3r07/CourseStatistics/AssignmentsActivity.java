@@ -109,8 +109,8 @@ public class AssignmentsActivity extends Activity {
                 EditText mEditTextMaxPoints = (EditText) view.findViewById(R.id.editText_maxPoints);
 
                 //Get data from edittext
-                String achievedPointsString = mEditTextAchievedPoints.getText().toString();
-                String maxPointsString = mEditTextMaxPoints.getText().toString();
+                String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',','.');
+                String maxPointsString = mEditTextMaxPoints.getText().toString().replace(',','.');
 
                 //Check if the entered Values are numeric (doubles)
                 if (isNumeric(achievedPointsString) && isNumeric(maxPointsString)) {
@@ -154,8 +154,7 @@ public class AssignmentsActivity extends Activity {
     //Checks if a string is Numeric (Source: http://goo.gl/mGQ3Sp)
     public static boolean isNumeric(String str) {
         try {
-            String newstr = str.replace(',','.');
-            double d = Double.parseDouble(newstr);
+            double d = Double.parseDouble(str);
         } catch (NumberFormatException nfe) {
             return false;
         }
