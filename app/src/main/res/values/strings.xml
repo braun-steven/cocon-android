@@ -16,5 +16,7 @@
     <string name="restore">Restore</string>
     <string name="course_name_textview">Name:</string>
     <string name="max_points_textview">Max. points \nper Assignment:</string>
+    <string name="edit_course_text">Edit course</string>
+    <string name="title_activity_edit_course">Edit Course</string>
 
 </resources>

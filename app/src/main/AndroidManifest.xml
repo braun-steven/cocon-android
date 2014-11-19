@@ -26,6 +26,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tak3r07.uebungspunkteuebersicht.MainActivity" />
         </activity>
+
+        <activity
+            android:name="com.tak3r07.CourseStatistics.EditCourseActivity"
+            android:label="@string/title_activity_edit_course"
+            android:parentActivityName="com.tak3r07.CourseStatistics.AssignmentsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.tak3r07.CourseStatistics.AssignmentsActivity" />
+        </activity>
     </application>
 
 </manifest>

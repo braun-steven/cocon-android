@@ -9,6 +9,14 @@
         android:showAsAction="never"
         android:title="@string/action_settings" />
     -->
+
+    <item
+        android:id="@+id/edit_course"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/edit_course_text"
+        android:onClick="onEditCourseClick"/>
+
     <item
         android:id="@+id/action_add_assignment"
         android:onClick="onClickAddAssignment"

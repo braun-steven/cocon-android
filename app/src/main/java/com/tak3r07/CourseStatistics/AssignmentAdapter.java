@@ -11,12 +11,15 @@ import android.widget.TextView;
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by tak3r07 on 11/10/14.
  */
 public class AssignmentAdapter extends BaseAdapter implements View.OnClickListener {
     private final Context context;
+
+
     private final ArrayList<Assignment> assignments;
 
     private LayoutInflater inflater;
@@ -83,5 +86,18 @@ public class AssignmentAdapter extends BaseAdapter implements View.OnClickListen
         }
     }
 
+    public ArrayList<Assignment> getAssignments() {
+        return assignments;
+    }
+
+
+    public void setAssignments(ArrayList<Assignment> newAssignmentsArrayList){
+        assignments.clear();
+
+        //update assignments array list
+        for (Iterator<Assignment> it = newAssignmentsArrayList.iterator(); it.hasNext();){
+            assignments.add(it.next());
+        }
+    }
 
 }

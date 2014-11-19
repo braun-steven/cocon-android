@@ -1,6 +1,7 @@
 package com.tak3r07.CourseStatistics;
 
 import java.io.Serializable;
+import java.util.Iterator;
 
 /**
  * Created by tak3r07 on 11/9/14.
@@ -48,7 +49,7 @@ public class Assignment implements Serializable {
 
     public void setMaxPoints(double maxPoints) {
         this.maxPoints = maxPoints;
-    }
+        }
 
     public double getAchievedPoints() {
         return achievedPoints;

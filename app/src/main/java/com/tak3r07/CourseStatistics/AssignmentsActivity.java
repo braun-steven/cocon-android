@@ -17,7 +17,15 @@ import android.widget.Toast;
 
 import com.tak3r07.unihelper.R;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 public class AssignmentsActivity extends Activity {
@@ -25,7 +33,7 @@ public class AssignmentsActivity extends Activity {
 
     private final String COURSE_TAG = "COURSE_TAG";
     private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";
-    private final String ARRAYLIST_SIZE = "ARRAYLIST_SIZE";
+    private final String ASSIGNMENTS_ARRAYLIST_TAG = "ASSIGNMENTS_ARRAYLIST_TAG";
 
 
     private AssignmentAdapter mAssignmentAdapter;
@@ -39,6 +47,7 @@ public class AssignmentsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course);
 
+
         //Get intent and implement received data
         Intent intent = getIntent();
         course = (Course) intent.getExtras().getSerializable(COURSE_TAG);
@@ -48,6 +57,16 @@ public class AssignmentsActivity extends Activity {
 
         //update assignments to be shown from the intents course
         mAssignmentArrayList = course.getAssignments();
+
+        if (savedInstanceState != null) {
+
+            //Get back Assignment-Arraylist from savedInstanceState
+            mAssignmentArrayList = (ArrayList<Assignment>) savedInstanceState.getSerializable(ASSIGNMENTS_ARRAYLIST_TAG);
+
+            //Get back Course
+            course = (Course) savedInstanceState.getSerializable(COURSE_TAG);
+
+        }
 
         //Set activity title
         this.setTitle(course.getCourseName());
@@ -79,13 +98,11 @@ public class AssignmentsActivity extends Activity {
         int id = item.getItemId();
 
         switch (id) {
-            case android.R.id.home:
-            {
+            case android.R.id.home: {
                 onBackPressed();
                 return true;
             }
         }
-
 
 
         return super.onOptionsItemSelected(item);
@@ -108,7 +125,7 @@ public class AssignmentsActivity extends Activity {
                 EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
 
                 //Get data from edittext
-                String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',','.');
+                String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',', '.');
 
                 //Check if the entered Values are numeric (doubles)
                 if (isNumeric(achievedPointsString)) {
@@ -158,17 +175,17 @@ public class AssignmentsActivity extends Activity {
         return true;
     }
 
-    public void onBackPressed(){
+    public void onBackPressed() {
 
 
         Intent data = new Intent();
-        data.putExtra(COURSE_TAG_POSITION,coursePositionInArray);
+        data.putExtra(COURSE_TAG_POSITION, coursePositionInArray);
         data.putExtra(COURSE_TAG, course);
-        setResult(RESULT_OK,data);
+        setResult(RESULT_OK, data);
         finish();
     }
 
-    public void setClickListener(){
+    public void setClickListener() {
         //Set click listener for Listview
 
         //On LONG click:
@@ -182,12 +199,12 @@ public class AssignmentsActivity extends Activity {
 
                 //Set title and message
                 alert.setTitle("Delete");
-                alert.setMessage("Do you want to delete Assignment Nr." + mAssignmentArrayList.get(position).getIndex()+ "?");
+                alert.setMessage("Do you want to delete Assignment Nr." + mAssignmentArrayList.get(position).getIndex() + "?");
 
                 alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         //Delete course and notify
-                        Toast.makeText(getApplicationContext(),mAssignmentArrayList.get(position).getIndex() + " deleted",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), mAssignmentArrayList.get(position).getIndex() + " deleted", Toast.LENGTH_LONG).show();
                         mAssignmentArrayList.remove(position);
 
                         //Update list
@@ -204,10 +221,94 @@ public class AssignmentsActivity extends Activity {
                 alert.show();
 
 
-
                 return true;
             }
         });
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current state
+        // Save array list
+        savedInstanceState.putSerializable(ASSIGNMENTS_ARRAYLIST_TAG, mAssignmentArrayList);
+        savedInstanceState.putSerializable(COURSE_TAG, course);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    public void onEditCourseClick(MenuItem item) {
+        //Put data into intent
+        Intent intent = new Intent();
+        intent.setClass(getApplicationContext(), EditCourseActivity.class);
+
+        //Add Course
+        intent.putExtra(COURSE_TAG, course);
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+
+
+            //Restore Course with new Settings
+            course = (Course) data.getExtras().getSerializable(COURSE_TAG);
+
+            //Set new Title
+
+            setTitle(course.getCourseName());
+
+            //Set new assignments for data update
+            mAssignmentAdapter.setAssignments(course.getAssignments());
+
+            //Notify adapter for changes
+            mAssignmentAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void save() {
+        //Store Data into InternalStorage
+        try {
+            FileOutputStream fos = getApplicationContext().openFileOutput("data", MODE_PRIVATE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(mCourseArrayList);
+            oos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void restore(){
+        //Restore data
+
+        try {
+            FileInputStream fis = getApplicationContext().openFileInput("data");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            ArrayList<Course> newArraylist = (ArrayList<Course>) ois.readObject();
+
+            //clear current arraylist to avoid double input
+            mCourseArrayList.clear();
+
+            //add each stored course item
+            for(Iterator<Course> it = newArraylist.iterator();it.hasNext();){
+                mCourseArrayList.add(it.next());
+            }
+            ois.close();
+            mCourseAdapter.notifyDataSetChanged();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -124,7 +124,25 @@ public class Course implements Serializable{
 
     public void setReachablePointsPerAssignment(Double reachablePointsPerAssignment) {
         this.reachablePointsPerAssignment = reachablePointsPerAssignment;
+
+        //Set in each Assignment
+        for (Iterator<Assignment> it = mAssignmentArrayList.iterator();it.hasNext();){
+            it.next().setMaxPoints(reachablePointsPerAssignment);
+        }
     }
 
+    //Simple Clone code (deep copy)
+    public Course clone(){
+        Course clone = new Course(courseName);
+        clone.setReachablePointsPerAssignment(reachablePointsPerAssignment);
+        clone.setNumberOfAssignments(numberOfAssignments);
+
+        ArrayList<Assignment> cloneList = new ArrayList<Assignment>();
+        for(Assignment a : mAssignmentArrayList){
+            cloneList.add(a);
+        }
+
+        return clone;
+    }
 
 }
