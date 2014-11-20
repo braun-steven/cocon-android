@@ -15,7 +15,6 @@
         android:id="@+id/editText_achievedPoints"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="number"
         android:singleLine="true"/>
 </LinearLayout>
 
