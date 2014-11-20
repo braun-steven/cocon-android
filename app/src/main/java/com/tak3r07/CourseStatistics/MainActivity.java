@@ -68,8 +68,11 @@ public class MainActivity extends Activity {
         //Set onClick and onLongClick
         setClickListener();
 
-        //If activity is freshly started (SavedInstanceState = null): restore data from storage
-        if (savedInstanceState == null) restore();
+        //If activity is freshly started (SavedInstanceState == null): restore data from storage
+        if (savedInstanceState == null) {
+            restore();
+            mCourseAdapter.notifyDataSetChanged();
+        }
 
 
     }
@@ -168,6 +171,10 @@ public class MainActivity extends Activity {
                 Course course = new Course(title);
                 course.setReachablePointsPerAssignment(reachablePointsPerAssignment);
                 mCourseAdapter.addCourse(course);
+
+                //save in data
+                save();
+
                 Toast.makeText(getApplicationContext(), "Course: " + title + " has been added", Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -190,33 +197,25 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-
-        //Get course and old course position
-        Course course = (Course) data.getExtras().getSerializable(COURSE_TAG);
-        int oldCoursePosition = data.getExtras().getInt(COURSE_TAG_POSITION);
-
-        //update the course at its old position
-        updateCourse(course, oldCoursePosition);
-
-        //Update adapter data
-        mCourseAdapter.notifyDataSetChanged();
+        if(resultCode == RESULT_OK) {
 
 
-        super.onActivityResult(requestCode,resultCode,data);
+            //Update courselist from database
+            restore();
 
+            //Update adapter data
+            mCourseAdapter.notifyDataSetChanged();
+
+
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
-    //Updates a specific course at "position"
-    public void updateCourse(Course updatedCourse, int position) {
-
-        //Overwrite its assignments
-        mCourseArrayList.get(position).setAssignments(updatedCourse.getAssignments());
-    }
     @Override
     protected void onDestroy(){
         save();
 
-        super.onPause();
+        super.onDestroy();
 
     }
 
@@ -245,14 +244,19 @@ public class MainActivity extends Activity {
             ArrayList<Course> newArraylist = (ArrayList<Course>) ois.readObject();
 
             //clear current arraylist to avoid double input
-            mCourseArrayList.clear();
+            if (mCourseArrayList != null) {
+                mCourseArrayList.clear();
+            } else{
+                //if null -> create new
+                mCourseArrayList = new ArrayList<Course>();
+            }
 
             //add each stored course item
             for(Iterator<Course> it = newArraylist.iterator();it.hasNext();){
                 mCourseArrayList.add(it.next());
             }
             ois.close();
-            mCourseAdapter.notifyDataSetChanged();
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (StreamCorruptedException e) {

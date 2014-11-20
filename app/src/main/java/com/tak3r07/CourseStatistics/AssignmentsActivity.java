@@ -33,7 +33,7 @@ public class AssignmentsActivity extends Activity {
 
     private final String COURSE_TAG = "COURSE_TAG";
     private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";
-    private final String ASSIGNMENTS_ARRAYLIST_TAG = "ASSIGNMENTS_ARRAYLIST_TAG";
+    private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
 
 
     private AssignmentAdapter mAssignmentAdapter;
@@ -41,6 +41,7 @@ public class AssignmentsActivity extends Activity {
     private ListView mListView;
     private int coursePositionInArray;
     private Course course;
+    private ArrayList<Course> mCourseArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,25 +49,29 @@ public class AssignmentsActivity extends Activity {
         setContentView(R.layout.activity_course);
 
 
+        if (savedInstanceState != null) {
+
+            //Get back Course-Arraylist from savedInstanceState
+            mCourseArrayList = (ArrayList<Course>) savedInstanceState.getSerializable(COURSE_ARRAY_LIST);
+
+        } else {
+            //Restore from data
+            restore();
+        }
+
+
         //Get intent and implement received data
         Intent intent = getIntent();
-        course = (Course) intent.getExtras().getSerializable(COURSE_TAG);
 
         //position of the course which was opened
         coursePositionInArray = intent.getExtras().getInt(COURSE_TAG_POSITION);
 
+        //Set current course
+        course = mCourseArrayList.get(coursePositionInArray);
+
         //update assignments to be shown from the intents course
         mAssignmentArrayList = course.getAssignments();
 
-        if (savedInstanceState != null) {
-
-            //Get back Assignment-Arraylist from savedInstanceState
-            mAssignmentArrayList = (ArrayList<Assignment>) savedInstanceState.getSerializable(ASSIGNMENTS_ARRAYLIST_TAG);
-
-            //Get back Course
-            course = (Course) savedInstanceState.getSerializable(COURSE_TAG);
-
-        }
 
         //Set activity title
         this.setTitle(course.getCourseName());
@@ -159,6 +164,7 @@ public class AssignmentsActivity extends Activity {
         alert.show();
     }
 
+    //Add assignment to adapter (Eventually add to course necessary?)
     public void addAssignment(Assignment assignment) {
         mAssignmentAdapter.addAssignment(assignment);
         Toast.makeText(getApplicationContext(), "New assignment added", Toast.LENGTH_SHORT).show();
@@ -177,10 +183,11 @@ public class AssignmentsActivity extends Activity {
 
     public void onBackPressed() {
 
+        //Save data
+        save();
 
+        //Set result and finish
         Intent data = new Intent();
-        data.putExtra(COURSE_TAG_POSITION, coursePositionInArray);
-        data.putExtra(COURSE_TAG, course);
         setResult(RESULT_OK, data);
         finish();
     }
@@ -231,8 +238,8 @@ public class AssignmentsActivity extends Activity {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save the user's current state
         // Save array list
-        savedInstanceState.putSerializable(ASSIGNMENTS_ARRAYLIST_TAG, mAssignmentArrayList);
-        savedInstanceState.putSerializable(COURSE_TAG, course);
+        savedInstanceState.putSerializable(COURSE_ARRAY_LIST, mCourseArrayList);
+
 
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
@@ -243,8 +250,8 @@ public class AssignmentsActivity extends Activity {
         Intent intent = new Intent();
         intent.setClass(getApplicationContext(), EditCourseActivity.class);
 
-        //Add Course
-        intent.putExtra(COURSE_TAG, course);
+        //Add Course-Number
+        intent.putExtra(COURSE_TAG_POSITION, coursePositionInArray);
         startActivityForResult(intent, 0);
     }
 
@@ -253,8 +260,9 @@ public class AssignmentsActivity extends Activity {
         if (resultCode == RESULT_OK) {
 
 
-            //Restore Course with new Settings
-            course = (Course) data.getExtras().getSerializable(COURSE_TAG);
+            //Restore data from saved data
+            restore();
+            course = mCourseArrayList.get(coursePositionInArray);
 
             //Set new Title
 
@@ -283,8 +291,7 @@ public class AssignmentsActivity extends Activity {
     }
 
 
-
-    public void restore(){
+    public void restore() {
         //Restore data
 
         try {
@@ -293,14 +300,18 @@ public class AssignmentsActivity extends Activity {
             ArrayList<Course> newArraylist = (ArrayList<Course>) ois.readObject();
 
             //clear current arraylist to avoid double input
-            mCourseArrayList.clear();
+            if (mCourseArrayList != null) {
+                mCourseArrayList.clear();
+            } else{
+                //if null -> create new
+                mCourseArrayList = new ArrayList<Course>();
+            }
+                //add each stored course item
+                for (Iterator<Course> it = newArraylist.iterator(); it.hasNext(); ) {
+                    mCourseArrayList.add(it.next());
 
-            //add each stored course item
-            for(Iterator<Course> it = newArraylist.iterator();it.hasNext();){
-                mCourseArrayList.add(it.next());
             }
             ois.close();
-            mCourseAdapter.notifyDataSetChanged();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (StreamCorruptedException e) {
@@ -310,5 +321,10 @@ public class AssignmentsActivity extends Activity {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public void onPause() {
+        save();
+        super.onPause();
     }
 }

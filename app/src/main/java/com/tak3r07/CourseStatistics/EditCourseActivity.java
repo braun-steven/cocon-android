@@ -24,13 +24,16 @@ import java.util.Iterator;
 public class EditCourseActivity extends Activity {
 
     private final String COURSE_TAG = "COURSE_TAG";
+    private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";
 
     private Course course;
-
-
+    private ArrayList<Course> mCourseArrayList = new ArrayList<Course>();
+    private int coursePositionInArray;
     private EditText mNameEditText;
     private EditText mNumberEditText;
     private EditText mMaxPointsEditText;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +42,13 @@ public class EditCourseActivity extends Activity {
 
         //Get intent data
         Intent intent = getIntent();
-        course = (Course) intent.getExtras().getSerializable(COURSE_TAG);
+        coursePositionInArray = intent.getExtras().getInt(COURSE_TAG_POSITION);
+
+        //restore from data
+        restore();
+
+        //get course in array
+        course = mCourseArrayList.get(coursePositionInArray);
 
         //Get View-References
         mNameEditText = (EditText) findViewById(R.id.course_editname_edittext);
@@ -70,6 +79,12 @@ public class EditCourseActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        switch (id) {
+            case android.R.id.home: {
+                onBackPressed();
+                return true;
+            }
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -80,9 +95,12 @@ public class EditCourseActivity extends Activity {
         course.setNumberOfAssignments(Integer.parseInt(mNumberEditText.getText().toString()));
         course.setReachablePointsPerAssignment(Double.parseDouble(mMaxPointsEditText.getText().toString()));
 
-        //Store Course in Intent
+        //Create empty intent
         Intent data = new Intent();
-        data.putExtra(COURSE_TAG, course);
+
+        //Store data
+        save();
+
         setResult(RESULT_OK, data);
         finish();
     }
@@ -117,14 +135,18 @@ public class EditCourseActivity extends Activity {
             ArrayList<Course> newArraylist = (ArrayList<Course>) ois.readObject();
 
             //clear current arraylist to avoid double input
-            mCourseArrayList.clear();
+            if (mCourseArrayList != null) {
+                mCourseArrayList.clear();
+            } else{
+                //if null -> create new
+                mCourseArrayList = new ArrayList<Course>();
+            }
 
             //add each stored course item
             for(Iterator<Course> it = newArraylist.iterator();it.hasNext();){
                 mCourseArrayList.add(it.next());
             }
             ois.close();
-            mCourseAdapter.notifyDataSetChanged();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (StreamCorruptedException e) {
