@@ -8,6 +8,8 @@ import java.util.Iterator;
  * Created by tak3r07 on 11/9/14.
  */
 public class Course implements Serializable{
+    static final long serialVersionUID =2099962292244075360L;
+
     //Coursename
     private String courseName;
 

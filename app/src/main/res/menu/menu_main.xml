@@ -1,10 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity">
+    xmlns:tools="http://schemas.android.com/apk/res-auto"
+    xmlns:myapp="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_add_course"
         android:onClick="onClickAddCourse"
-        android:showAsAction="always"
+        tools:showAsAction="always"
         android:title="@string/button_add_text" />
     <!--
     <item
@@ -15,12 +15,12 @@
     -->
     <item android:id="@+id/backup"
         android:orderInCategory="98"
-        android:showAsAction="never"
+        tools:showAsAction="never"
         android:title="@string/backup"
         android:onClick="onClickMenuBackup"/>
     <item android:id="@+id/restore"
         android:orderInCategory="99"
-        android:showAsAction="never"
+        tools:showAsAction="never"
         android:title="@string/restore"
         android:onClick="onClickMenuRestore"/>
 </menu>

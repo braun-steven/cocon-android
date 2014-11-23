@@ -18,5 +18,6 @@
     <string name="max_points_textview">Max. points \nper Assignment:</string>
     <string name="edit_course_text">Edit course</string>
     <string name="title_activity_edit_course">Edit Course</string>
+    <string name="text_extra_assignment_checkbox">This is an extra Assignment</string>
 
 </resources>

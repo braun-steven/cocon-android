@@ -8,7 +8,8 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_gravity="top"
-        card_view:cardElevation="4dp"
+        android:elevation="2dp"
+        card_view:cardElevation="1dp"
         card_view:cardCornerRadius="1dp"
         >
 

@@ -6,11 +6,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 
-public class AssignmentsActivity extends Activity {
+public class AssignmentsActivity extends ActionBarActivity {
 
 
     private final String COURSE_TAG = "COURSE_TAG";
@@ -144,6 +146,12 @@ public class AssignmentsActivity extends Activity {
 
                     //Create new assignment from pulled data
                     Assignment newAssignment = new Assignment(index, course.getReachablePointsPerAssignment(), achievedPoints);
+
+                    //Check if this is an extra assignment
+                    CheckBox mCheckBox = (CheckBox)view.findViewById(R.id.checkBox_extra_assignment);
+                    if(mCheckBox.isChecked()){
+                        newAssignment.setExtraAssignment(true);
+                    }
 
                     //add new assignment
                     addAssignment(newAssignment);

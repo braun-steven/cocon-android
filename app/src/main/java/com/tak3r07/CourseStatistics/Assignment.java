@@ -9,15 +9,21 @@ import java.util.Iterator;
 public class Assignment implements Serializable {
 
     String TAG = "UEBUNGSPUNKTE-Log";
+    static final long serialVersionUID = 62872256170663659L;
 
     //Index of the Assignment
-    int index;
+    private int index;
 
     // Maximal reachable points of this assignment
-    double maxPoints;
+    private double maxPoints;
 
     //Achieved number of points of this assignment
-    double achievedPoints;
+    private double achievedPoints;
+
+
+
+    //Boolean whether this is an extra-assignment or not
+    private boolean isExtraAssignment = false;
 
     //Constructor
     public Assignment(int index, double maxPoints, double achievedPoints) {
@@ -28,17 +34,16 @@ public class Assignment implements Serializable {
 
     //Calculates and return the achieved percentage of max points of this assignment
     public Double getPercentage() {
-        try {
-            //Round on 4 digits
-            Double percentage = Math.round(achievedPoints / maxPoints * 1000) / 10d;
-
+        Double percentage = 0d;
+        //Round on 4 digits
+        if (maxPoints != 0) {
+            percentage = Math.round(achievedPoints / maxPoints * 1000) / 10d;
+        } else {
             return percentage;
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return 0.;
         }
+
+        return percentage;
+
 
     }
 
@@ -49,7 +54,7 @@ public class Assignment implements Serializable {
 
     public void setMaxPoints(double maxPoints) {
         this.maxPoints = maxPoints;
-        }
+    }
 
     public double getAchievedPoints() {
         return achievedPoints;
@@ -65,5 +70,14 @@ public class Assignment implements Serializable {
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public boolean isExtraAssignment() {
+        return isExtraAssignment;
+    }
+
+    public void setExtraAssignment(boolean isExtraAssignment) {
+        this.isExtraAssignment = isExtraAssignment;
+        this.maxPoints = 0d;
     }
 }

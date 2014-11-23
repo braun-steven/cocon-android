@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,12 +31,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends ActionBarActivity {
 
     private final String COURSE_TAG = "COURSE_TAG";
     private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";
     private final String ARRAYLIST_SIZE = "ARRAYLIST_SIZE";
     private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
+
 
 
     private ListView mListView;

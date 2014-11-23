@@ -64,7 +64,7 @@ public class CourseAdapter extends BaseAdapter implements View.OnClickListener {
         mImageView.setImageResource(getLetterIconId(firstChar));
         //Set text
         mTextViewFirst.setText(courses.get(position).getCourseName());
-        mTextViewSecond.setText("Total: " + courses.get(position).getOverAllPercentage().toString() + " %");
+        mTextViewSecond.setText("\u00d8 " + courses.get(position).getOverAllPercentage().toString() + " %");
         mEndPercentageTextView.setText(courses.get(position).getEndPercentage().toString() + " %");
 
         return rowView;

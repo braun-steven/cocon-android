@@ -3,6 +3,7 @@ package com.tak3r07.CourseStatistics;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +22,7 @@ import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class EditCourseActivity extends Activity {
+public class EditCourseActivity extends ActionBarActivity {
 
     private final String COURSE_TAG = "COURSE_TAG";
     private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";

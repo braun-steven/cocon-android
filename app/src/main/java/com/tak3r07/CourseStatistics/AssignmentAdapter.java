@@ -66,7 +66,15 @@ public class AssignmentAdapter extends BaseAdapter implements View.OnClickListen
         //Set text
         mTextViewTitle.setText("Assignment Nr. " + currentAssignment.getIndex());
         mTextViewPoints.setText(currentAssignment.getAchievedPoints() +"/"+currentAssignment.getMaxPoints());
-        mTextViewPercentage.setText(currentAssignment.getPercentage().toString()+" %");
+
+        //Test if Assignment is Extraassignment:
+        if (currentAssignment.isExtraAssignment()){
+            mTextViewPercentage.setText("+");
+        } else {
+            //Else set usual text
+            mTextViewPercentage.setText(currentAssignment.getPercentage().toString()+" %");
+
+        }
 
 
         return rowView;
