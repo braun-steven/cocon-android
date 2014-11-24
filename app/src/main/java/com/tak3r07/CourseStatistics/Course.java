@@ -7,15 +7,14 @@ import java.util.Iterator;
 /**
  * Created by tak3r07 on 11/9/14.
  */
-public class Course implements Serializable{
-    static final long serialVersionUID =2099962292244075360L;
+public class Course implements Serializable {
+    static final long serialVersionUID = 2099962292244075360L;
 
     //Coursename
     private String courseName;
 
     //List of the course assignments
     private ArrayList<Assignment> mAssignmentArrayList = new ArrayList<Assignment>();
-
 
 
     //Number of how many assignments there are
@@ -35,9 +34,6 @@ public class Course implements Serializable{
         reachablePointsPerAssignment = 100d;
 
     }
-
-
-
 
 
     //Constructor
@@ -92,14 +88,14 @@ public class Course implements Serializable{
 
         //Round on 4 digits
 
-        double endPercentage = Math.round(overAllAchievedPoints/(reachablePointsPerAssignment*numberOfAssignments)*1000)/10d;
+        double endPercentage = Math.round(overAllAchievedPoints / (reachablePointsPerAssignment * numberOfAssignments) * 1000) / 10d;
 
         //return result
         return endPercentage;
     }
 
 
-     public String getCourseName() {
+    public String getCourseName() {
         return courseName;
     }
 
@@ -107,8 +103,11 @@ public class Course implements Serializable{
         this.courseName = courseName;
     }
 
-    public ArrayList<Assignment> getAssignments(){ return mAssignmentArrayList;}
-    public void setAssignments(ArrayList<Assignment> newAssignments){
+    public ArrayList<Assignment> getAssignments() {
+        return mAssignmentArrayList;
+    }
+
+    public void setAssignments(ArrayList<Assignment> newAssignments) {
         mAssignmentArrayList = newAssignments;
     }
 
@@ -128,19 +127,24 @@ public class Course implements Serializable{
         this.reachablePointsPerAssignment = reachablePointsPerAssignment;
 
         //Set in each Assignment
-        for (Iterator<Assignment> it = mAssignmentArrayList.iterator();it.hasNext();){
-            it.next().setMaxPoints(reachablePointsPerAssignment);
+        Assignment currentAssignment;
+        for (Iterator<Assignment> it = mAssignmentArrayList.iterator(); it.hasNext(); ) {
+
+            currentAssignment = it.next();
+            if (currentAssignment.isExtraAssignment() == false) {
+                it.next().setMaxPoints(reachablePointsPerAssignment);
+            }
         }
     }
 
     //Simple Clone code (deep copy)
-    public Course clone(){
+    public Course clone() {
         Course clone = new Course(courseName);
         clone.setReachablePointsPerAssignment(reachablePointsPerAssignment);
         clone.setNumberOfAssignments(numberOfAssignments);
 
         ArrayList<Assignment> cloneList = new ArrayList<Assignment>();
-        for(Assignment a : mAssignmentArrayList){
+        for (Assignment a : mAssignmentArrayList) {
             cloneList.add(a);
         }
 

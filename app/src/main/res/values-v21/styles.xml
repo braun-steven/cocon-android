@@ -1,7 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="android:Theme.Material.Light.DarkActionBar">
-        <item name="android:statusBarColor">@android:color/background_dark</item>
-    </style>
 
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <!-- Customize your theme here. -->
+        <!-- Main theme colors -->
+        <!--   your app branding color for the app bar -->
+        <item name="colorPrimary">#3F51B5</item>
+        <!--   darker variant for the status bar and contextual app bars -->
+        <item name="colorPrimaryDark">#303F9F</item>
+        <!--   theme UI controls like checkboxes and text fields -->
+        <item name="colorAccent">#C5CAE9</item>
+    </style>
 </resources>
