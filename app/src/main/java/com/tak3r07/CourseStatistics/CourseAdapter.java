@@ -2,12 +2,15 @@ package com.tak3r07.CourseStatistics;
 
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tak3r07.unihelper.R;
 
@@ -49,7 +52,7 @@ public class CourseAdapter extends BaseAdapter implements View.OnClickListener {
 
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (getCount()<=0) return null;
+        if (getCount() <= 0) return null;
 
         //Get all Views and inflate item-layout
         View rowView = inflater.inflate(R.layout.list_item_course, parent, false);
@@ -66,6 +69,9 @@ public class CourseAdapter extends BaseAdapter implements View.OnClickListener {
         mTextViewFirst.setText(courses.get(position).getCourseName());
         mTextViewSecond.setText("\u00d8 " + courses.get(position).getOverAllPercentage().toString() + " %");
         mEndPercentageTextView.setText(courses.get(position).getEndPercentage().toString() + " %");
+
+        //Set Percentage Color
+        mEndPercentageTextView.setTextColor(getColorForPercentage(courses.get(position).getEndPercentage()));
 
         return rowView;
     }
@@ -130,14 +136,29 @@ public class CourseAdapter extends BaseAdapter implements View.OnClickListener {
                 return R.drawable.letters_y;
             case 'z':
                 return R.drawable.letters_z;
-            default: return 0;
+            default:
+                return 0;
         }
     }
 
-    public void addCourse(Course course){
-        if (course!=null){
+    public void addCourse(Course course) {
+        if (course != null) {
             courses.add(course);
             this.notifyDataSetChanged();
         }
+    }
+
+    /**
+     * This method receives a percentage and retrieves a color
+     */
+    public int getColorForPercentage(Double percentage) {
+
+        if (percentage < 10) return context.getResources().getColor(R.color.red_500);
+        if (percentage < 20) return context.getResources().getColor(R.color.deep_orange_500);
+        if (percentage < 30) return context.getResources().getColor(R.color.orange_500);
+        if (percentage < 40) return context.getResources().getColor(R.color.yellow_500);
+        if (percentage < 50) return context.getResources().getColor(R.color.light_green_500);
+        if (percentage > 50) return context.getResources().getColor(R.color.green_500);
+        return Color.BLACK;
     }
 }
