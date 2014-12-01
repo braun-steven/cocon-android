@@ -10,5 +10,6 @@
         <item name="colorPrimaryDark">#039BE5</item>
         <!--   theme UI controls like checkboxes and text fields -->
         <item name="colorAccent">#4FC3F7</item>
+        <item name="android:titleTextStyle">@color/grey_white_1000</item>
     </style>
 </resources>

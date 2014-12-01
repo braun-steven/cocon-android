@@ -51,7 +51,7 @@ public class Course implements Serializable {
         mAssignmentArrayList.add(assignment);
     }
 
-    //Calculate overall percentage of current assignments
+    //Calculate overall percentage of current assignments (= average)
     public Double getOverAllPercentage() {
         double overAllAchievedPoints = 0;
         double overAllMaxPoints = 0;
@@ -149,6 +149,59 @@ public class Course implements Serializable {
         }
 
         return clone;
+    }
+
+    //Return necessary points per assignment until 50% reached
+    public Double getNecessaryPointsPerAssignmentUntilFin() {
+        Double necPointsAtAll = numberOfAssignments * reachablePointsPerAssignment * 0.5;
+
+        Double achievedPointsAtAll = 0.;
+
+        //Iterate on the array and sum up all its achieved points
+        for (Iterator<Assignment> iterator = mAssignmentArrayList.iterator(); iterator.hasNext(); ) {
+
+            achievedPointsAtAll += iterator.next().getAchievedPoints();
+
+        }
+
+        int numberAssignmentsLeft = numberOfAssignments - mAssignmentArrayList.size();
+        Double numberOfPointsLeft = necPointsAtAll - achievedPointsAtAll;
+
+        Double necPointsPerAssUntilFin = Math.round(numberOfPointsLeft / numberAssignmentsLeft*100)/100d;
+
+
+        if(necPointsPerAssUntilFin < 0 ) return 0.;
+        return necPointsPerAssUntilFin;
+
+    }
+
+    public int getNumberOfAssUntilFin(){
+        Double necPointsAtAll = numberOfAssignments * reachablePointsPerAssignment * 0.5;
+
+        Double achievedPointsAtAll = 0.;
+
+        //Iterate on the array and sum up all its achieved points
+        for (Iterator<Assignment> iterator = mAssignmentArrayList.iterator(); iterator.hasNext(); ) {
+
+            achievedPointsAtAll += iterator.next().getAchievedPoints();
+
+        }
+
+        int numberAssignmentsLeft = numberOfAssignments - mAssignmentArrayList.size();
+        Double numberOfPointsLeft = necPointsAtAll - achievedPointsAtAll;
+
+        Double averagePointsPerAssignment = getOverAllPercentage() * reachablePointsPerAssignment / 100d;
+
+        //Count until more than 50%
+        Double predictedPoints = achievedPointsAtAll;
+        int count = 0;
+        while(predictedPoints < necPointsAtAll){
+            //Each loop it adds the averagepoints per assignment so it predicts your future results
+            count++;
+            predictedPoints+= averagePointsPerAssignment;
+        }
+
+        return count;
     }
 
 }

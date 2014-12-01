@@ -12,7 +12,9 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
-        app:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:elevation="4dp"/>
 
 
@@ -22,7 +24,7 @@
         android:paddingBottom="0dp"
         android:paddingLeft="0dp"
         android:paddingRight="0dp"
-        android:paddingTop="0dp">
+        android:paddingTop="2dp">
 
 
         <ListView

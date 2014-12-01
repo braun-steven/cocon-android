@@ -1,6 +1,5 @@
 package com.tak3r07.CourseStatistics;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tak3r07.unihelper.R;
@@ -90,6 +90,9 @@ public class AssignmentsActivity extends ActionBarActivity {
         //Create and add listview adapter
         mAssignmentAdapter = new AssignmentAdapter(this, mAssignmentArrayList);
         mListView.setAdapter(mAssignmentAdapter);
+
+        //Initialize "Overview"-Cardview
+        initOverview();
     }
 
 
@@ -178,6 +181,10 @@ public class AssignmentsActivity extends ActionBarActivity {
     //Add assignment to adapter (Eventually add to course necessary?)
     public void addAssignment(Assignment assignment) {
         mAssignmentAdapter.addAssignment(assignment);
+
+        //Update Overview
+        initOverview();
+
         Toast.makeText(getApplicationContext(), "New assignment added", Toast.LENGTH_SHORT).show();
     }
 
@@ -337,5 +344,19 @@ public class AssignmentsActivity extends ActionBarActivity {
     public void onPause() {
         save();
         super.onPause();
+    }
+
+    public void initOverview(){
+        //Refer to TextView objects
+        TextView mTextViewAverage = (TextView) findViewById(R.id.course_overview_average);
+        TextView mTextViewNecPoiPerAss = (TextView) findViewById(R.id.course_overview_nec_pointspass);
+        TextView mTextViewAssUntilFin = (TextView) findViewById(R.id.course_overview_assignments_until_finished);
+        TextView mTextViewOverall = (TextView) findViewById(R.id.course_overview_overall_percentage_text);
+
+        //Set texts
+        mTextViewAverage.setText(course.getOverAllPercentage().toString() + " %"); //Warning: "getOverAll = average in course classe"
+        mTextViewOverall.setText(course.getEndPercentage().toString()+ " %");
+        mTextViewNecPoiPerAss.setText(course.getNecessaryPointsPerAssignmentUntilFin().toString());
+        mTextViewAssUntilFin.setText(String.valueOf(course.getNumberOfAssUntilFin()));
     }
 }
