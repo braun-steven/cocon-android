@@ -20,9 +20,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="0dp"
-        android:paddingLeft="6dp"
-        android:paddingRight="6dp"
-        android:paddingTop="6dp">
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:paddingTop="0dp">
 
 
         <ListView
@@ -30,8 +30,8 @@
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:divider="@null"
-            android:dividerHeight="0dp"
-            android:elevation="2dp"/>
+            android:divider="@drawable/list_divider"
+            android:dividerHeight="1px"
+            android:elevation="0dp"/>
     </LinearLayout>
 </LinearLayout>
