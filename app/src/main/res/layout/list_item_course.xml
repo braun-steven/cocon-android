@@ -1,18 +1,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="0dip"
-    android:elevation="0dp">
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp">
 
     <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/card_view_item_course"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_gravity="top"
-        android:elevation="0dp"
-        card_view:cardElevation="0dp"
-        card_view:cardCornerRadius="0dp"
-        >
+        android:layout_gravity="center"
+        card_view:cardElevation="5dp"
+        card_view:cardCornerRadius="2dp"
+        card_view:contentPadding="1dp">
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -24,7 +25,7 @@
                 android:layout_height="fill_parent"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentTop="true"
-                android:src="@drawable/letters_a" />
+                android:src="@drawable/letters_e" />
 
             <TextView
                 android:id="@+id/course_secondLine"

@@ -167,15 +167,18 @@ public class Course implements Serializable {
         int numberAssignmentsLeft = numberOfAssignments - mAssignmentArrayList.size();
         Double numberOfPointsLeft = necPointsAtAll - achievedPointsAtAll;
 
-        Double necPointsPerAssUntilFin = Math.round(numberOfPointsLeft / numberAssignmentsLeft*100)/100d;
+        Double necPointsPerAssUntilFin = Math.round(numberOfPointsLeft / numberAssignmentsLeft * 100) / 100d;
 
 
-        if(necPointsPerAssUntilFin < 0 ) return 0.;
+        if (necPointsPerAssUntilFin < 0) return 0.;
         return necPointsPerAssUntilFin;
 
     }
 
-    public int getNumberOfAssUntilFin(){
+    /**
+     * Return the number of assignments which are necessary until one would reach 50% with its current performance per assignment
+     */
+    public int getNumberOfAssUntilFin() {
         Double necPointsAtAll = numberOfAssignments * reachablePointsPerAssignment * 0.5;
 
         Double achievedPointsAtAll = 0.;
@@ -192,13 +195,16 @@ public class Course implements Serializable {
 
         Double averagePointsPerAssignment = getOverAllPercentage() * reachablePointsPerAssignment / 100d;
 
+        //Scenario: Course has been initialized for the first time
+        if(averagePointsPerAssignment == 0) return 0;
+
         //Count until more than 50%
         Double predictedPoints = achievedPointsAtAll;
         int count = 0;
-        while(predictedPoints < necPointsAtAll){
+        while (predictedPoints < necPointsAtAll) {
             //Each loop it adds the averagepoints per assignment so it predicts your future results
             count++;
-            predictedPoints+= averagePointsPerAssignment;
+            predictedPoints += averagePointsPerAssignment;
         }
 
         return count;
