@@ -111,8 +111,8 @@ public class MainActivity extends ActionBarActivity {
     public void onClickAddCourse(MenuItem item) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-        alert.setTitle("New course");
-        alert.setMessage("Enter course name & Max. points per Assignment");
+        alert.setTitle(getString(R.string.new_course));
+        alert.setMessage(getString(R.string.enter_course_name_and_max_p_p_a));
 
         //Set dialog_add_course layout
         final LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -120,7 +120,7 @@ public class MainActivity extends ActionBarActivity {
         alert.setView(view);
 
         //Add Course Operation
-        alert.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(getString(R.string.add), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 //Get views
                 EditText mCourseNameEditText = (EditText) view.findViewById(R.id.course_name_edittext);
@@ -138,14 +138,14 @@ public class MainActivity extends ActionBarActivity {
 
                 } else {
                     //If data was not numeric
-                    Toast.makeText(getApplicationContext(), "Invalid values", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.invalid_values), Toast.LENGTH_LONG).show();
 
                 }
 
             }
         });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 // Canceled.
             }
@@ -171,7 +171,7 @@ public class MainActivity extends ActionBarActivity {
             //Only create new course if "courseexists" is false
             if (courseExists) {
                 //Notify user
-                Toast.makeText(getApplicationContext(), "A course with the same name already exists", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.a_course_same_name), Toast.LENGTH_LONG).show();
             } else {
                 //Add course
                 Course course = new Course(title);
@@ -181,11 +181,11 @@ public class MainActivity extends ActionBarActivity {
                 //save in data
                 save();
 
-                Toast.makeText(getApplicationContext(), "Course: " + title + " has been added", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.course) + title + getString(R.string.has_been_added), Toast.LENGTH_SHORT).show();
             }
         } else {
             //Notify about empty string
-            Toast.makeText(getApplicationContext(), "Abort: No title set", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.abort_no_title), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -306,13 +306,13 @@ public class MainActivity extends ActionBarActivity {
                 AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
 
                 //Set title and message
-                alert.setTitle("Delete");
-                alert.setMessage("Do you want to delete " + mCourseArrayList.get(position).getCourseName()+ "?");
+                alert.setTitle(getString(R.string.delete));
+                alert.setMessage(getString(R.string.do_you_want_to_delete) + mCourseArrayList.get(position).getCourseName()+ "?");
 
-                                alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                alert.setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         //Delete course and notify
-                        Toast.makeText(getApplicationContext(),mCourseArrayList.get(position).getCourseName()+ " deleted",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),mCourseArrayList.get(position).getCourseName()+ getString(R.string.deleted),Toast.LENGTH_LONG).show();
                         mCourseArrayList.remove(position);
 
                         //Update list
@@ -320,7 +320,7 @@ public class MainActivity extends ActionBarActivity {
                     }
                 });
 
-                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // Canceled.
                     }
@@ -340,14 +340,14 @@ public class MainActivity extends ActionBarActivity {
     public void onClickMenuRestore(MenuItem item){
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-        alert.setTitle("Restore");
-        alert.setMessage("Do you want to restore data from storage?");
+        alert.setTitle(getString(R.string.restore));
+        alert.setMessage(getString(R.string.do_you_want_restore));
 
 
-        alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 //check if external storage is readable
-                if (isExternalStorageReadable()){
+                if (isExternalStorageReadable()) {
                     File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files");
                     try {
                         FileInputStream fis = new FileInputStream(myFilesDir.getPath() + "/data.backup");
@@ -360,7 +360,7 @@ public class MainActivity extends ActionBarActivity {
                         mCourseArrayList.clear();
 
                         //add each stored course item
-                        for(Iterator<Course> it = newArraylist.iterator();it.hasNext();){
+                        for (Iterator<Course> it = newArraylist.iterator(); it.hasNext(); ) {
                             mCourseArrayList.add(it.next());
                         }
                         ois.close();
@@ -369,7 +369,7 @@ public class MainActivity extends ActionBarActivity {
                         mCourseAdapter.notifyDataSetChanged();
 
                         //Notify user about completed restore
-                        Toast.makeText(getApplicationContext(), "Restore complete", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.restore_complete), Toast.LENGTH_LONG).show();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (StreamCorruptedException e) {
@@ -384,7 +384,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 // Canceled.
             }
@@ -397,11 +397,11 @@ public class MainActivity extends ActionBarActivity {
     public void onClickMenuBackup(MenuItem item){
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-        alert.setTitle("Backup");
-        alert.setMessage("Do you want to Backup data to storage?");
+        alert.setTitle(getString(R.string.backup));
+        alert.setMessage(getString(R.string.backup_to_storage));
 
 
-        alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 //Check for RW permissions
@@ -417,7 +417,7 @@ public class MainActivity extends ActionBarActivity {
                         oos.close();
 
                         //Notify user about completed backup
-                        Toast.makeText(getApplicationContext(), "Backup complete", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.backup_complete), Toast.LENGTH_LONG).show();
 
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
@@ -429,7 +429,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 // Canceled.
             }

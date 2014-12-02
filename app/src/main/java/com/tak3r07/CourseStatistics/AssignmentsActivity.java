@@ -124,15 +124,15 @@ public class AssignmentsActivity extends ActionBarActivity {
     public void onClickAddAssignment(MenuItem item) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-        alert.setTitle("New Assignment");
-        alert.setMessage("Enter assignment points");
+        alert.setTitle(getString(R.string.new_assignment));
+        alert.setMessage(getString(R.string.enter_assignment_points));
 
         // Set an custom dialog view to get user input
         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View view = View.inflate(this, R.layout.dialog_add_assignment, null);
         alert.setView(view);
 
-        alert.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(getString(R.string.add), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 //Get EditText views
                 EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
@@ -163,13 +163,13 @@ public class AssignmentsActivity extends ActionBarActivity {
                     addAssignment(newAssignment);
                 } else {
                     //If data was not numeric
-                    Toast.makeText(getApplicationContext(), "Invalid values", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.invalid_values), Toast.LENGTH_LONG).show();
 
                 }
             }
         });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 // Canceled.
             }
@@ -185,7 +185,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         //Update Overview
         initOverview();
 
-        Toast.makeText(getApplicationContext(), "New assignment added", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), getString(R.string.new_assignment_added), Toast.LENGTH_SHORT).show();
     }
 
 
@@ -223,13 +223,13 @@ public class AssignmentsActivity extends ActionBarActivity {
                 AlertDialog.Builder alert = new AlertDialog.Builder(AssignmentsActivity.this);
 
                 //Set title and message
-                alert.setTitle("Delete");
-                alert.setMessage("Do you want to delete Assignment Nr." + mAssignmentArrayList.get(position).getIndex() + "?");
+                alert.setTitle(getString(R.string.delete));
+                alert.setMessage(getString(R.string.want_delete_assignment) + mAssignmentArrayList.get(position).getIndex() + "?");
 
-                alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                alert.setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         //Delete course and notify
-                        Toast.makeText(getApplicationContext(), mAssignmentArrayList.get(position).getIndex() + " deleted", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), mAssignmentArrayList.get(position).getIndex() + getString(R.string.deleted), Toast.LENGTH_LONG).show();
                         mAssignmentArrayList.remove(position);
 
                         //Update list
@@ -237,7 +237,7 @@ public class AssignmentsActivity extends ActionBarActivity {
                     }
                 });
 
-                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // Canceled.
                     }

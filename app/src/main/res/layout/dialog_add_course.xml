@@ -17,7 +17,7 @@
             android:layout_alignBottom="@+id/course_name_edittext"
             android:layout_alignEnd="@+id/max_reachable_points_textview"
             android:layout_alignRight="@+id/max_reachable_points_textview"
-            android:text="@string/course_name_textview"
+            android:text="@string/name"
             android:textAppearance="?android:attr/textAppearanceMedium" />
         <EditText
             android:id="@+id/course_name_edittext"

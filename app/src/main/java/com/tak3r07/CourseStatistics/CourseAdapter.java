@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
+import java.util.zip.Inflater;
 
 /**
  * Created by tak3r07 on 11/10/14.
@@ -25,6 +26,7 @@ public class CourseAdapter extends BaseAdapter implements View.OnClickListener {
     private final ArrayList<Course> courses;
 
     private LayoutInflater inflater;
+    private ViewHolder holder;
 
 
     public CourseAdapter(Context context, ArrayList<Course> courses) {
@@ -51,32 +53,54 @@ public class CourseAdapter extends BaseAdapter implements View.OnClickListener {
         return 0;
     }
 
+    static class ViewHolder {
+        TextView mTextViewFirst;
+        TextView mTextViewSecond;
+        ImageView mImageView;
+        TextView mEndPercentageTextView;
+    }
+
 
     public View getView(int position, View convertView, ViewGroup parent) {
         if (getCount() <= 0) return null;
 
-        //Get all Views and inflate item-layout
-        View rowView = inflater.inflate(R.layout.list_item_course, parent, false);
-        TextView mTextViewFirst = (TextView) rowView.findViewById(R.id.course_firstLine);
-        TextView mTextViewSecond = (TextView) rowView.findViewById(R.id.course_secondLine);
-        ImageView mImageView = (ImageView) rowView.findViewById(R.id.icon);
-        TextView mEndPercentageTextView = (TextView) rowView.findViewById(R.id.end_percentage_textview);
+        //If converView is null -> inflate layout and store in viewholder object
+        if(convertView==null){
+
+            // inflate the layout
+            inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.list_item_course, parent, false);
+
+            holder = new ViewHolder();
+
+            //Get all Views and inflate item-layout
+            holder.mTextViewFirst = (TextView) convertView.findViewById(R.id.course_firstLine);
+            holder.mTextViewSecond = (TextView) convertView.findViewById(R.id.course_secondLine);
+            holder.mImageView = (ImageView) convertView.findViewById(R.id.icon);
+            holder.mEndPercentageTextView = (TextView) convertView.findViewById(R.id.end_percentage_textview);
+            convertView.setTag(holder);
+        }else {
+            //if convertview was not null -> use viewholder from tag
+            holder = (ViewHolder) convertView.getTag();
+        }
+
+
 
 
         //Set Icon
         Character firstChar = courses.get(position).getCourseName().toLowerCase().charAt(0);
-        mImageView.setImageResource(getLetterIconId(firstChar));
+        holder.mImageView.setImageResource(getLetterIconId(firstChar));
         //Set text
-        mTextViewFirst.setText(courses.get(position).getCourseName());
-        mTextViewSecond.setText("\u00d8 " + courses.get(position).getOverAllPercentage().toString() + " %");
-        mEndPercentageTextView.setText(courses.get(position).getEndPercentage().toString() + " %");
+        holder.mTextViewFirst.setText(courses.get(position).getCourseName());
+        holder.mTextViewSecond.setText("\u00d8 " + courses.get(position).getOverAllPercentage().toString() + " %");
+        holder.mEndPercentageTextView.setText(courses.get(position).getEndPercentage().toString() + " %");
 
         //Set Percentage Color
-        mEndPercentageTextView.setTextColor(getColorForPercentage(courses.get(position).getEndPercentage()));
+        holder.mEndPercentageTextView.setTextColor(getColorForPercentage(courses.get(position).getEndPercentage()));
 
 
 
-        return rowView;
+        return convertView;
     }
 
 

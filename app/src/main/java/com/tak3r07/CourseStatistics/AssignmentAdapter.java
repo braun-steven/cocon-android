@@ -23,6 +23,7 @@ public class AssignmentAdapter extends BaseAdapter implements View.OnClickListen
     private final ArrayList<Assignment> assignments;
 
     private LayoutInflater inflater;
+    private ViewHolder holder;
 
 
     public AssignmentAdapter(Context context, ArrayList<Assignment> assignments) {
@@ -49,35 +50,56 @@ public class AssignmentAdapter extends BaseAdapter implements View.OnClickListen
         return 0;
     }
 
+    static class ViewHolder {
+        TextView mTextViewTitle;
+        TextView mTextViewPoints;
+        TextView mTextViewPercentage;
+    }
+
 
 
     public View getView(int position, View convertView, ViewGroup parent) {
         if (getCount()<=0) return null;
 
+        //If convertview is null -> inflate layout from resource
+        if(convertView==null){
+
+            // inflate the layout
+            inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.list_item_assignment, parent, false);
+
+            holder = new ViewHolder();
+            //Inflate item layout and get views
+
+            holder.mTextViewTitle = (TextView) convertView.findViewById(R.id.assignment_title);
+            holder.mTextViewPoints = (TextView) convertView.findViewById(R.id.points_textview);
+            holder.mTextViewPercentage = (TextView) convertView.findViewById(R.id.percentage_textview);
+            convertView.setTag(holder);
+        }else{
+            //if convertview is not null -> get holder from tag
+            holder = (ViewHolder) convertView.getTag();
+        }
+
         //Store current assignment
         Assignment currentAssignment = assignments.get(position);
 
-        //Inflate item layout and get views
-        View rowView = inflater.inflate(R.layout.list_item_assignment, parent, false);
-        TextView mTextViewTitle = (TextView) rowView.findViewById(R.id.assignment_title);
-        TextView mTextViewPoints = (TextView) rowView.findViewById(R.id.points_textview);
-        TextView mTextViewPercentage = (TextView) rowView.findViewById(R.id.percentage_textview);
+
 
         //Set text
-        mTextViewTitle.setText("Assignment Nr. " + currentAssignment.getIndex());
-        mTextViewPoints.setText(currentAssignment.getAchievedPoints() +" / "+currentAssignment.getMaxPoints());
+        holder.mTextViewTitle.setText(context.getString(R.string.assignment_number) + currentAssignment.getIndex());
+        holder.mTextViewPoints.setText(currentAssignment.getAchievedPoints() +" / "+currentAssignment.getMaxPoints());
 
         //Test if Assignment is Extraassignment:
         if (currentAssignment.isExtraAssignment()){
-            mTextViewPercentage.setText("+");
+            holder.mTextViewPercentage.setText("+");
         } else {
             //Else set usual text
-            mTextViewPercentage.setText(currentAssignment.getPercentage().toString()+" %");
+            holder.mTextViewPercentage.setText(currentAssignment.getPercentage().toString()+" %");
 
         }
 
 
-        return rowView;
+        return convertView;
     }
 
 

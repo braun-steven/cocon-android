@@ -23,5 +23,31 @@
     <string name="course_overview_necessary_text">Necessary Points/Assignment</string>
     <string name="course_overview_assignments_until_finished_textview">#Assignments until 50%</string>
     <string name="course_overview_average_textview">Average</string>
+    <string name="assignment_number">"Assignment Nr. "</string>
+    <string name="new_assignment">New Assignment</string>
+    <string name="enter_assignment_points">Enter assignment points</string>
+    <string name="add">Add</string>
+    <string name="invalid_values">Invalid values</string>
+    <string name="cancel">Cancel</string>
+    <string name="new_assignment_added">New assignment added</string>
+    <string name="delete">Delete</string>
+    <string name="want_delete_assignment">Do you want to delete Assignment Nr.</string>
+    <string name="deleted">" deleted"</string>
+    <string name="new_course">New course</string>
+    <string name="enter_course_name_and_max_p_p_a">Enter course name and Max. points per Assignment</string>
+    <string name="a_course_same_name">A course with the same name already exists</string>
+    <string name="course">"Course: "</string>
+    <string name="has_been_added">" has been added"</string>
+    <string name="abort_no_title">Abort: No title set</string>
+    <string name="do_you_want_to_delete">"Do you want to delete "</string>
+    <string name="do_you_want_restore">Do you want to restore data from storage?</string>
+    <string name="confirm">Confirm</string>
+    <string name="restore_complete">Restore complete</string>
+    <string name="backup_complete">Backup complete</string>
+    <string name="backup_to_storage">Do you want to Backup data to storage?</string>
+    <string name="name">Name</string>
+    <string name="points_per_assignment">Points per assignment</string>
+    <string name="number_of_assignments">Number of assignments</string>
+    <string name="save">Save</string>
 
 </resources>
