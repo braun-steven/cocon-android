@@ -50,7 +50,7 @@ public class EditCourseActivity extends ActionBarActivity {
         coursePositionInArray = intent.getExtras().getInt(COURSE_TAG_POSITION);
 
         //restore from data
-        restore();
+        mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
 
         //get course in array
         course = mCourseArrayList.get(coursePositionInArray);
@@ -104,7 +104,7 @@ public class EditCourseActivity extends ActionBarActivity {
         Intent data = new Intent();
 
         //Store data
-        save();
+        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
 
         setResult(RESULT_OK, data);
         finish();
@@ -115,51 +115,8 @@ public class EditCourseActivity extends ActionBarActivity {
         finish();
     }
 
-    public void save() {
-        //Store Data into InternalStorage
-        try {
-            FileOutputStream fos = getApplicationContext().openFileOutput("data", MODE_PRIVATE);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(mCourseArrayList);
-            oos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 
 
-    public void restore(){
-        //Restore data
 
-        try {
-            FileInputStream fis = getApplicationContext().openFileInput("data");
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            ArrayList<Course> newArraylist = (ArrayList<Course>) ois.readObject();
-
-            //clear current arraylist to avoid double input
-            if (mCourseArrayList != null) {
-                mCourseArrayList.clear();
-            } else{
-                //if null -> create new
-                mCourseArrayList = new ArrayList<Course>();
-            }
-
-            //add each stored course item
-            for(Iterator<Course> it = newArraylist.iterator();it.hasNext();){
-                mCourseArrayList.add(it.next());
-            }
-            ois.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -61,7 +61,7 @@ public class AssignmentsActivity extends ActionBarActivity {
 
         } else {
             //Restore from data
-            restore();
+            mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
         }
 
 
@@ -202,7 +202,7 @@ public class AssignmentsActivity extends ActionBarActivity {
     public void onBackPressed() {
 
         //Save data
-        save();
+        CourseDataHandler.save(getApplicationContext(),mCourseArrayList);
 
         //Set result and finish
         Intent data = new Intent();
@@ -279,7 +279,7 @@ public class AssignmentsActivity extends ActionBarActivity {
 
 
             //Restore data from saved data
-            restore();
+            mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
             course = mCourseArrayList.get(coursePositionInArray);
 
             //Set new Title
@@ -294,55 +294,9 @@ public class AssignmentsActivity extends ActionBarActivity {
         }
     }
 
-    public void save() {
-        //Store Data into InternalStorage
-        try {
-            FileOutputStream fos = getApplicationContext().openFileOutput("data", MODE_PRIVATE);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(mCourseArrayList);
-            oos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public void restore() {
-        //Restore data
-
-        try {
-            FileInputStream fis = getApplicationContext().openFileInput("data");
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            ArrayList<Course> newArraylist = (ArrayList<Course>) ois.readObject();
-
-            //clear current arraylist to avoid double input
-            if (mCourseArrayList != null) {
-                mCourseArrayList.clear();
-            } else{
-                //if null -> create new
-                mCourseArrayList = new ArrayList<Course>();
-            }
-                //add each stored course item
-                for (Iterator<Course> it = newArraylist.iterator(); it.hasNext(); ) {
-                    mCourseArrayList.add(it.next());
-
-            }
-            ois.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void onPause() {
-        save();
+        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
         super.onPause();
     }
 
