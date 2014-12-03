@@ -370,6 +370,7 @@ public class MainActivity extends ActionBarActivity {
 
                         //Notify user about completed restore
                         Toast.makeText(getApplicationContext(), getString(R.string.restore_complete), Toast.LENGTH_LONG).show();
+                        save();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (StreamCorruptedException e) {
