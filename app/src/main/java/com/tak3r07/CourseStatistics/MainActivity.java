@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,7 +42,6 @@ public class MainActivity extends ActionBarActivity {
     private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
 
 
-
     private ListView mListView;
 
 
@@ -53,7 +54,6 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
 
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
         setSupportActionBar(toolbar);
 
@@ -64,6 +64,7 @@ public class MainActivity extends ActionBarActivity {
 
         }
 
+        /* LISTVIEW SETUP NOW UNCOMMENTED FOR RECYCLERVIEW
         //ListView setup
         mListView = (ListView) findViewById(R.id.listView_courses);
 
@@ -73,6 +74,16 @@ public class MainActivity extends ActionBarActivity {
 
         //Set onClick and onLongClick
         setClickListener();
+        */
+
+        //RecyclerView Setup
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_courses);
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        RecyclerViewCourseAdapter mCourseAdapter = new RecyclerViewCourseAdapter(mCourseArrayList, getApplicationContext());
+        mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mRecyclerView.setAdapter(mCourseAdapter);
+
 
         //If activity is freshly started (SavedInstanceState == null): restore data from storage
         if (savedInstanceState == null) {
@@ -128,7 +139,7 @@ public class MainActivity extends ActionBarActivity {
 
                 //Get values
                 String courseName = mCourseNameEditText.getText().toString();
-                String reachablePointsString = mReachablePointsEditText.getText().toString().replace(',','.');
+                String reachablePointsString = mReachablePointsEditText.getText().toString().replace(',', '.');
 
                 //Convert
                 if (AssignmentsActivity.isNumeric(reachablePointsString)) {
@@ -179,7 +190,7 @@ public class MainActivity extends ActionBarActivity {
                 mCourseAdapter.addCourse(course);
 
                 //save in data
-                CourseDataHandler.save(getApplicationContext(),mCourseArrayList);
+                CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
 
                 Toast.makeText(getApplicationContext(), getString(R.string.course) + title + getString(R.string.has_been_added), Toast.LENGTH_SHORT).show();
             }
@@ -203,7 +214,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if(resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
 
 
             //Update courselist from database
@@ -218,17 +229,14 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onDestroy(){
-        CourseDataHandler.save(getApplicationContext(),mCourseArrayList);
+    protected void onDestroy() {
+        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
         super.onDestroy();
 
     }
 
 
-
-
-
-    public void setClickListener(){
+    public void setClickListener() {
         //Listview onlclick and open Assignments-Activity
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -261,12 +269,12 @@ public class MainActivity extends ActionBarActivity {
 
                 //Set title and message
                 alert.setTitle(getString(R.string.delete));
-                alert.setMessage(getString(R.string.do_you_want_to_delete) + mCourseArrayList.get(position).getCourseName()+ "?");
+                alert.setMessage(getString(R.string.do_you_want_to_delete) + mCourseArrayList.get(position).getCourseName() + "?");
 
-                                alert.setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
+                alert.setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         //Delete course and notify
-                        Toast.makeText(getApplicationContext(),mCourseArrayList.get(position).getCourseName()+ getString(R.string.deleted),Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), mCourseArrayList.get(position).getCourseName() + getString(R.string.deleted), Toast.LENGTH_LONG).show();
                         mCourseArrayList.remove(position);
 
                         //Update list
@@ -283,7 +291,6 @@ public class MainActivity extends ActionBarActivity {
                 alert.show();
 
 
-
                 return true;
             }
         });
@@ -291,7 +298,7 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-    public void onClickMenuRestore(MenuItem item){
+    public void onClickMenuRestore(MenuItem item) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
         alert.setTitle(getString(R.string.restore));
@@ -324,7 +331,7 @@ public class MainActivity extends ActionBarActivity {
 
                         //Notify user about completed restore
                         Toast.makeText(getApplicationContext(), getString(R.string.restore_complete), Toast.LENGTH_LONG).show();
-                        CourseDataHandler.save(getApplicationContext(),mCourseArrayList);
+                        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
                     } catch (ClassNotFoundException | IOException e) {
                         e.printStackTrace();
                     }
@@ -343,7 +350,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     //Restore Button in Menu
-    public void onClickMenuBackup(MenuItem item){
+    public void onClickMenuBackup(MenuItem item) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
         alert.setTitle(getString(R.string.backup));
@@ -354,7 +361,7 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 //Check for RW permissions
-                if (isExternalStorageWritable()){
+                if (isExternalStorageWritable()) {
                     File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files");
                     myFilesDir.mkdirs();
 
