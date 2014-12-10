@@ -196,7 +196,7 @@ public class Course implements Serializable {
         Double averagePointsPerAssignment = getOverAllPercentage() * reachablePointsPerAssignment / 100d;
 
         //Scenario: Course has been initialized for the first time
-        if(averagePointsPerAssignment == 0) return 0;
+        if (averagePointsPerAssignment == 0) return 0;
 
         //Count until more than 50%
         Double predictedPoints = achievedPointsAtAll;

@@ -19,6 +19,7 @@
             android:layout_alignRight="@+id/max_reachable_points_textview"
             android:text="@string/name"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+
         <EditText
             android:id="@+id/course_name_edittext"
             android:layout_width="match_parent"
@@ -35,7 +36,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_margin="6dp">
-
 
 
         <TextView

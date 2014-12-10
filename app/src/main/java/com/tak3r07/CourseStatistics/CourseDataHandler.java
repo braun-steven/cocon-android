@@ -27,7 +27,7 @@ public class CourseDataHandler {
         }
     }
 
-    public static ArrayList<Course> restore(Context context, ArrayList<Course> mCourseArrayList){
+    public static ArrayList<Course> restore(Context context, ArrayList<Course> mCourseArrayList) {
         //Restore data
 
         try {
@@ -38,13 +38,13 @@ public class CourseDataHandler {
             //clear current arraylist to avoid double input
             if (mCourseArrayList != null) {
                 mCourseArrayList.clear();
-            } else{
+            } else {
                 //if null -> create new
                 mCourseArrayList = new ArrayList<Course>();
             }
 
             //add each stored course item
-            for(Iterator<Course> it = newArraylist.iterator();it.hasNext();){
+            for (Iterator<Course> it = newArraylist.iterator(); it.hasNext(); ) {
                 mCourseArrayList.add(it.next());
             }
             ois.close();
@@ -52,6 +52,6 @@ public class CourseDataHandler {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-    return mCourseArrayList;
+        return mCourseArrayList;
     }
 }

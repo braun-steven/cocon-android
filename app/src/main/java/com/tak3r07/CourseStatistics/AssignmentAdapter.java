@@ -57,12 +57,11 @@ public class AssignmentAdapter extends BaseAdapter implements View.OnClickListen
     }
 
 
-
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (getCount()<=0) return null;
+        if (getCount() <= 0) return null;
 
         //If convertview is null -> inflate layout from resource
-        if(convertView==null){
+        if (convertView == null) {
 
             // inflate the layout
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -75,7 +74,7 @@ public class AssignmentAdapter extends BaseAdapter implements View.OnClickListen
             holder.mTextViewPoints = (TextView) convertView.findViewById(R.id.points_textview);
             holder.mTextViewPercentage = (TextView) convertView.findViewById(R.id.percentage_textview);
             convertView.setTag(holder);
-        }else{
+        } else {
             //if convertview is not null -> get holder from tag
             holder = (ViewHolder) convertView.getTag();
         }
@@ -84,17 +83,16 @@ public class AssignmentAdapter extends BaseAdapter implements View.OnClickListen
         Assignment currentAssignment = assignments.get(position);
 
 
-
         //Set text
         holder.mTextViewTitle.setText(context.getString(R.string.assignment_number) + currentAssignment.getIndex());
-        holder.mTextViewPoints.setText(currentAssignment.getAchievedPoints() +" / "+currentAssignment.getMaxPoints());
+        holder.mTextViewPoints.setText(currentAssignment.getAchievedPoints() + " / " + currentAssignment.getMaxPoints());
 
         //Test if Assignment is Extraassignment:
-        if (currentAssignment.isExtraAssignment()){
+        if (currentAssignment.isExtraAssignment()) {
             holder.mTextViewPercentage.setText("+");
         } else {
             //Else set usual text
-            holder.mTextViewPercentage.setText(currentAssignment.getPercentage().toString()+" %");
+            holder.mTextViewPercentage.setText(currentAssignment.getPercentage().toString() + " %");
 
         }
 
@@ -109,8 +107,8 @@ public class AssignmentAdapter extends BaseAdapter implements View.OnClickListen
 
     }
 
-    public void addAssignment(Assignment assignment){
-        if (assignment!=null){
+    public void addAssignment(Assignment assignment) {
+        if (assignment != null) {
             assignments.add(assignment);
             this.notifyDataSetChanged();
         }
@@ -121,11 +119,11 @@ public class AssignmentAdapter extends BaseAdapter implements View.OnClickListen
     }
 
 
-    public void setAssignments(ArrayList<Assignment> newAssignmentsArrayList){
+    public void setAssignments(ArrayList<Assignment> newAssignmentsArrayList) {
         assignments.clear();
 
         //update assignments array list
-        for (Iterator<Assignment> it = newAssignmentsArrayList.iterator(); it.hasNext();){
+        for (Iterator<Assignment> it = newAssignmentsArrayList.iterator(); it.hasNext(); ) {
             assignments.add(it.next());
         }
     }

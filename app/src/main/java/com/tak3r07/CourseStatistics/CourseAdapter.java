@@ -65,7 +65,7 @@ public class CourseAdapter extends BaseAdapter implements View.OnClickListener {
         if (getCount() <= 0) return null;
 
         //If converView is null -> inflate layout and store in viewholder object
-        if(convertView==null){
+        if (convertView == null) {
 
             // inflate the layout
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -79,12 +79,10 @@ public class CourseAdapter extends BaseAdapter implements View.OnClickListener {
             holder.mImageView = (ImageView) convertView.findViewById(R.id.icon);
             holder.mEndPercentageTextView = (TextView) convertView.findViewById(R.id.end_percentage_textview);
             convertView.setTag(holder);
-        }else {
+        } else {
             //if convertview was not null -> use viewholder from tag
             holder = (ViewHolder) convertView.getTag();
         }
-
-
 
 
         //Set Icon
@@ -97,7 +95,6 @@ public class CourseAdapter extends BaseAdapter implements View.OnClickListener {
 
         //Set Percentage Color
         holder.mEndPercentageTextView.setTextColor(getColorForPercentage(courses.get(position).getEndPercentage()));
-
 
 
         return convertView;

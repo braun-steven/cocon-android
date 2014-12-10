@@ -154,8 +154,8 @@ public class AssignmentsActivity extends ActionBarActivity {
                     Assignment newAssignment = new Assignment(index, course.getReachablePointsPerAssignment(), achievedPoints);
 
                     //Check if this is an extra assignment
-                    CheckBox mCheckBox = (CheckBox)view.findViewById(R.id.checkBox_extra_assignment);
-                    if(mCheckBox.isChecked()){
+                    CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
+                    if (mCheckBox.isChecked()) {
                         newAssignment.setExtraAssignment(true);
                     }
 
@@ -202,7 +202,7 @@ public class AssignmentsActivity extends ActionBarActivity {
     public void onBackPressed() {
 
         //Save data
-        CourseDataHandler.save(getApplicationContext(),mCourseArrayList);
+        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
 
         //Set result and finish
         Intent data = new Intent();
@@ -300,7 +300,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         super.onPause();
     }
 
-    public void initOverview(){
+    public void initOverview() {
         //Refer to TextView objects
         TextView mTextViewAverage = (TextView) findViewById(R.id.course_overview_average);
         TextView mTextViewNecPoiPerAss = (TextView) findViewById(R.id.course_overview_nec_pointspass);
@@ -309,7 +309,7 @@ public class AssignmentsActivity extends ActionBarActivity {
 
         //Set texts
         mTextViewAverage.setText(course.getOverAllPercentage().toString() + " %"); //Warning: "getOverAll = average in course classe"
-        mTextViewOverall.setText(course.getEndPercentage().toString()+ " %");
+        mTextViewOverall.setText(course.getEndPercentage().toString() + " %");
         mTextViewNecPoiPerAss.setText(course.getNecessaryPointsPerAssignmentUntilFin().toString());
         mTextViewAssUntilFin.setText(String.valueOf(course.getNumberOfAssUntilFin()));
     }

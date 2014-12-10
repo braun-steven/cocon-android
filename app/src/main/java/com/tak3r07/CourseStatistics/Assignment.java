@@ -21,7 +21,6 @@ public class Assignment implements Serializable {
     private double achievedPoints;
 
 
-
     //Boolean whether this is an extra-assignment or not
     private boolean isExtraAssignment = false;
 

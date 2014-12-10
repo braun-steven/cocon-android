@@ -36,7 +36,6 @@ public class EditCourseActivity extends ActionBarActivity {
     private EditText mMaxPointsEditText;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +93,7 @@ public class EditCourseActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onClickSave(View view){
+    public void onClickSave(View view) {
         //Save new values in course
         course.setCourseName(mNameEditText.getText().toString());
         course.setNumberOfAssignments(Integer.parseInt(mNumberEditText.getText().toString()));
@@ -110,13 +109,10 @@ public class EditCourseActivity extends ActionBarActivity {
         finish();
     }
 
-    public void onClickCancel(View view){
-        setResult(RESULT_CANCELED,null);
+    public void onClickCancel(View view) {
+        setResult(RESULT_CANCELED, null);
         finish();
     }
-
-
-
 
 
 }

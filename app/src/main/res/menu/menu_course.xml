@@ -14,7 +14,7 @@
         android:orderInCategory="100"
         tools:showAsAction="never"
         android:title="@string/edit_course_text"
-        android:onClick="onEditCourseClick"/>
+        android:onClick="onEditCourseClick" />
 
     <item
         android:id="@+id/action_add_assignment"
