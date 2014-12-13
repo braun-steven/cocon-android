@@ -1,6 +1,7 @@
 package com.tak3r07.CourseStatistics;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.tak3r07.unihelper.R;
@@ -31,13 +33,16 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         mCourseArrayList = courses;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder{
 
+        //Initialize views in Viewholder
         TextView mTextViewFirst;
         TextView mTextViewSecond;
         ImageView mImageView;
         TextView mEndPercentageTextView;
 
+
+        //Holds views
         public ViewHolder(View itemView) {
             super(itemView);
             mTextViewFirst = (TextView) itemView.findViewById(R.id.course_firstLine);
@@ -46,6 +51,7 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
             mEndPercentageTextView = (TextView) itemView.findViewById(R.id.end_percentage_textview);
         }
 
+
     }
 
 
@@ -53,18 +59,17 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //Inflate layout
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_course, parent, false);
+        ViewHolder vh = new ViewHolder(itemView);
 
-        return new ViewHolder(itemView);
+        return vh;
     }
 
 
 
-
+    //Sets up the view
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         Course course = mCourseArrayList.get(position);
-
-
         //Set Icon
         Character firstChar = course.getCourseName().toLowerCase().charAt(0);
         holder.mImageView.setImageResource(getLetterIconId(firstChar));
@@ -75,6 +80,8 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
 
         //Set Percentage Color
         holder.mEndPercentageTextView.setTextColor(getColorForPercentage(course.getEndPercentage()));
+
+
 
     }
 
@@ -155,5 +162,13 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         if (percentage < 50) return context.getResources().getColor(R.color.light_green_500);
         if (percentage > 50) return context.getResources().getColor(R.color.green_500);
         return Color.BLACK;
+    }
+
+    //Adds Course
+    public void addCourse(Course course) {
+        if (course != null) {
+            mCourseArrayList.add(course);
+            this.notifyDataSetChanged();
+        }
     }
 }

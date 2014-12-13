@@ -46,7 +46,7 @@ public class MainActivity extends ActionBarActivity {
 
 
     private ArrayList<Course> mCourseArrayList = new ArrayList<Course>();
-    private CourseAdapter mCourseAdapter;
+    private RecyclerViewCourseAdapter mCourseAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +79,7 @@ public class MainActivity extends ActionBarActivity {
         //RecyclerView Setup
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_courses);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        RecyclerViewCourseAdapter mCourseAdapter = new RecyclerViewCourseAdapter(mCourseArrayList, getApplicationContext());
+        mCourseAdapter = new RecyclerViewCourseAdapter(mCourseArrayList, getApplicationContext());
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mCourseAdapter);
