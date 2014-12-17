@@ -294,7 +294,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         }
     }
 
-
+    //Store data on pause
     public void onPause() {
         CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
         super.onPause();

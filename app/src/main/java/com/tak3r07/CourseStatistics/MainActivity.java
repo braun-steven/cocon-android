@@ -38,7 +38,6 @@ public class MainActivity extends ActionBarActivity {
 
     private final String COURSE_TAG = "COURSE_TAG";
     private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";
-    private final String ARRAYLIST_SIZE = "ARRAYLIST_SIZE";
     private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
 
 
@@ -211,28 +210,20 @@ public class MainActivity extends ActionBarActivity {
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (resultCode == RESULT_OK) {
-
-
-            //Update courselist from database
-            mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
-
-            //Update adapter data
-            mCourseAdapter.notifyDataSetChanged();
-
-
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
+    //Safe data if destroyed
     @Override
     protected void onDestroy() {
         CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
         super.onDestroy();
 
+    }
+
+    //Restore data if resumed
+    @Override
+    protected void onResume() {
+        mCourseArrayList = CourseDataHandler.restore(getApplicationContext(),mCourseArrayList);
+        mCourseAdapter.notifyDataSetChanged();
+        super.onResume();
     }
 
 

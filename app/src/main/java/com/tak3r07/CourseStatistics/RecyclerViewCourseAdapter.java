@@ -1,7 +1,7 @@
 package com.tak3r07.CourseStatistics;
 
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.tak3r07.unihelper.R;
@@ -24,6 +23,8 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
     private ArrayList<Course> mCourseArrayList;
     private Context context;
 
+    private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";
+
     RecyclerViewCourseAdapter(ArrayList<Course> courses, Context context) {
         this.context = context;
         if (courses == null) {
@@ -33,7 +34,7 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         mCourseArrayList = courses;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         //Initialize views in Viewholder
         TextView mTextViewFirst;
@@ -45,6 +46,7 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         //Holds views
         public ViewHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
             mTextViewFirst = (TextView) itemView.findViewById(R.id.course_firstLine);
             mTextViewSecond = (TextView) itemView.findViewById(R.id.course_secondLine);
             mImageView = (ImageView) itemView.findViewById(R.id.icon);
@@ -52,6 +54,22 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         }
 
 
+        /*
+        OnCick: Course at the specific position shall be opened
+         */
+        @Override
+        public void onClick(View v) {
+            //Setup new Intent
+            Intent intent = new Intent();
+            intent.setClass(CourseStatistics.getAppContext(), AssignmentsActivity.class);
+
+            //add course position to update assignments when result comes back
+            intent.putExtra("COURSE_TAG_POSITION", getPosition());
+            //Start activity
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            CourseStatistics.getAppContext().startActivity(intent);
+
+        }
     }
 
 
