@@ -25,7 +25,7 @@
                 android:layout_height="fill_parent"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentTop="true"
-                android:src="@drawable/letters_e" />
+                android:src="@drawable/letters_e"/>
 
             <TextView
                 android:id="@+id/course_secondLine"

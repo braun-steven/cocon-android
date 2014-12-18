@@ -41,6 +41,7 @@ public class MainActivity extends ActionBarActivity {
     private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
 
 
+
     private ListView mListView;
 
 
@@ -82,6 +83,7 @@ public class MainActivity extends ActionBarActivity {
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mCourseAdapter);
+        mRecyclerView.setLongClickable(true);
 
 
         //If activity is freshly started (SavedInstanceState == null): restore data from storage
@@ -221,7 +223,9 @@ public class MainActivity extends ActionBarActivity {
     //Restore data if resumed
     @Override
     protected void onResume() {
+        //Restore data
         mCourseArrayList = CourseDataHandler.restore(getApplicationContext(),mCourseArrayList);
+        //Notify Adapter
         mCourseAdapter.notifyDataSetChanged();
         super.onResume();
     }
@@ -235,6 +239,8 @@ public class MainActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //Create new Intent
                 Intent intent = new Intent();
+
+                //Set class to be opeened
                 intent.setClass(getApplicationContext(), AssignmentsActivity.class);
 
                 //add  course

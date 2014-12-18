@@ -132,7 +132,7 @@ public class Course implements Serializable {
 
             currentAssignment = it.next();
             if (currentAssignment.isExtraAssignment() == false) {
-                it.next().setMaxPoints(reachablePointsPerAssignment);
+                currentAssignment.setMaxPoints(reachablePointsPerAssignment);
             }
         }
     }
@@ -181,19 +181,9 @@ public class Course implements Serializable {
     public int getNumberOfAssUntilFin() {
         Double necPointsAtAll = numberOfAssignments * reachablePointsPerAssignment * 0.5;
 
-        Double achievedPointsAtAll = 0.;
+        Double achievedPointsAtAll = getTotalPoints();
 
-        //Iterate on the array and sum up all its achieved points
-        for (Iterator<Assignment> iterator = mAssignmentArrayList.iterator(); iterator.hasNext(); ) {
-
-            achievedPointsAtAll += iterator.next().getAchievedPoints();
-
-        }
-
-        int numberAssignmentsLeft = numberOfAssignments - mAssignmentArrayList.size();
-        Double numberOfPointsLeft = necPointsAtAll - achievedPointsAtAll;
-
-        Double averagePointsPerAssignment = getOverAllPercentage() * reachablePointsPerAssignment / 100d;
+        Double averagePointsPerAssignment = getAveragePointsPerAssignment();
 
         //Scenario: Course has been initialized for the first time
         if (averagePointsPerAssignment == 0) return 0;
@@ -208,6 +198,30 @@ public class Course implements Serializable {
         }
 
         return count;
+    }
+
+    /**
+    Returns Average Points per Assignment
+     */
+    public Double getAveragePointsPerAssignment(){
+        return Math.round(getOverAllPercentage()*getReachablePointsPerAssignment()*1)/100d;
+    }
+
+    /**
+     * Returns total points of all assignments of this course
+     * @return achievedPointsAtAll Double
+     */
+    public Double getTotalPoints(){
+        Double achievedPointsAtAll = 0.;
+
+        //Iterate on the array and sum up all its achieved points
+        for (Iterator<Assignment> iterator = mAssignmentArrayList.iterator(); iterator.hasNext(); ) {
+
+            achievedPointsAtAll += iterator.next().getAchievedPoints();
+
+        }
+
+        return achievedPointsAtAll;
     }
 
 }

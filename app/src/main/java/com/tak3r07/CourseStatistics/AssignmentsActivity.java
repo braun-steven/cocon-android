@@ -308,9 +308,18 @@ public class AssignmentsActivity extends ActionBarActivity {
         TextView mTextViewOverall = (TextView) findViewById(R.id.course_overview_overall_percentage_text);
 
         //Set texts
-        mTextViewAverage.setText(course.getOverAllPercentage().toString() + " %"); //Warning: "getOverAll = average in course classe"
-        mTextViewOverall.setText(course.getEndPercentage().toString() + " %");
+
+
+        //Overall
+        mTextViewOverall.setText(course.getEndPercentage().toString() + " % - " + course.getTotalPoints() + "/" + course.getNumberOfAssignments()*course.getReachablePointsPerAssignment());
+
+        //Average
+        mTextViewAverage.setText(course.getOverAllPercentage().toString() + " % - " + course.getAveragePointsPerAssignment() + "/" + course.getReachablePointsPerAssignment()); //Warning: "getOverAll = average in course classe"
+
+        //Nedded Points per assignment until 50% is reached
         mTextViewNecPoiPerAss.setText(course.getNecessaryPointsPerAssignmentUntilFin().toString());
+
+        //Number of assignments until 50% is reached
         mTextViewAssUntilFin.setText(String.valueOf(course.getNumberOfAssUntilFin()));
     }
 }

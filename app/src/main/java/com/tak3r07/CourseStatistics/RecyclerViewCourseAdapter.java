@@ -1,17 +1,22 @@
 package com.tak3r07.CourseStatistics;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.tak3r07.unihelper.R;
+
 import java.util.ArrayList;
 
 /**
@@ -19,6 +24,8 @@ import java.util.ArrayList;
  * Adapter for RecyclerView in MainActivity
  */
 public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerViewCourseAdapter.ViewHolder> {
+
+
 
     private ArrayList<Course> mCourseArrayList;
     private Context context;
@@ -34,19 +41,26 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         mCourseArrayList = courses;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener {
 
         //Initialize views in Viewholder
         TextView mTextViewFirst;
         TextView mTextViewSecond;
         ImageView mImageView;
         TextView mEndPercentageTextView;
-
+        //Context to refer to app context (for intent, dialog etc)
+        Context context;
+        //Adapter to notifiy data set changed
+        RecyclerViewCourseAdapter mCourseAdapter;
 
         //Holds views
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, Context context, RecyclerViewCourseAdapter mCourseAdapter) {
+
             super(itemView);
+            this.context = context;
+            this.mCourseAdapter = mCourseAdapter;
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
             mTextViewFirst = (TextView) itemView.findViewById(R.id.course_firstLine);
             mTextViewSecond = (TextView) itemView.findViewById(R.id.course_secondLine);
             mImageView = (ImageView) itemView.findViewById(R.id.icon);
@@ -55,21 +69,63 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
 
 
         /*
-        OnCick: Course at the specific position shall be opened
+        OnClick: Course at the specific position shall be opened
          */
         @Override
         public void onClick(View v) {
             //Setup new Intent
             Intent intent = new Intent();
-            intent.setClass(CourseStatistics.getAppContext(), AssignmentsActivity.class);
+            intent.setClass(context, AssignmentsActivity.class);
 
             //add course position to update assignments when result comes back
             intent.putExtra("COURSE_TAG_POSITION", getPosition());
             //Start activity
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            CourseStatistics.getAppContext().startActivity(intent);
+            context.startActivity(intent);
 
         }
+
+        @Override
+        public boolean onLongClick(View v) {
+            //Open Alert dialog to delete item
+
+            AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+
+            //Set title and message
+            alert.setTitle(context.getString(R.string.delete));
+            alert.setMessage(context.getString(R.string.do_you_want_to_delete) + mTextViewFirst.getText().toString() + "?");
+
+            //Set positive button behaviour
+            alert.setPositiveButton(context.getString(R.string.delete), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    //Delete course and notify
+                    Toast.makeText(context, mTextViewFirst.getText().toString() + context.getString(R.string.deleted), Toast.LENGTH_LONG).show();
+
+                    //Remove Course
+                    mCourseAdapter.getmCourseArrayList().remove(getPosition());
+
+                    //Save Course ArrayList to storage
+                    CourseDataHandler.save(context, mCourseAdapter.getmCourseArrayList());
+                    mCourseAdapter.notifyDataSetChanged();
+
+
+                }
+            });
+
+            alert.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // Canceled.
+                }
+            });
+
+            alert.show();
+
+
+            return true;
+        }
+
+
     }
 
 
@@ -77,11 +133,10 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //Inflate layout
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_course, parent, false);
-        ViewHolder vh = new ViewHolder(itemView);
+        ViewHolder vh = new ViewHolder(itemView, context, this);
 
         return vh;
     }
-
 
 
     //Sets up the view
@@ -98,7 +153,6 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
 
         //Set Percentage Color
         holder.mEndPercentageTextView.setTextColor(getColorForPercentage(course.getEndPercentage()));
-
 
 
     }
@@ -188,5 +242,13 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
             mCourseArrayList.add(course);
             this.notifyDataSetChanged();
         }
+    }
+
+    public ArrayList<Course> getmCourseArrayList() {
+        return mCourseArrayList;
+    }
+
+    public void setmCourseArrayList(ArrayList<Course> mCourseArrayList) {
+        this.mCourseArrayList = mCourseArrayList;
     }
 }
