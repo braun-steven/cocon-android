@@ -163,66 +163,6 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         return mCourseArrayList.size();
     }
 
-    public int getLetterIconId(Character character) {
-        switch (character) {
-            case 'a':
-                return R.drawable.letters_a;
-            case 'b':
-                return R.drawable.letters_b;
-            case 'c':
-                return R.drawable.letters_c;
-            case 'd':
-                return R.drawable.letters_d;
-            case 'e':
-                return R.drawable.letters_e;
-            case 'f':
-                return R.drawable.letters_f;
-            case 'g':
-                return R.drawable.letters_g;
-            case 'h':
-                return R.drawable.letters_h;
-            case 'i':
-                return R.drawable.letters_i;
-            case 'j':
-                return R.drawable.letters_j;
-            case 'k':
-                return R.drawable.letters_k;
-            case 'l':
-                return R.drawable.letters_l;
-            case 'm':
-                return R.drawable.letters_m;
-            case 'n':
-                return R.drawable.letters_n;
-            case 'o':
-                return R.drawable.letters_o;
-            case 'p':
-                return R.drawable.letters_p;
-            case 'q':
-                return R.drawable.letters_q;
-            case 'r':
-                return R.drawable.letters_r;
-            case 's':
-                return R.drawable.letters_s;
-            case 't':
-                return R.drawable.letters_t;
-            case 'u':
-                return R.drawable.letters_u;
-            case 'v':
-                return R.drawable.letters_v;
-            case 'w':
-                return R.drawable.letters_w;
-            case 'x':
-                return R.drawable.letters_x;
-            case 'y':
-                return R.drawable.letters_y;
-            case 'z':
-                return R.drawable.letters_z;
-            default:
-                return 0;
-        }
-    }
-
-
     /**
      * This method receives a percentage and retrieves a color
      */
