@@ -50,7 +50,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        //Setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
         setSupportActionBar(toolbar);
 
@@ -61,17 +61,6 @@ public class MainActivity extends ActionBarActivity {
 
         }
 
-        /* LISTVIEW SETUP NOW UNCOMMENTED FOR RECYCLERVIEW
-        //ListView setup
-        mListView = (ListView) findViewById(R.id.listView_courses);
-
-        //Add adapter to listview
-        mCourseAdapter = new CourseAdapter(this, mCourseArrayList);
-        mListView.setAdapter(mCourseAdapter);
-
-        //Set onClick and onLongClick
-        setClickListener();
-        */
 
         //RecyclerView Setup
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_courses);
