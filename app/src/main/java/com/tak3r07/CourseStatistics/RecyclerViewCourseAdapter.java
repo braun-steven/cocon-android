@@ -46,7 +46,8 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         //Initialize views in Viewholder
         TextView mTextViewFirst;
         TextView mTextViewSecond;
-        ImageView mImageView;
+        //ImageView mImageView;
+        TextView mLetter;
         TextView mEndPercentageTextView;
         //Context to refer to app context (for intent, dialog etc)
         Context context;
@@ -63,8 +64,9 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
             itemView.setOnLongClickListener(this);
             mTextViewFirst = (TextView) itemView.findViewById(R.id.course_firstLine);
             mTextViewSecond = (TextView) itemView.findViewById(R.id.course_secondLine);
-            mImageView = (ImageView) itemView.findViewById(R.id.icon);
+            //mImageView = (ImageView) itemView.findViewById(R.id.icon);
             mEndPercentageTextView = (TextView) itemView.findViewById(R.id.end_percentage_textview);
+            mLetter = (TextView) itemView.findViewById(R.id.course_letter);
         }
 
 
@@ -103,13 +105,10 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
                     Toast.makeText(context, mTextViewFirst.getText().toString() + context.getString(R.string.deleted), Toast.LENGTH_LONG).show();
 
                     //Remove Course
-                    mCourseAdapter.getmCourseArrayList().remove(getPosition());
+                    mCourseAdapter.removeCourse(getPosition());
 
                     //Save Course ArrayList to storage
                     CourseDataHandler.save(context, mCourseAdapter.getmCourseArrayList());
-                    mCourseAdapter.notifyDataSetChanged();
-
-
                 }
             });
 
@@ -132,7 +131,7 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //Inflate layout
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_course, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_course_alternative, parent, false);
         ViewHolder vh = new ViewHolder(itemView, context, this);
 
         return vh;
@@ -145,7 +144,9 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         Course course = mCourseArrayList.get(position);
         //Set Icon
         Character firstChar = course.getCourseName().toLowerCase().charAt(0);
-        holder.mImageView.setImageResource(getLetterIconId(firstChar));
+        holder.mLetter.setText(firstChar.toString().toUpperCase());
+        holder.mLetter.setWidth(holder.mLetter.getLineHeight());
+        //holder.mImageView.setImageResource(getLetterIconId(firstChar));
         //Set text
         holder.mTextViewFirst.setText(course.getCourseName());
         holder.mTextViewSecond.setText("\u00d8 " + course.getOverAllPercentage().toString() + " %");
@@ -240,7 +241,15 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
     public void addCourse(Course course) {
         if (course != null) {
             mCourseArrayList.add(course);
-            this.notifyDataSetChanged();
+            notifyItemInserted(mCourseArrayList.size());
+        }
+    }
+
+    //Removes Course
+    public void removeCourse(int position) {
+        if (position>=0){
+            mCourseArrayList.remove(position);
+            notifyItemRemoved(position);
         }
     }
 
