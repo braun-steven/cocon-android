@@ -6,6 +6,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,9 +42,8 @@ public class AssignmentsActivity extends ActionBarActivity {
     private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
 
 
-    private AssignmentAdapter mAssignmentAdapter;
+    private RecyclerViewAssignmentAdapter mAssignmentAdapter;
     private ArrayList<Assignment> mAssignmentArrayList;
-    private ListView mListView;
     private int coursePositionInArray;
     private Course course;
     private ArrayList<Course> mCourseArrayList;
@@ -82,14 +84,16 @@ public class AssignmentsActivity extends ActionBarActivity {
         this.setTitle(course.getCourseName());
 
 
-        //ListView setup
-        mListView = (ListView) findViewById(R.id.listView_assignments);
-
-        setClickListener();
-
-        //Create and add listview adapter
-        mAssignmentAdapter = new AssignmentAdapter(this, mAssignmentArrayList);
-        mListView.setAdapter(mAssignmentAdapter);
+        //RecyclerView Setup
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_assignments);
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        mAssignmentAdapter = new RecyclerViewAssignmentAdapter(mAssignmentArrayList, getApplicationContext());
+        mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mRecyclerView.setAdapter(mAssignmentAdapter);
+        mRecyclerView.setLongClickable(true);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setHasFixedSize(true);
 
         //Initialize "Overview"-Cardview
         initOverview();
@@ -208,48 +212,6 @@ public class AssignmentsActivity extends ActionBarActivity {
         Intent data = new Intent();
         setResult(RESULT_OK, data);
         finish();
-    }
-
-    public void setClickListener() {
-        //Set click listener for Listview
-
-        //On LONG click:
-        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-                                           final int position, long id) {
-                //Open Alert dialog to delete item
-
-                AlertDialog.Builder alert = new AlertDialog.Builder(AssignmentsActivity.this);
-
-                //Set title and message
-                alert.setTitle(getString(R.string.delete));
-                alert.setMessage(getString(R.string.want_delete_assignment) + mAssignmentArrayList.get(position).getIndex() + "?");
-
-                alert.setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        //Delete course and notify
-                        Toast.makeText(getApplicationContext(), mAssignmentArrayList.get(position).getIndex() + getString(R.string.deleted), Toast.LENGTH_LONG).show();
-                        mAssignmentArrayList.remove(position);
-
-                        //Update list
-                        mAssignmentAdapter.notifyDataSetChanged();
-                    }
-                });
-
-                alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        // Canceled.
-                    }
-                });
-
-                alert.show();
-
-
-                return true;
-            }
-        });
-
     }
 
     @Override

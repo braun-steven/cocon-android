@@ -42,10 +42,6 @@ public class MainActivity extends ActionBarActivity {
     private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
 
 
-
-    private ListView mListView;
-
-
     private ArrayList<Course> mCourseArrayList = new ArrayList<Course>();
     private RecyclerViewCourseAdapter mCourseAdapter;
 
@@ -233,70 +229,6 @@ public class MainActivity extends ActionBarActivity {
         super.onResume();
     }
 
-
-    public void setClickListener() {
-        //Listview onlclick and open Assignments-Activity
-
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Create new Intent
-                Intent intent = new Intent();
-
-                //Set class to be opeened
-                intent.setClass(getApplicationContext(), AssignmentsActivity.class);
-
-                //add  course
-                intent.putExtra(COURSE_TAG, mCourseArrayList.get(position));
-
-                //add course position to update assignments when result comes back
-                intent.putExtra(COURSE_TAG_POSITION, position);
-
-                startActivityForResult(intent, 0);
-
-            }
-        });
-
-
-        //On LONG click:
-        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-                                           final int position, long id) {
-                //Open Alert dialog to delete item
-
-                AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-
-                //Set title and message
-                alert.setTitle(getString(R.string.delete));
-                alert.setMessage(getString(R.string.do_you_want_to_delete) + mCourseArrayList.get(position).getCourseName() + "?");
-
-                alert.setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        //Delete course and notify
-                        Toast.makeText(getApplicationContext(), mCourseArrayList.get(position).getCourseName() + getString(R.string.deleted), Toast.LENGTH_LONG).show();
-                        mCourseArrayList.remove(position);
-
-                        //Update list
-                        mCourseAdapter.notifyDataSetChanged();
-                    }
-                });
-
-                alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        // Canceled.
-                    }
-                });
-
-                alert.show();
-
-
-                return true;
-            }
-        });
-
-
-    }
 
     public void onClickMenuRestore(MenuItem item) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
