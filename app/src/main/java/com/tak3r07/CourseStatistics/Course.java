@@ -74,8 +74,11 @@ public class Course implements Serializable {
 
     }
 
-    //calculate endpercentage: (all points of current assignments) / ((max number of point per assignment) * (number of assignments))
-    public Double getEndPercentage() {
+    /**
+     * calculate average : (all points of current assignments) / ((max points per assignment) * (number of assignments))
+     *
+     */
+    public Double getAverage() {
         double overAllAchievedPoints = 0;
 
         //Iterate on the array and sum up all its max and achieved points
@@ -88,10 +91,10 @@ public class Course implements Serializable {
 
         //Round on 4 digits
 
-        double endPercentage = Math.round(overAllAchievedPoints / (reachablePointsPerAssignment * numberOfAssignments) * 1000) / 10d;
+        double average = Math.round(overAllAchievedPoints / (reachablePointsPerAssignment * numberOfAssignments) * 1000) / 10d;
 
         //return result
-        return endPercentage;
+        return average;
     }
 
 
@@ -137,7 +140,9 @@ public class Course implements Serializable {
         }
     }
 
-    //Simple Clone code (deep copy)
+    /**
+     * Simple Clone code (deep copy)
+     */
     public Course clone() {
         Course clone = new Course(courseName);
         clone.setReachablePointsPerAssignment(reachablePointsPerAssignment);
@@ -151,26 +156,29 @@ public class Course implements Serializable {
         return clone;
     }
 
-    //Return necessary points per assignment until 50% reached
+    /**
+     * Return necessary points per assignment until 50% reached
+     */
     public Double getNecessaryPointsPerAssignmentUntilFin() {
+
+        //Necessary points for the whole course to reach 50%
         Double necPointsAtAll = numberOfAssignments * reachablePointsPerAssignment * 0.5;
 
-        Double achievedPointsAtAll = 0.;
+        //yet achieved points
+        Double achievedPointsAtAll = getTotalPoints();
 
-        //Iterate on the array and sum up all its achieved points
-        for (Iterator<Assignment> iterator = mAssignmentArrayList.iterator(); iterator.hasNext(); ) {
-
-            achievedPointsAtAll += iterator.next().getAchievedPoints();
-
-        }
-
+        //Number of assignments left for this semester
         int numberAssignmentsLeft = numberOfAssignments - mAssignmentArrayList.size();
+
+
         Double numberOfPointsLeft = necPointsAtAll - achievedPointsAtAll;
 
+        //Missing points divided by missing assignments
         Double necPointsPerAssUntilFin = Math.round(numberOfPointsLeft / numberAssignmentsLeft * 100) / 100d;
 
 
         if (necPointsPerAssUntilFin < 0) return 0.;
+
         return necPointsPerAssUntilFin;
 
     }
@@ -179,20 +187,27 @@ public class Course implements Serializable {
      * Return the number of assignments which are necessary until one would reach 50% with its current performance per assignment
      */
     public int getNumberOfAssUntilFin() {
+
+        //Necessary points for the whole course to reach 50%
         Double necPointsAtAll = numberOfAssignments * reachablePointsPerAssignment * 0.5;
 
+        //Yet achieved points
         Double achievedPointsAtAll = getTotalPoints();
 
+        //Average points per assignment
         Double averagePointsPerAssignment = getAveragePointsPerAssignment();
 
         //Scenario: Course has been initialized for the first time
         if (averagePointsPerAssignment == 0) return 0;
 
-        //Count until more than 50%
+        //Predicted points if you get your average points in all your next assignments
         Double predictedPoints = achievedPointsAtAll;
+
+        //Counts the number of assignments
         int count = 0;
+
+        //Each loop adds the averagepoints per assignment so it predicts your future results
         while (predictedPoints < necPointsAtAll) {
-            //Each loop it adds the averagepoints per assignment so it predicts your future results
             count++;
             predictedPoints += averagePointsPerAssignment;
         }
@@ -201,24 +216,25 @@ public class Course implements Serializable {
     }
 
     /**
-    Returns Average Points per Assignment
+     * Returns Average Points per Assignment
      */
-    public Double getAveragePointsPerAssignment(){
-        return Math.round(getOverAllPercentage()*getReachablePointsPerAssignment()*1)/100d;
+    public Double getAveragePointsPerAssignment() {
+        return Math.round(getOverAllPercentage() * getReachablePointsPerAssignment() * 1) / 100d;
     }
 
     /**
      * Returns total points of all assignments of this course
+     *
      * @return achievedPointsAtAll Double
      */
-    public Double getTotalPoints(){
+    public Double getTotalPoints() {
+
+        //Start sum at 0 points
         Double achievedPointsAtAll = 0.;
 
         //Iterate on the array and sum up all its achieved points
         for (Iterator<Assignment> iterator = mAssignmentArrayList.iterator(); iterator.hasNext(); ) {
-
             achievedPointsAtAll += iterator.next().getAchievedPoints();
-
         }
 
         return achievedPointsAtAll;

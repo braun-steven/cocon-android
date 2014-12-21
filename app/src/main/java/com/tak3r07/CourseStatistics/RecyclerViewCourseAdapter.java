@@ -9,8 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -150,10 +148,10 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         //Set text
         holder.mTextViewFirst.setText(course.getCourseName());
         holder.mTextViewSecond.setText("\u00d8 " + course.getOverAllPercentage().toString() + " %");
-        holder.mEndPercentageTextView.setText(course.getEndPercentage().toString() + " %");
+        holder.mEndPercentageTextView.setText(course.getAverage().toString() + " %");
 
         //Set Percentage Color
-        holder.mEndPercentageTextView.setTextColor(getColorForPercentage(course.getEndPercentage()));
+        holder.mEndPercentageTextView.setTextColor(getColorForPercentage(course.getAverage()));
 
 
     }

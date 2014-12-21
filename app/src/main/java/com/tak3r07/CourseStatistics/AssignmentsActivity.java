@@ -14,24 +14,14 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tak3r07.unihelper.R;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 
 public class AssignmentsActivity extends ActionBarActivity {
@@ -274,7 +264,7 @@ public class AssignmentsActivity extends ActionBarActivity {
 
 
         //Overall
-        mTextViewOverall.setText(course.getEndPercentage().toString() + " % - " + course.getTotalPoints() + "/" + course.getNumberOfAssignments()*course.getReachablePointsPerAssignment());
+        mTextViewOverall.setText(course.getAverage().toString() + " % - " + course.getTotalPoints() + "/" + course.getNumberOfAssignments()*course.getReachablePointsPerAssignment());
 
         //Average
         mTextViewAverage.setText(course.getOverAllPercentage().toString() + " % - " + course.getAveragePointsPerAssignment() + "/" + course.getReachablePointsPerAssignment()); //Warning: "getOverAll = average in course classe"
