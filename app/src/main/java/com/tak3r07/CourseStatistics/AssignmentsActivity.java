@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 public class AssignmentsActivity extends ActionBarActivity {
@@ -117,60 +118,74 @@ public class AssignmentsActivity extends ActionBarActivity {
     }
 
     public void onClickAddAssignment(MenuItem item) {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        //First check if there are already too many assignments
+        //Count extra-assignments
+        int countExtraAssignments = 0;
+        for (Iterator<Assignment> it = mAssignmentArrayList.iterator();it.hasNext();){
+            if(it.next().isExtraAssignment()) countExtraAssignments++;
+        }
 
-        alert.setTitle(getString(R.string.new_assignment));
-        alert.setMessage(getString(R.string.enter_assignment_points));
-
-        // Set an custom dialog view to get user input
-        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View view = View.inflate(this, R.layout.dialog_add_assignment, null);
-        alert.setView(view);
-
-        alert.setPositiveButton(getString(R.string.add), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                //Get EditText views
-                EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
-
-                //Get data from edittext
-                String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',', '.');
-
-                //Check if the entered Values are numeric (doubles)
-                if (isNumeric(achievedPointsString)) {
-
-                    Double achievedPoints = Double.parseDouble(achievedPointsString);
+        if (course.getNumberOfAssignments() - (mAssignmentArrayList.size() - countExtraAssignments) > 0) {
 
 
-                    // Index is arraylist size + 1 (so another item is added)
-                    int index = mAssignmentArrayList.size() + 1;
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+            alert.setTitle(getString(R.string.new_assignment));
+            alert.setMessage(getString(R.string.enter_assignment_points));
+
+            // Set an custom dialog view to get user input
+            LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final View view = View.inflate(this, R.layout.dialog_add_assignment, null);
+            alert.setView(view);
+
+            alert.setPositiveButton(getString(R.string.add), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    //Get EditText views
+                    EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
+
+                    //Get data from edittext
+                    String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',', '.');
+
+                    //Check if the entered Values are numeric (doubles)
+                    if (isNumeric(achievedPointsString)) {
+
+                        Double achievedPoints = Double.parseDouble(achievedPointsString);
 
 
-                    //Create new assignment from pulled data
-                    Assignment newAssignment = new Assignment(index, course.getReachablePointsPerAssignment(), achievedPoints);
+                        // Index is arraylist size + 1 (so another item is added)
+                        int index = mAssignmentArrayList.size() + 1;
 
-                    //Check if this is an extra assignment
-                    CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
-                    if (mCheckBox.isChecked()) {
-                        newAssignment.setExtraAssignment(true);
+
+                        //Create new assignment from pulled data
+                        Assignment newAssignment = new Assignment(index, course.getReachablePointsPerAssignment(), achievedPoints);
+
+                        //Check if this is an extra assignment
+                        CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
+                        if (mCheckBox.isChecked()) {
+                            newAssignment.setExtraAssignment(true);
+                        }
+
+                        //add new assignment
+                        addAssignment(newAssignment);
+                    } else {
+                        //If data was not numeric
+                        Toast.makeText(getApplicationContext(), getString(R.string.invalid_values), Toast.LENGTH_LONG).show();
+
                     }
-
-                    //add new assignment
-                    addAssignment(newAssignment);
-                } else {
-                    //If data was not numeric
-                    Toast.makeText(getApplicationContext(), getString(R.string.invalid_values), Toast.LENGTH_LONG).show();
-
                 }
-            }
-        });
+            });
 
-        alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Canceled.
-            }
-        });
+            alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // Canceled.
+                }
+            });
 
-        alert.show();
+            alert.show();
+        } else {
+            //already too many assignments
+            Toast.makeText(getApplicationContext(), getString(R.string.reached_assignments_limit), Toast.LENGTH_LONG).show();
+        }
     }
 
     //Add assignment to adapter (Eventually add to course necessary?)
@@ -244,6 +259,9 @@ public class AssignmentsActivity extends ActionBarActivity {
 
             //Notify adapter for changes
             mAssignmentAdapter.notifyDataSetChanged();
+
+            //Update overview
+            initOverview();
         }
     }
 
@@ -267,7 +285,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         mTextViewOverall.setText(course.getAverage().toString() + " % - " + course.getTotalPoints() + "/" + course.getNumberOfAssignments()*course.getReachablePointsPerAssignment());
 
         //Average
-        mTextViewAverage.setText(course.getOverAllPercentage().toString() + " % - " + course.getAveragePointsPerAssignment() + "/" + course.getReachablePointsPerAssignment()); //Warning: "getOverAll = average in course classe"
+        mTextViewAverage.setText(course.getOverAllPercentage(true).toString() + " % - " + course.getAveragePointsPerAssignment(true) + "/" + course.getReachablePointsPerAssignment()); //Warning: "getOverAll = average in course classe"
 
         //Nedded Points per assignment until 50% is reached
         mTextViewNecPoiPerAss.setText(course.getNecessaryPointsPerAssignmentUntilFin().toString());

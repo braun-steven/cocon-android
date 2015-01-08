@@ -47,4 +47,7 @@
     <string name="text_extra_assignment_checkbox">Dies ist ein Zusatzblatt</string>
     <string name="title_activity_edit_course">Kurs bearbeiten</string>
     <string name="want_delete_assignment">"Löschen: "</string>
+    <string name="reached_assignments_limit">Du hast die maximale Anzahl an Übungsblätter für diesen Kurs erreicht!</string>
+    <string name="title_activity_course">CourseActivity</string>
+    <string name="number_assignments_too_low">Neue Anzahl an Übungsblätter geringer als vorhandene Anzahl</string>
 </resources>

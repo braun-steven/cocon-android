@@ -36,9 +36,6 @@ import java.util.Iterator;
 
 
 public class MainActivity extends ActionBarActivity {
-
-    private final String COURSE_TAG = "COURSE_TAG";
-    private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";
     private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
 
 

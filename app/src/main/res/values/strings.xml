@@ -49,5 +49,7 @@
     <string name="points_per_assignment">Points per assignment</string>
     <string name="number_of_assignments">Number of assignments</string>
     <string name="save">Save</string>
+    <string name="reached_assignments_limit">You have reached your assignments limit for this course!</string>
+    <string name="number_assignments_too_low">New number of assignments lower than current number of assignments</string>
 
 </resources>

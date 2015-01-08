@@ -147,7 +147,7 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         //holder.mImageView.setImageResource(getLetterIconId(firstChar));
         //Set text
         holder.mTextViewFirst.setText(course.getCourseName());
-        holder.mTextViewSecond.setText("\u00d8 " + course.getOverAllPercentage().toString() + " %");
+        holder.mTextViewSecond.setText("\u00d8 " + course.getOverAllPercentage(true).toString() + " %");
         holder.mEndPercentageTextView.setText(course.getAverage().toString() + " %");
 
         //Set Percentage Color

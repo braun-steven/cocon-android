@@ -52,19 +52,28 @@ public class Course implements Serializable {
     }
 
     //Calculate overall percentage of current assignments (= average)
-    public Double getOverAllPercentage() {
+    public Double getOverAllPercentage(boolean extraAssignments) {
         double overAllAchievedPoints = 0;
         double overAllMaxPoints = 0;
 
-
-        //Iterate on the array and sum up all its max and achieved points
-        Assignment currentAssignment;
-        for (Iterator<Assignment> iterator = mAssignmentArrayList.iterator(); iterator.hasNext(); ) {
-            currentAssignment = iterator.next();
-            overAllAchievedPoints += currentAssignment.getAchievedPoints();
-            overAllMaxPoints += currentAssignment.getMaxPoints();
+        if (extraAssignments == true) {
+            //Iterate on the array and sum up all its max and achieved points
+            Assignment currentAssignment;
+            for (Iterator<Assignment> iterator = mAssignmentArrayList.iterator(); iterator.hasNext(); ) {
+                currentAssignment = iterator.next();
+                overAllAchievedPoints += currentAssignment.getAchievedPoints();
+                overAllMaxPoints += currentAssignment.getMaxPoints();
+            }
+        } else {
+            //Iterate on the array and sum up all its max and achieved points excluding the extra assignments
+            Assignment currentAssignment;
+            for (Iterator<Assignment> iterator = mAssignmentArrayList.iterator(); iterator.hasNext(); ) {
+                currentAssignment = iterator.next();
+                if (currentAssignment.isExtraAssignment() == true) continue;
+                overAllAchievedPoints += currentAssignment.getAchievedPoints();
+                overAllMaxPoints += currentAssignment.getMaxPoints();
+            }
         }
-
         //Round on 4 digits
         double overAllPercentage = Math.round(overAllAchievedPoints / overAllMaxPoints * 1000) / 10d;
 
@@ -76,7 +85,6 @@ public class Course implements Serializable {
 
     /**
      * calculate average : (all points of current assignments) / ((max points per assignment) * (number of assignments))
-     *
      */
     public Double getAverage() {
         double overAllAchievedPoints = 0;
@@ -167,8 +175,14 @@ public class Course implements Serializable {
         //yet achieved points
         Double achievedPointsAtAll = getTotalPoints();
 
+        //Count extra-assignments
+        int countExtraAssignments = 0;
+        for (Iterator<Assignment> it = mAssignmentArrayList.iterator();it.hasNext();){
+            if(it.next().isExtraAssignment()) countExtraAssignments++;
+        }
+
         //Number of assignments left for this semester
-        int numberAssignmentsLeft = numberOfAssignments - mAssignmentArrayList.size();
+        int numberAssignmentsLeft = numberOfAssignments - (mAssignmentArrayList.size() - countExtraAssignments);
 
 
         Double numberOfPointsLeft = necPointsAtAll - achievedPointsAtAll;
@@ -194,8 +208,8 @@ public class Course implements Serializable {
         //Yet achieved points
         Double achievedPointsAtAll = getTotalPoints();
 
-        //Average points per assignment
-        Double averagePointsPerAssignment = getAveragePointsPerAssignment();
+        //Average points per assignment (false will exclude the extra assignments)
+        Double averagePointsPerAssignment = getAveragePointsPerAssignment(false);
 
         //Scenario: Course has been initialized for the first time
         if (averagePointsPerAssignment == 0) return 0;
@@ -218,8 +232,8 @@ public class Course implements Serializable {
     /**
      * Returns Average Points per Assignment
      */
-    public Double getAveragePointsPerAssignment() {
-        return Math.round(getOverAllPercentage() * getReachablePointsPerAssignment() * 1) / 100d;
+    public Double getAveragePointsPerAssignment(boolean extraAssignments) {
+        return Math.round(getOverAllPercentage(extraAssignments) * getReachablePointsPerAssignment() * 1) / 100d;
     }
 
     /**

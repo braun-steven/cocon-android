@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.tak3r07.unihelper.R;
 
@@ -94,19 +95,37 @@ public class EditCourseActivity extends ActionBarActivity {
     }
 
     public void onClickSave(View view) {
-        //Save new values in course
-        course.setCourseName(mNameEditText.getText().toString());
-        course.setNumberOfAssignments(Integer.parseInt(mNumberEditText.getText().toString()));
-        course.setReachablePointsPerAssignment(Double.parseDouble(mMaxPointsEditText.getText().toString()));
+        String name = mNameEditText.getText().toString();
+        int numberOfAssignments = Integer.parseInt(mNumberEditText.getText().toString());
+        double reachablePointsPerAssignment = Double.parseDouble(mMaxPointsEditText.getText().toString());
 
-        //Create empty intent
-        Intent data = new Intent();
 
-        //Store data
-        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
+        //Count extra-assignments
+        int countExtraAssignments = 0;
+        for (Iterator<Assignment> it = course.getAssignments().iterator(); it.hasNext(); ) {
+            if (it.next().isExtraAssignment()) countExtraAssignments++;
+        }
 
-        setResult(RESULT_OK, data);
-        finish();
+        //Check if new numberOfAssignments Value is still smaller than the existing size
+        if (numberOfAssignments >= (course.getAssignments().size() - countExtraAssignments)) {
+
+            //Save new values in course
+            course.setCourseName(name);
+            course.setNumberOfAssignments(numberOfAssignments);
+            course.setReachablePointsPerAssignment(reachablePointsPerAssignment);
+
+            //Create empty intent
+            Intent data = new Intent();
+
+            //Store data
+            CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
+
+            setResult(RESULT_OK, data);
+            finish();
+        } else {
+            //Notify user about too low numberOfAssignments
+            Toast.makeText(getApplicationContext(), getString(R.string.number_assignments_too_low), Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void onClickCancel(View view) {
