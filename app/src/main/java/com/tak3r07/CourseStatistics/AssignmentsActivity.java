@@ -19,10 +19,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.helper.GraphViewXML;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.PointsGraphSeries;
 import com.tak3r07.unihelper.R;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 
 public class AssignmentsActivity extends ActionBarActivity {
@@ -118,28 +125,26 @@ public class AssignmentsActivity extends ActionBarActivity {
     }
 
     public void onClickAddAssignment(MenuItem item) {
-        //First check if there are already too many assignments
-        //Count extra-assignments
-        int countExtraAssignments = 0;
-        for (Iterator<Assignment> it = mAssignmentArrayList.iterator();it.hasNext();){
-            if(it.next().isExtraAssignment()) countExtraAssignments++;
-        }
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-        if (course.getNumberOfAssignments() - (mAssignmentArrayList.size() - countExtraAssignments) > 0) {
+        alert.setTitle(getString(R.string.new_assignment));
+        alert.setMessage(getString(R.string.enter_assignment_points));
 
+        // Set an custom dialog view to get user input
+        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View view = View.inflate(this, R.layout.dialog_add_assignment, null);
+        alert.setView(view);
 
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setPositiveButton(getString(R.string.add), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                //First check if there are already too many assignments
+                //Count extra-assignments
+                int countExtraAssignments = 0;
+                for (Assignment aMAssignmentArrayList : mAssignmentArrayList) {
+                    if (aMAssignmentArrayList.isExtraAssignment()) countExtraAssignments++;
+                }
 
-            alert.setTitle(getString(R.string.new_assignment));
-            alert.setMessage(getString(R.string.enter_assignment_points));
-
-            // Set an custom dialog view to get user input
-            LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View view = View.inflate(this, R.layout.dialog_add_assignment, null);
-            alert.setView(view);
-
-            alert.setPositiveButton(getString(R.string.add), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
+                if (course.getNumberOfAssignments() - (mAssignmentArrayList.size() - countExtraAssignments) > 0) {
                     //Get EditText views
                     EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
 
@@ -172,20 +177,21 @@ public class AssignmentsActivity extends ActionBarActivity {
                         Toast.makeText(getApplicationContext(), getString(R.string.invalid_values), Toast.LENGTH_LONG).show();
 
                     }
+                } else {
+                    //already too many assignments
+                    Toast.makeText(getApplicationContext(), getString(R.string.reached_assignments_limit), Toast.LENGTH_LONG).show();
                 }
-            });
+            }
+        });
 
-            alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // Canceled.
-                }
-            });
+        alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
 
-            alert.show();
-        } else {
-            //already too many assignments
-            Toast.makeText(getApplicationContext(), getString(R.string.reached_assignments_limit), Toast.LENGTH_LONG).show();
-        }
+        alert.show();
+
     }
 
     //Add assignment to adapter (Eventually add to course necessary?)
@@ -282,7 +288,7 @@ public class AssignmentsActivity extends ActionBarActivity {
 
 
         //Overall
-        mTextViewOverall.setText(course.getAverage().toString() + " % - " + course.getTotalPoints() + "/" + course.getNumberOfAssignments()*course.getReachablePointsPerAssignment());
+        mTextViewOverall.setText(course.getAverage().toString() + " % - " + course.getTotalPoints() + "/" + course.getNumberOfAssignments() * course.getReachablePointsPerAssignment());
 
         //Average
         mTextViewAverage.setText(course.getOverAllPercentage(true).toString() + " % - " + course.getAveragePointsPerAssignment(true) + "/" + course.getReachablePointsPerAssignment()); //Warning: "getOverAll = average in course classe"
@@ -292,5 +298,39 @@ public class AssignmentsActivity extends ActionBarActivity {
 
         //Number of assignments until 50% is reached
         mTextViewAssUntilFin.setText(String.valueOf(course.getNumberOfAssUntilFin()));
+
+        //Graph
+
+
+        ArrayList<DataPoint> dataPoints = new ArrayList<DataPoint>();
+        for (Assignment currentAssignment : course.getAssignments()) {
+            //exclude extra assignments
+            if (!currentAssignment.isExtraAssignment()) {
+                dataPoints.add(new DataPoint(currentAssignment.getIndex(), currentAssignment.getAchievedPoints()));
+            }
+        }
+
+        DataPoint[] points = new DataPoint[dataPoints.size()];
+        for (int i = 0; i < dataPoints.size(); i++) {
+            points[i] = dataPoints.get(i);
+        }
+        GraphView graph = (GraphView) findViewById(R.id.graph);
+        PointsGraphSeries<DataPoint> series = new PointsGraphSeries<DataPoint>(points);
+        series.setSize(8);
+
+        //Setup Graph
+        graph.addSeries(series);
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(course.getReachablePointsPerAssignment());
+        graph.getGridLabelRenderer().setNumVerticalLabels(4);
+
+        //Count extra-assignments
+        int countExtraAssignments = 0;
+        for (Assignment assignment : course.getAssignments()) {
+            if (assignment.isExtraAssignment()) countExtraAssignments++;
+        }
+
+        graph.getGridLabelRenderer().setNumHorizontalLabels(course.getAssignments().size() - countExtraAssignments);
     }
 }
