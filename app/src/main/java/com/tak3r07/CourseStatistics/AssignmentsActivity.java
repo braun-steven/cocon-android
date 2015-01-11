@@ -327,6 +327,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         series.setSize(8);
 
         //Setup Graph
+        graph.removeAllSeries();
         graph.addSeries(series);
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinY(0);
