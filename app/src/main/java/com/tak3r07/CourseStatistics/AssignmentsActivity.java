@@ -86,7 +86,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         //RecyclerView Setup
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_assignments);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mAssignmentAdapter = new RecyclerViewAssignmentAdapter(mAssignmentArrayList, getApplicationContext());
+        mAssignmentAdapter = new RecyclerViewAssignmentAdapter(mAssignmentArrayList, getApplicationContext(), course, this);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mAssignmentAdapter);
@@ -310,6 +310,14 @@ public class AssignmentsActivity extends ActionBarActivity {
             }
         }
 
+
+        //Count extra-assignments
+        int countExtraAssignments = 0;
+        for (Assignment assignment : course.getAssignments()) {
+            if (assignment.isExtraAssignment()) countExtraAssignments++;
+        }
+
+
         DataPoint[] points = new DataPoint[dataPoints.size()];
         for (int i = 0; i < dataPoints.size(); i++) {
             points[i] = dataPoints.get(i);
@@ -322,14 +330,10 @@ public class AssignmentsActivity extends ActionBarActivity {
         graph.addSeries(series);
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(course.getAssignments().size() - countExtraAssignments);
         graph.getViewport().setMaxY(course.getReachablePointsPerAssignment());
-        graph.getGridLabelRenderer().setNumVerticalLabels(4);
 
-        //Count extra-assignments
-        int countExtraAssignments = 0;
-        for (Assignment assignment : course.getAssignments()) {
-            if (assignment.isExtraAssignment()) countExtraAssignments++;
-        }
+
 
         graph.getGridLabelRenderer().setNumHorizontalLabels(course.getAssignments().size() - countExtraAssignments);
     }

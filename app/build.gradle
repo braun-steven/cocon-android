@@ -8,8 +8,8 @@ android {
         applicationId "com.tak3r07.unihelper"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 142
-        versionName "1.4.2"
+        versionCode 143
+        versionName "1.4.3"
     }
     buildTypes {
         release {

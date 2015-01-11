@@ -76,7 +76,13 @@ public class Assignment implements Serializable {
     }
 
     public void setExtraAssignment(boolean isExtraAssignment) {
+
         this.isExtraAssignment = isExtraAssignment;
         this.maxPoints = 0d;
+    }
+
+    public void setExtraAssignment(boolean isExtraAssignment, double maxPoints){
+        this.isExtraAssignment = isExtraAssignment;
+        this.maxPoints = maxPoints;
     }
 }

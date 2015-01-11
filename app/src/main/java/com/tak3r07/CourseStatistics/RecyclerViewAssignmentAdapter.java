@@ -9,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,13 +25,16 @@ import java.util.ArrayList;
 public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<RecyclerViewAssignmentAdapter.ViewHolder> {
 
 
-
     private ArrayList<Assignment> mAssignmentsArrayList;
     private Context context;
+    private final Course course;
+    private final AssignmentsActivity assignmentsActivity;
 
 
-    RecyclerViewAssignmentAdapter(ArrayList<Assignment> assignments, Context context) {
+    RecyclerViewAssignmentAdapter(ArrayList<Assignment> assignments, Context context, Course course, AssignmentsActivity assignmentsActivity) {
         this.context = context;
+        this.course = course;
+        this.assignmentsActivity = assignmentsActivity;
         if (assignments == null) {
             throw new IllegalArgumentException("assignments ArrayList must not be null");
         }
@@ -37,7 +42,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         mAssignmentsArrayList = assignments;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         //Initialize views in Viewholder
         TextView mTextViewTitle;
@@ -48,10 +53,14 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         //Adapter to notifiy data set changed
         RecyclerViewAssignmentAdapter mAssignmentsAdapter;
 
+        //Activity to notify Overview for data set change
+        AssignmentsActivity assignmentsActivity;
+
         //Holds views
-        public ViewHolder(View itemView, Context context, RecyclerViewAssignmentAdapter mAssignmentsAdapter) {
+        public ViewHolder(View itemView, Context context, RecyclerViewAssignmentAdapter mAssignmentsAdapter, AssignmentsActivity activity) {
 
             super(itemView);
+            this.assignmentsActivity = activity;
             this.context = context;
             this.mAssignmentsAdapter = mAssignmentsAdapter;
             itemView.setOnClickListener(this);
@@ -73,10 +82,10 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
 
         @Override
-        public boolean onLongClick(View v) {
+        public boolean onLongClick(final View v) {
             //Open Alert dialog to delete item
 
-            AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+            final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
 
             //Set title and message
             alert.setTitle(context.getString(R.string.delete));
@@ -94,9 +103,93 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                 }
             });
 
-            alert.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            alert.setNeutralButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     // Canceled.
+
+                }
+            });
+
+            alert.setNegativeButton(context.getString(R.string.edit_assignment), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+
+                    alert.setTitle(context.getString(R.string.dialog_edit_assignment_title));
+                    alert.setMessage(context.getString(R.string.enter_assignment_points));
+
+                    // Set an custom dialog view to get user input
+                    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    final View view = View.inflate(v.getContext(), R.layout.dialog_add_assignment, null);
+                    alert.setView(view);
+
+                    //Get assignment reference
+                    final Assignment currentAssignment = mAssignmentsAdapter.mAssignmentsArrayList.get(getPosition());
+
+                    //Checkbox reference
+                    final CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
+                    mCheckBox.setChecked(currentAssignment.isExtraAssignment());
+
+                    //Get EditText views
+                    final EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
+                    mEditTextAchievedPoints.setHint(currentAssignment.getAchievedPoints() + "");
+
+                    alert.setPositiveButton(context.getString(R.string.dialog_edit_assignment_save), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+
+
+                            //Get data from edittext
+                            String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',', '.');
+
+                            //Check if the entered Values are numeric (doubles)
+                            if (AssignmentsActivity.isNumeric(achievedPointsString)) {
+
+                                Double achievedPoints = Double.parseDouble(achievedPointsString);
+
+                                //Set new achieved points value
+                                currentAssignment.setAchievedPoints(achievedPoints);
+
+
+                                //Set extra assignment if checked
+                                if (mCheckBox.isChecked()) {
+                                    currentAssignment.setExtraAssignment(true);
+                                } else {
+                                    currentAssignment.setExtraAssignment(false, mAssignmentsAdapter.course.getReachablePointsPerAssignment());
+                                }
+
+                                //Update Overview tile
+                                assignmentsActivity.initOverview();
+
+                                //Update Listitem
+                                //Set text
+                                mTextViewTitle.setText(context.getString(R.string.assignment_number) + currentAssignment.getIndex());
+                                mTextViewPoints.setText(currentAssignment.getAchievedPoints() + " / " + currentAssignment.getMaxPoints());
+
+                                //Test if Assignment is Extraassignment:
+                                if (currentAssignment.isExtraAssignment()) {
+                                    mTextViewPercentage.setText("+");
+                                } else {
+                                    //Else set usual text
+                                    mTextViewPercentage.setText(currentAssignment.getPercentage().toString() + " %");
+
+                                }
+
+
+                            } else {
+                                //If data was not numeric
+                                Toast.makeText(context, context.getString(R.string.invalid_values), Toast.LENGTH_LONG).show();
+
+                            }
+                        }
+                    });
+
+                    alert.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            // Canceled.
+                        }
+                    });
+
+                    alert.show();
                 }
             });
 
@@ -114,9 +207,8 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //Inflate layout
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_assignment, parent, false);
-        ViewHolder vh = new ViewHolder(itemView, context, this);
 
-        return vh;
+        return new ViewHolder(itemView, context, this, assignmentsActivity);
     }
 
 
@@ -147,12 +239,12 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         return mAssignmentsArrayList.size();
     }
 
-    public void addAssignment(Assignment assignment){
+    public void addAssignment(Assignment assignment) {
         mAssignmentsArrayList.add(assignment);
         notifyItemInserted(mAssignmentsArrayList.size());
     }
 
-    public void removeAssignment(int position){
+    public void removeAssignment(int position) {
         mAssignmentsArrayList.remove(position);
         notifyItemRemoved(position);
     }
@@ -164,7 +256,6 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
     public void setAssignments(ArrayList<Assignment> mAssignmentsArrayList) {
         this.mAssignmentsArrayList = mAssignmentsArrayList;
     }
-
 
 
 }

@@ -50,4 +50,7 @@
     <string name="reached_assignments_limit">Du hast die maximale Anzahl an Übungsblätter für diesen Kurs erreicht!</string>
     <string name="title_activity_course">CourseActivity</string>
     <string name="number_assignments_too_low">Neue Anzahl an Übungsblätter geringer als vorhandene Anzahl</string>
+    <string name="edit_assignment">Bearbeiten</string>
+    <string name="dialog_edit_assignment_save">Speichern</string>
+    <string name="dialog_edit_assignment_title">Übungsblatt bearbeiten</string>
 </resources>
