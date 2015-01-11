@@ -20,22 +20,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.helper.GraphViewXML;
 import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.PointsGraphSeries;
 import com.tak3r07.unihelper.R;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 
 public class AssignmentsActivity extends ActionBarActivity {
 
 
-    private final String COURSE_TAG = "COURSE_TAG";
     private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";
     private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
 
@@ -131,7 +125,6 @@ public class AssignmentsActivity extends ActionBarActivity {
         alert.setMessage(getString(R.string.enter_assignment_points));
 
         // Set an custom dialog view to get user input
-        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View view = View.inflate(this, R.layout.dialog_add_assignment, null);
         alert.setView(view);
 
@@ -158,7 +151,8 @@ public class AssignmentsActivity extends ActionBarActivity {
 
 
                         // Index is arraylist size + 1 (so another item is added)
-                        int index = mAssignmentArrayList.size() + 1;
+                        int index = mAssignmentArrayList.get(mAssignmentArrayList.size()-1).getIndex() +1;
+                        //int index = mAssignmentArrayList.size() + 1;
 
 
                         //Create new assignment from pulled data
