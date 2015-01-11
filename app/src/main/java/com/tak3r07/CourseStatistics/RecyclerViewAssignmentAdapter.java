@@ -100,6 +100,9 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
                     //Remove Course
                     mAssignmentsAdapter.removeAssignment(getPosition());
+
+                    //Update Overview tile
+                    assignmentsActivity.initOverview();
                 }
             });
 
