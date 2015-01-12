@@ -150,10 +150,15 @@ public class AssignmentsActivity extends ActionBarActivity {
                         Double achievedPoints = Double.parseDouble(achievedPointsString);
 
 
-                        // Index is arraylist size + 1 (so another item is added)
-                        int index = mAssignmentArrayList.get(mAssignmentArrayList.size()-1).getIndex() +1;
-                        //int index = mAssignmentArrayList.size() + 1;
 
+                        // Index is lists' last element index + 1 (so another item is added)
+                        int index;
+                        //First check if list is empty
+                        if (mAssignmentArrayList.isEmpty()){
+                            index = 0;
+                        }else{
+                            index = mAssignmentArrayList.get(mAssignmentArrayList.size()-1).getIndex() +1;
+                        }
 
                         //Create new assignment from pulled data
                         Assignment newAssignment = new Assignment(index, course.getReachablePointsPerAssignment(), achievedPoints);
@@ -294,8 +299,6 @@ public class AssignmentsActivity extends ActionBarActivity {
         mTextViewAssUntilFin.setText(String.valueOf(course.getNumberOfAssUntilFin()));
 
         //Graph
-
-
         ArrayList<DataPoint> dataPoints = new ArrayList<DataPoint>();
         for (Assignment currentAssignment : course.getAssignments()) {
             //exclude extra assignments
@@ -331,5 +334,13 @@ public class AssignmentsActivity extends ActionBarActivity {
 
 
         graph.getGridLabelRenderer().setNumHorizontalLabels(course.getAssignments().size() - countExtraAssignments);
+    }
+
+    //Safe data if destroyed
+    @Override
+    protected void onDestroy() {
+        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
+        super.onDestroy();
+
     }
 }
