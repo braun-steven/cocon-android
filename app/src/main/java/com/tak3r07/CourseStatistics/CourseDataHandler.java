@@ -1,6 +1,7 @@
 package com.tak3r07.CourseStatistics;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -24,6 +25,7 @@ public class CourseDataHandler {
             oos.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Toast.makeText(context, "Data could not be stored", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -44,13 +46,14 @@ public class CourseDataHandler {
             }
 
             //add each stored course item
-            for (Iterator<Course> it = newArraylist.iterator(); it.hasNext(); ) {
-                mCourseArrayList.add(it.next());
+            for (Course course : newArraylist) {
+                mCourseArrayList.add(course);
             }
             ois.close();
 
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+            Toast.makeText(context, "Data could not be read", Toast.LENGTH_LONG).show();
         }
         return mCourseArrayList;
     }
