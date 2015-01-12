@@ -279,6 +279,12 @@ public class AssignmentsActivity extends ActionBarActivity {
         super.onResume();
     }
 
+    //Store data on pause
+    public void onPause() {
+        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
+        super.onPause();
+    }
+
     public void initOverview() {
         //Refer to TextView objects
         TextView mTextViewAverage = (TextView) findViewById(R.id.course_overview_average);
