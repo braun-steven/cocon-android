@@ -56,6 +56,9 @@ public class MainActivity extends ActionBarActivity {
             //Get back Course-Arraylist from savedInstanceState
             mCourseArrayList = (ArrayList<Course>) savedInstanceState.getSerializable(COURSE_ARRAY_LIST);
 
+        } else {
+            // Restore from storage
+            mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
         }
 
 
@@ -71,11 +74,7 @@ public class MainActivity extends ActionBarActivity {
         mRecyclerView.setHasFixedSize(true);
 
 
-        //If activity is freshly started (SavedInstanceState == null): restore data from storage
-        if (savedInstanceState == null) {
-            mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
-            mCourseAdapter.notifyDataSetChanged();
-        }
+        mCourseAdapter.notifyDataSetChanged();
 
 
     }
@@ -209,7 +208,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         //Restore data
-        mCourseArrayList = CourseDataHandler.restore(getApplicationContext(),mCourseArrayList);
+        mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
         //Notify Adapter
         mCourseAdapter.notifyDataSetChanged();
         super.onResume();
