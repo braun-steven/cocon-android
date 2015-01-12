@@ -130,6 +130,7 @@ public class AssignmentsActivity extends ActionBarActivity {
 
         alert.setPositiveButton(getString(R.string.add), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
+
                 //First check if there are already too many assignments
                 //Count extra-assignments
                 int countExtraAssignments = 0;
@@ -137,7 +138,9 @@ public class AssignmentsActivity extends ActionBarActivity {
                     if (aMAssignmentArrayList.isExtraAssignment()) countExtraAssignments++;
                 }
 
-                if (course.getNumberOfAssignments() - (mAssignmentArrayList.size() - countExtraAssignments) > 0) {
+                CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
+
+                if (course.getNumberOfAssignments() - (mAssignmentArrayList.size() - countExtraAssignments) > 0 || mCheckBox.isChecked()) {
                     //Get EditText views
                     EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
 
@@ -150,21 +153,19 @@ public class AssignmentsActivity extends ActionBarActivity {
                         Double achievedPoints = Double.parseDouble(achievedPointsString);
 
 
-
                         // Index is lists' last element index + 1 (so another item is added)
                         int index;
                         //First check if list is empty
-                        if (mAssignmentArrayList.isEmpty()){
-                            index = 0;
-                        }else{
-                            index = mAssignmentArrayList.get(mAssignmentArrayList.size()-1).getIndex() +1;
+                        if (mAssignmentArrayList.isEmpty()) {
+                            index = 1;
+                        } else {
+                            index = mAssignmentArrayList.get(mAssignmentArrayList.size() - 1).getIndex() + 1;
                         }
 
                         //Create new assignment from pulled data
                         Assignment newAssignment = new Assignment(index, course.getReachablePointsPerAssignment(), achievedPoints);
 
                         //Check if this is an extra assignment
-                        CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
                         if (mCheckBox.isChecked()) {
                             newAssignment.setExtraAssignment(true);
                         }
@@ -270,10 +271,12 @@ public class AssignmentsActivity extends ActionBarActivity {
         }
     }
 
-    //Store data on pause
-    public void onPause() {
-        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
-        super.onPause();
+    //Restore data if resumed
+    @Override
+    protected void onResume() {
+        //Restore data
+        mCourseArrayList = CourseDataHandler.restore(getApplicationContext(),mCourseArrayList);
+        super.onResume();
     }
 
     public void initOverview() {
@@ -330,7 +333,6 @@ public class AssignmentsActivity extends ActionBarActivity {
         graph.getViewport().setMinY(0);
         graph.getViewport().setMaxY(course.getAssignments().size() - countExtraAssignments);
         graph.getViewport().setMaxY(course.getReachablePointsPerAssignment());
-
 
 
         graph.getGridLabelRenderer().setNumHorizontalLabels(course.getAssignments().size() - countExtraAssignments);
