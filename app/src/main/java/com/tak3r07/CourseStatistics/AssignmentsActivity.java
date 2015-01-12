@@ -344,11 +344,4 @@ public class AssignmentsActivity extends ActionBarActivity {
         graph.getGridLabelRenderer().setNumHorizontalLabels(course.getAssignments().size() - countExtraAssignments);
     }
 
-    //Safe data if destroyed
-    @Override
-    protected void onDestroy() {
-        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
-        super.onDestroy();
-
-    }
 }

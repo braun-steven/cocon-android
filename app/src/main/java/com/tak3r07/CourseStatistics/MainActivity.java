@@ -329,4 +329,11 @@ public class MainActivity extends ActionBarActivity {
         }
         return false;
     }
+
+    //Store data on pause
+    @Override
+    public void onPause() {
+        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
+        super.onPause();
+    }
 }
