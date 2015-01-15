@@ -25,21 +25,19 @@ import java.util.ArrayList;
 public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<RecyclerViewAssignmentAdapter.ViewHolder> {
 
 
-    private ArrayList<Assignment> mAssignmentsArrayList;
     private Context context;
-    private final Course course;
     private final AssignmentsActivity assignmentsActivity;
+    private ArrayList<Course> mCourseArrayList;
+    private int coursePositionInArray;
 
-
-    RecyclerViewAssignmentAdapter(ArrayList<Assignment> assignments, Context context, Course course, AssignmentsActivity assignmentsActivity) {
+    RecyclerViewAssignmentAdapter(ArrayList<Course> courses, int coursePositionInArray, Context context, AssignmentsActivity assignmentsActivity) {
         this.context = context;
-        this.course = course;
         this.assignmentsActivity = assignmentsActivity;
-        if (assignments == null) {
+        this.mCourseArrayList = courses;
+        this.coursePositionInArray = coursePositionInArray;
+        if (courses.get(coursePositionInArray).getAssignments() == null) {
             throw new IllegalArgumentException("assignments ArrayList must not be null");
         }
-
-        mAssignmentsArrayList = assignments;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -127,7 +125,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                     alert.setView(view);
 
                     //Get assignment reference
-                    final Assignment currentAssignment = mAssignmentsAdapter.mAssignmentsArrayList.get(getPosition());
+                    final Assignment currentAssignment = mAssignmentsAdapter.mCourseArrayList.get(mAssignmentsAdapter.coursePositionInArray).getAssignment(getPosition());
 
                     //Checkbox reference
                     final CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
@@ -157,7 +155,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                                 if (mCheckBox.isChecked()) {
                                     currentAssignment.setExtraAssignment(true);
                                 } else {
-                                    currentAssignment.setExtraAssignment(false, mAssignmentsAdapter.course.getReachablePointsPerAssignment());
+                                    currentAssignment.setExtraAssignment(false, mAssignmentsAdapter.mCourseArrayList.get(mAssignmentsAdapter.coursePositionInArray).getReachablePointsPerAssignment());
                                 }
 
                                 //Update Overview tile
@@ -219,7 +217,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         //Store current assignment
-        Assignment currentAssignment = mAssignmentsArrayList.get(position);
+        Assignment currentAssignment = mCourseArrayList.get(coursePositionInArray).getAssignments().get(position);
 
 
         //Set text
@@ -239,26 +237,26 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
     @Override
     public int getItemCount() {
-        return mAssignmentsArrayList.size();
+        return mCourseArrayList.get(coursePositionInArray).getAssignments().size();
     }
 
     public void addAssignment(Assignment assignment) {
-        mAssignmentsArrayList.add(assignment);
-        notifyItemInserted(mAssignmentsArrayList.size());
+        mCourseArrayList.get(coursePositionInArray).getAssignments().add(assignment);
+        notifyItemInserted(mCourseArrayList.get(coursePositionInArray).getAssignments().size());
     }
 
     public void removeAssignment(int position) {
-        mAssignmentsArrayList.remove(position);
+        mCourseArrayList.get(coursePositionInArray).getAssignments().remove(position);
         notifyItemRemoved(position);
     }
 
     public ArrayList<Assignment> getAssignments() {
-        return mAssignmentsArrayList;
+        return mCourseArrayList.get(coursePositionInArray).getAssignments();
     }
 
-    public void setAssignments(ArrayList<Assignment> mAssignmentsArrayList) {
-        this.mAssignmentsArrayList = mAssignmentsArrayList;
+    //Update Course reference after it has been newly loaded from storage in AssignmentsActivity
+    public void updateCourses(ArrayList<Course> mCourseArrayList){
+        this.mCourseArrayList = mCourseArrayList;
     }
-
 
 }
