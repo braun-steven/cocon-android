@@ -193,6 +193,9 @@ public class AssignmentsActivity extends ActionBarActivity {
         //Update Overview
         initOverview();
 
+        //save in data
+        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
+
         Toast.makeText(getApplicationContext(), getString(R.string.new_assignment_added), Toast.LENGTH_SHORT).show();
     }
 
@@ -268,11 +271,6 @@ public class AssignmentsActivity extends ActionBarActivity {
         super.onResume();
     }
 
-    //Store data on pause
-    public void onPause() {
-        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
-        super.onPause();
-    }
 
     public void initOverview() {
         //Refer to TextView objects
@@ -326,7 +324,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         graph.addSeries(series);
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinY(0);
-        graph.getViewport().setMaxY(mCourseArrayList.get(coursePositionInArray).getAssignments().size() - countExtraAssignments);
+        graph.getViewport().setMaxX(mCourseArrayList.get(coursePositionInArray).getAssignments().size() - countExtraAssignments);
         graph.getViewport().setMaxY(mCourseArrayList.get(coursePositionInArray).getReachablePointsPerAssignment());
 
 

@@ -196,24 +196,6 @@ public class MainActivity extends ActionBarActivity {
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    //Safe data if destroyed
-    @Override
-    protected void onDestroy() {
-        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
-        super.onDestroy();
-
-    }
-
-    //Restore data if resumed
-    @Override
-    protected void onResume() {
-        //Restore data
-        mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
-        //Notify Adapter
-        mCourseAdapter.notifyDataSetChanged();
-        super.onResume();
-    }
-
 
     public void onClickMenuRestore(MenuItem item) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -330,10 +312,14 @@ public class MainActivity extends ActionBarActivity {
         return false;
     }
 
-    //Store data on pause
+    //Restore data if resumed
     @Override
-    public void onPause() {
-        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
-        super.onPause();
+    protected void onResume() {
+        //Restore data
+        mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
+        //Notify Adapter
+        mCourseAdapter.notifyDataSetChanged();
+        super.onResume();
     }
+
 }
