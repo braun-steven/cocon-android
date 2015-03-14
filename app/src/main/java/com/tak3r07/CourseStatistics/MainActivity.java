@@ -31,7 +31,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 
 
@@ -266,7 +269,13 @@ public class MainActivity extends ActionBarActivity {
 
                     //Write Course-Array-List to storage
                     try {
-                        FileOutputStream fos = new FileOutputStream(myFilesDir.getPath() + "/data.backup");
+                        //add backup-string to date
+                        Calendar c = Calendar.getInstance();
+                        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+                        String formattedDate = df.format(c.getTime());
+
+                        Toast.makeText(getApplicationContext(), formattedDate, Toast.LENGTH_LONG).show();
+                        FileOutputStream fos = new FileOutputStream(myFilesDir.getPath() + "/" + formattedDate + ".backup");
                         ObjectOutputStream oos = new ObjectOutputStream(fos);
                         oos.writeObject(mCourseArrayList);
                         oos.close();
