@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -34,6 +35,7 @@ import java.io.StreamCorruptedException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -206,12 +208,25 @@ public class MainActivity extends ActionBarActivity {
         alert.setTitle(getString(R.string.restore));
         alert.setMessage(getString(R.string.do_you_want_restore));
 
+        //Create ArrayAdapter
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
+
 
         alert.setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 //check if external storage is readable
                 if (isExternalStorageReadable()) {
                     File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files");
+
+                    //Get all backup files
+
+                    File files[] = myFilesDir.listFiles();
+                    for(File file: files){
+                        arrayAdapter.add(file.getAbsolutePath());
+                    }
+
+
+
                     try {
                         FileInputStream fis = new FileInputStream(myFilesDir.getPath() + "/data.backup");
                         ObjectInputStream ois = new ObjectInputStream(fis);
