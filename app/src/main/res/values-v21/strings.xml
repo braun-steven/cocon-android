@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="reached_assignments_limit">You have reached your assignments limit!</string>
+    <string name="yes">yes</string>
 </resources>

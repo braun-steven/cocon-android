@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -203,58 +204,138 @@ public class MainActivity extends ActionBarActivity {
 
 
     public void onClickMenuRestore(MenuItem item) {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
         alert.setTitle(getString(R.string.restore));
         alert.setMessage(getString(R.string.do_you_want_restore));
 
+        //Inflate view from resource
+        final View view = View.inflate(this, R.layout.dialog_restore, null);
+        alert.setView(view);
+
+
         //Create ArrayAdapter
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
+
+        //Create listview
+        ListView listView = (ListView) view.findViewById(R.id.listView_restore_dialog);
+
+
+        //Inflate Edittext
+        final EditText editText = (EditText) view.findViewById(R.id.editText_restore_dialog);
+
+
+        //check if external storage is readable
+        if (isExternalStorageReadable()) {
+            File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files");
+
+            //Get all backup files
+
+            File files[] = myFilesDir.listFiles();
+            //Iterate over all files
+            for (File file : files) {
+                //Get only filename
+                String[] path = file.getPath().split("/");
+                String filename = path[path.length - 1];
+                if (filename.endsWith(".backup") == false) {
+                    continue;
+                } else {
+                    //Add filename to array
+                    arrayAdapter.add(path[path.length - 1]);
+                }
+            }
+
+
+        }
+
+        listView.setAdapter(arrayAdapter);
+        //Listview onclick
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                editText.setText(arrayAdapter.getItem(position));
+            }
+        });
+
+
+        /**
+         * Remove Selected Backup
+         */
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                final String fileName = arrayAdapter.getItem(position);
+                final File myFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files/" + fileName);
+
+
+                //Open Alert dialog to delete item
+
+                final AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+
+                //Set title and message
+                alert.setTitle(getApplicationContext().getString(R.string.delete));
+                alert.setMessage(getApplicationContext().getString(R.string.do_you_want_to_delete) + fileName + "?");
+
+                //Set positive button behaviour
+                alert.setPositiveButton(getApplicationContext().getString(R.string.delete), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        arrayAdapter.remove(fileName);
+                        arrayAdapter.notifyDataSetChanged();
+                        myFile.delete();
+                    }
+                });
+
+                alert.setNegativeButton(getApplicationContext().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                alert.show();
+
+
+                return true;
+            }
+        });
 
 
         alert.setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                //check if external storage is readable
-                if (isExternalStorageReadable()) {
+
+                try {
                     File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files");
+                    if (editText.getText().toString().isEmpty())
+                        Toast.makeText(getApplicationContext(), "No backup selected", Toast.LENGTH_SHORT).show();
+                    //Restore from chosen Backup, which lays in the top textfield
+                    FileInputStream fis = new FileInputStream(myFilesDir.getPath() + "/" + editText.getText().toString());
+                    ObjectInputStream ois = new ObjectInputStream(fis);
 
-                    //Get all backup files
+                    //New Arraylist
+                    ArrayList<Course> newArraylist = (ArrayList<Course>) ois.readObject();
 
-                    File files[] = myFilesDir.listFiles();
-                    for(File file: files){
-                        arrayAdapter.add(file.getAbsolutePath());
+                    //clear current arraylist to avoid double input
+                    mCourseArrayList.clear();
+
+                    //add each stored course item
+                    for (Iterator<Course> it = newArraylist.iterator(); it.hasNext(); ) {
+                        mCourseArrayList.add(it.next());
                     }
+                    ois.close();
 
+                    //Notify course adapter
+                    mCourseAdapter.notifyDataSetChanged();
 
-
-                    try {
-                        FileInputStream fis = new FileInputStream(myFilesDir.getPath() + "/data.backup");
-                        ObjectInputStream ois = new ObjectInputStream(fis);
-
-                        //New Arraylist
-                        ArrayList<Course> newArraylist = (ArrayList<Course>) ois.readObject();
-
-                        //clear current arraylist to avoid double input
-                        mCourseArrayList.clear();
-
-                        //add each stored course item
-                        for (Iterator<Course> it = newArraylist.iterator(); it.hasNext(); ) {
-                            mCourseArrayList.add(it.next());
-                        }
-                        ois.close();
-
-                        //Notify course adapter
-                        mCourseAdapter.notifyDataSetChanged();
-
-                        //Notify user about completed restore
-                        Toast.makeText(getApplicationContext(), getString(R.string.restore_complete), Toast.LENGTH_LONG).show();
-                        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
-                    } catch (ClassNotFoundException | IOException e) {
-                        e.printStackTrace();
-                    }
+                    //Notify user about completed restore
+                    Toast.makeText(getApplicationContext(), getString(R.string.restore_complete), Toast.LENGTH_LONG).show();
+                    CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
+                } catch (ClassNotFoundException | IOException e) {
+                    e.printStackTrace();
                 }
-
             }
+
         });
 
         alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -286,7 +367,7 @@ public class MainActivity extends ActionBarActivity {
                     try {
                         //add backup-string to date
                         Calendar c = Calendar.getInstance();
-                        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+                        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy-HH:mm:ss");
                         String formattedDate = df.format(c.getTime());
 
                         Toast.makeText(getApplicationContext(), formattedDate, Toast.LENGTH_LONG).show();

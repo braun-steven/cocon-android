@@ -53,4 +53,5 @@
     <string name="edit_assignment">Bearbeiten</string>
     <string name="dialog_edit_assignment_save">Speichern</string>
     <string name="dialog_edit_assignment_title">Übungsblatt bearbeiten</string>
+    <string name="yes">yes</string>
 </resources>

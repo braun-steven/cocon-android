@@ -54,5 +54,6 @@
     <string name="edit_assignment">Edit</string>
     <string name="dialog_edit_assignment_save">Save</string>
     <string name="dialog_edit_assignment_title">Edit Assignment</string>
+    <string name="yes">yes</string>
 
 </resources>
