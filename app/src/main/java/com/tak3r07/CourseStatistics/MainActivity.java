@@ -215,7 +215,7 @@ public class MainActivity extends ActionBarActivity {
 
 
         //Create ArrayAdapter
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
+        final ArrayList<String> backupPaths = new ArrayList<String>();
 
         //Create listview
         ListView listView = (ListView) view.findViewById(R.id.listView_restore_dialog);
@@ -241,20 +241,22 @@ public class MainActivity extends ActionBarActivity {
                     continue;
                 } else {
                     //Add filename to array
-                    arrayAdapter.add(path[path.length - 1]);
+                    backupPaths.add(path[path.length - 1]);
                 }
             }
 
 
         }
 
-        listView.setAdapter(arrayAdapter);
+        final PathAdapter<String> pathAdapter = new PathAdapter<String>(MainActivity.this, backupPaths);
+
+        listView.setAdapter(pathAdapter);
         //Listview onclick
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                editText.setText(arrayAdapter.getItem(position));
+                editText.setText(pathAdapter.getItem(position));
             }
         });
 
@@ -266,7 +268,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                final String fileName = arrayAdapter.getItem(position);
+                final String fileName = pathAdapter.getItem(position);
                 final File myFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files/" + fileName);
 
 
@@ -281,8 +283,8 @@ public class MainActivity extends ActionBarActivity {
                 //Set positive button behaviour
                 alert.setPositiveButton(getApplicationContext().getString(R.string.delete), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        arrayAdapter.remove(fileName);
-                        arrayAdapter.notifyDataSetChanged();
+                        pathAdapter.remove(fileName);
+                        pathAdapter.notifyDataSetChanged();
                         myFile.delete();
                     }
                 });
