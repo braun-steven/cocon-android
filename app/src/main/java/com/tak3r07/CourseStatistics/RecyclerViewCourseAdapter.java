@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
@@ -21,25 +20,23 @@ import java.util.ArrayList;
  * Created by tak3r07 on 12/8/14.
  * Adapter for RecyclerView in MainActivity
  */
-public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerViewCourseAdapter.ViewHolder> {
-
+public class RecyclerViewCourseAdapter
+        extends RecyclerView.Adapter<RecyclerViewCourseAdapter.ViewHolder> {
 
 
     private ArrayList<Course> mCourseArrayList;
     private Context context;
 
-    private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";
-
-    RecyclerViewCourseAdapter(ArrayList<Course> courses, Context context) {
+    RecyclerViewCourseAdapter(Context context) {
         this.context = context;
-        if (courses == null) {
+        mCourseArrayList = new DatabaseHelper(context).getAllCourses();
+        if (mCourseArrayList == null) {
             throw new IllegalArgumentException("courses ArrayList must not be null");
         }
-
-        mCourseArrayList = courses;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener {
+    public static class ViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener, View.OnLongClickListener {
 
         //Initialize views in Viewholder
         TextView mTextViewFirst;
@@ -53,7 +50,9 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         RecyclerViewCourseAdapter mCourseAdapter;
 
         //Holds views
-        public ViewHolder(View itemView, Context context, RecyclerViewCourseAdapter mCourseAdapter) {
+        public ViewHolder(View itemView,
+                          Context context,
+                          RecyclerViewCourseAdapter mCourseAdapter) {
 
             super(itemView);
             this.context = context;
@@ -78,7 +77,8 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
             intent.setClass(context, AssignmentsActivity.class);
 
             //add course position to update assignments when result comes back
-            intent.putExtra("COURSE_TAG_POSITION", getPosition());
+            intent.putExtra("COURSE_TAG_ID",
+                    mCourseAdapter.getmCourseArrayList().get(getPosition()).getId());
             //Start activity
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
@@ -99,14 +99,22 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
             alert.setPositiveButton(context.getString(R.string.delete), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
+                    //Get current assignment
+                    Course currentCourse = mCourseAdapter.getmCourseArrayList().get(getPosition());
+
                     //Delete course and notify
-                    Toast.makeText(context, mTextViewFirst.getText().toString() + context.getString(R.string.deleted), Toast.LENGTH_LONG).show();
+                    Toast.makeText(
+                            context,
+                            mTextViewFirst.getText().toString() + context.getString(R.string.deleted),
+                            Toast.LENGTH_LONG).show();
+
+                    //Delete from database
+                    DatabaseHelper dbHelper = new DatabaseHelper(context);
+                    dbHelper.deleteCourse(currentCourse);
 
                     //Remove Course
                     mCourseAdapter.removeCourse(getPosition());
 
-                    //Save Course ArrayList to storage
-                    CourseDataHandler.save(context, mCourseAdapter.getmCourseArrayList());
                 }
             });
 
@@ -129,7 +137,10 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //Inflate layout
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_course_alternative, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.list_item_course_alternative,
+                        parent,
+                        false);
         ViewHolder vh = new ViewHolder(itemView, context, this);
 
         return vh;
@@ -147,7 +158,8 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
         //holder.mImageView.setImageResource(getLetterIconId(firstChar));
         //Set text
         holder.mTextViewFirst.setText(course.getCourseName());
-        holder.mTextViewSecond.setText("\u00d8 " + course.getOverAllPercentage(true).toString() + " %");
+        holder.mTextViewSecond.setText(
+                "\u00d8 " + course.getOverAllPercentage(true).toString() + " %");
         holder.mEndPercentageTextView.setText(course.getAverage().toString() + " %");
 
         //Set Percentage Color
@@ -185,7 +197,7 @@ public class RecyclerViewCourseAdapter extends RecyclerView.Adapter<RecyclerView
 
     //Removes Course
     public void removeCourse(int position) {
-        if (position>=0){
+        if (position >= 0) {
             mCourseArrayList.remove(position);
             notifyItemRemoved(position);
         }

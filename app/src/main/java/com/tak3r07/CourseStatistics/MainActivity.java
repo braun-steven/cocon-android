@@ -1,10 +1,8 @@
 package com.tak3r07.CourseStatistics;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
@@ -17,8 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -32,12 +28,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 
 
@@ -64,14 +57,15 @@ public class MainActivity extends ActionBarActivity {
 
         } else {
             // Restore from storage
-            mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
+            DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+            mCourseArrayList = dbHelper.getAllCourses();
         }
 
 
         //RecyclerView Setup
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_courses);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mCourseAdapter = new RecyclerViewCourseAdapter(mCourseArrayList, getApplicationContext());
+        mCourseAdapter = new RecyclerViewCourseAdapter(getApplicationContext());
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mCourseAdapter);
@@ -181,7 +175,8 @@ public class MainActivity extends ActionBarActivity {
                 mCourseAdapter.addCourse(course);
 
                 //save in data
-                CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
+                DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+                dbHelper.addCourse(course);
 
                 Toast.makeText(getApplicationContext(), getString(R.string.course) + title + getString(R.string.has_been_added), Toast.LENGTH_SHORT).show();
             }
@@ -332,7 +327,12 @@ public class MainActivity extends ActionBarActivity {
 
                     //Notify user about completed restore
                     Toast.makeText(getApplicationContext(), getString(R.string.restore_complete), Toast.LENGTH_LONG).show();
-                    CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
+
+
+                    //Store in database
+                    DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+                    dbHelper.updateCourses(mCourseArrayList);
+
                 } catch (ClassNotFoundException | IOException e) {
                     e.printStackTrace();
                 }
@@ -423,8 +423,11 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         //Restore data
-        mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
+        DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+        mCourseArrayList = dbHelper.getAllCourses();
+
         //Notify Adapter
+        mCourseAdapter.setmCourseArrayList(mCourseArrayList);
         mCourseAdapter.notifyDataSetChanged();
         super.onResume();
     }

@@ -3,9 +3,8 @@ package com.tak3r07.CourseStatistics;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,15 +26,15 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
     private Context context;
     private final AssignmentsActivity assignmentsActivity;
-    private ArrayList<Course> mCourseArrayList;
-    private int coursePositionInArray;
+    private Course currentCourse;
 
-    RecyclerViewAssignmentAdapter(ArrayList<Course> courses, int coursePositionInArray, Context context, AssignmentsActivity assignmentsActivity) {
+    RecyclerViewAssignmentAdapter(Context context,
+                                  Course currentCourse,
+                                  AssignmentsActivity assignmentsActivity) {
         this.context = context;
         this.assignmentsActivity = assignmentsActivity;
-        this.mCourseArrayList = courses;
-        this.coursePositionInArray = coursePositionInArray;
-        if (courses.get(coursePositionInArray).getAssignments() == null) {
+        this.currentCourse = currentCourse;
+        if (currentCourse.getAssignments() == null) {
             throw new IllegalArgumentException("assignments ArrayList must not be null");
         }
     }
@@ -93,14 +92,26 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
             alert.setPositiveButton(context.getString(R.string.delete), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
-                    //Delete course and notify
+                    //Get current assignment
+                    Assignment currentAssignment = mAssignmentsAdapter.getAssignments().get(getPosition());
+
+                    //Delete assignment and notify
                     Toast.makeText(context, mTextViewTitle.getText().toString() + context.getString(R.string.deleted), Toast.LENGTH_LONG).show();
 
-                    //Remove Course
+                    //LOGGING
+                    Log.d("DEBUG", "Going to remove assignment: " +
+                            ", Index: " + currentAssignment.getId() +
+                            ", Points:" + currentAssignment.getAchievedPoints());
+
+                    //Save changes in Database
+                    DatabaseHelper dbHelper = new DatabaseHelper(context);
+                    boolean result = dbHelper.deleteAssignment(currentAssignment);
+
+                    Toast.makeText(context, result ? "Delete successful" : "Delete failed", Toast.LENGTH_SHORT).show();
+
+                    //Remove Assignment
                     mAssignmentsAdapter.removeAssignment(getPosition());
 
-                    //Save changes
-                    CourseDataHandler.save(context, mAssignmentsAdapter.mCourseArrayList);
 
                     //Update Overview tile
                     assignmentsActivity.initOverview();
@@ -128,7 +139,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                     alert.setView(view);
 
                     //Get assignment reference
-                    final Assignment currentAssignment = mAssignmentsAdapter.mCourseArrayList.get(mAssignmentsAdapter.coursePositionInArray).getAssignment(getPosition());
+                    final Assignment currentAssignment = mAssignmentsAdapter.currentCourse.getAssignment(getPosition());
 
                     //Checkbox reference
                     final CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
@@ -158,7 +169,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                                 if (mCheckBox.isChecked()) {
                                     currentAssignment.setExtraAssignment(true);
                                 } else {
-                                    currentAssignment.setExtraAssignment(false, mAssignmentsAdapter.mCourseArrayList.get(mAssignmentsAdapter.coursePositionInArray).getReachablePointsPerAssignment());
+                                    currentAssignment.setExtraAssignment(false, mAssignmentsAdapter.currentCourse.getReachablePointsPerAssignment());
                                 }
 
                                 //Update Overview tile
@@ -177,6 +188,10 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                                     mTextViewPercentage.setText(currentAssignment.getPercentage().toString() + " %");
 
                                 }
+
+                                DatabaseHelper dbHelper = new DatabaseHelper(context);
+                                dbHelper.updateAssignment(currentAssignment);
+                                Log.d("DATABASE", "Assignment " + currentAssignment.getIndex() + " updated");
 
 
                             } else {
@@ -220,7 +235,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         //Store current assignment
-        Assignment currentAssignment = mCourseArrayList.get(coursePositionInArray).getAssignments().get(position);
+        Assignment currentAssignment = currentCourse.getAssignments().get(position);
 
 
         //Set text
@@ -240,26 +255,21 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
     @Override
     public int getItemCount() {
-        return mCourseArrayList.get(coursePositionInArray).getAssignments().size();
+        return currentCourse.getAssignments().size();
     }
 
     public void addAssignment(Assignment assignment) {
-        mCourseArrayList.get(coursePositionInArray).getAssignments().add(assignment);
-        notifyItemInserted(mCourseArrayList.get(coursePositionInArray).getAssignments().size());
+        currentCourse.getAssignments().add(assignment);
+        notifyItemInserted(currentCourse.getAssignments().size());
     }
 
     public void removeAssignment(int position) {
-        mCourseArrayList.get(coursePositionInArray).getAssignments().remove(position);
+        currentCourse.getAssignments().remove(position);
         notifyItemRemoved(position);
     }
 
     public ArrayList<Assignment> getAssignments() {
-        return mCourseArrayList.get(coursePositionInArray).getAssignments();
-    }
-
-    //Update Course reference after it has been newly loaded from storage in AssignmentsActivity
-    public void updateCourses(ArrayList<Course> mCourseArrayList){
-        this.mCourseArrayList = mCourseArrayList;
+        return currentCourse.getAssignments();
     }
 
 }

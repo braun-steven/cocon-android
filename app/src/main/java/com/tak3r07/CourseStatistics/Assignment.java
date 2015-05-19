@@ -1,7 +1,7 @@
 package com.tak3r07.CourseStatistics;
 
 import java.io.Serializable;
-import java.util.Iterator;
+import java.util.Random;
 
 /**
  * Created by tak3r07 on 11/9/14.
@@ -20,16 +20,42 @@ public class Assignment implements Serializable {
     //Achieved number of points of this assignment
     private double achievedPoints;
 
-
     //Boolean whether this is an extra-assignment or not
     private boolean isExtraAssignment = false;
 
-    //Constructor
-    public Assignment(int index, double maxPoints, double achievedPoints) {
+    private int id;
+
+    private int course_id;
+
+    /**
+     * Constructor for new Assignments
+     *
+     * @param id             -1 = new Assignment, else = read from DATABASE
+     * @param index
+     * @param maxPoints
+     * @param achievedPoints
+     * @param course_id
+     */
+    public Assignment(int id, int index, double maxPoints, double achievedPoints, int course_id) {
         setIndex(index);
         setMaxPoints(maxPoints);
         setAchievedPoints(achievedPoints);
+        setCourse_id(course_id);
+
+        //Check if assignment comes from database or should be created as "new assignment"
+        if (id == -1) {
+            //Set random id
+            Random rand = new Random();
+            this.id = rand.nextInt(10000000);
+        } else {
+            setId(id);
+        }
+
+
     }
+
+
+    //Constructor for assignment which will be read from the database
 
     //Calculates and return the achieved percentage of max points of this assignment
     public Double getPercentage() {
@@ -46,6 +72,22 @@ public class Assignment implements Serializable {
 
     }
 
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public void setCourse_id(int id) {
+        this.course_id = id;
+    }
+
+    public int getCourse_id() {
+        return course_id;
+    }
 
     public double getMaxPoints() {
         return maxPoints;
@@ -81,7 +123,7 @@ public class Assignment implements Serializable {
         this.maxPoints = 0d;
     }
 
-    public void setExtraAssignment(boolean isExtraAssignment, double maxPoints){
+    public void setExtraAssignment(boolean isExtraAssignment, double maxPoints) {
         this.isExtraAssignment = isExtraAssignment;
         this.maxPoints = maxPoints;
     }

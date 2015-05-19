@@ -3,6 +3,7 @@ package com.tak3r07.CourseStatistics;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 /**
  * Created by tak3r07 on 11/9/14.
@@ -21,6 +22,7 @@ public class Course implements Serializable {
     private int numberOfAssignments;
     private Double reachablePointsPerAssignment;
 
+    private int id;
 
     public Course(String courseName) {
 
@@ -32,6 +34,10 @@ public class Course implements Serializable {
 
         //Set reachablePointsPerAssignment
         reachablePointsPerAssignment = 100d;
+
+        //Set random id
+        Random rand = new Random();
+        this.id = rand.nextInt(10000000);
 
     }
 
@@ -130,6 +136,14 @@ public class Course implements Serializable {
         this.numberOfAssignments = numberOfAssignments;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
     public Double getReachablePointsPerAssignment() {
         return reachablePointsPerAssignment;
     }
@@ -177,8 +191,8 @@ public class Course implements Serializable {
 
         //Count extra-assignments
         int countExtraAssignments = 0;
-        for (Iterator<Assignment> it = mAssignmentArrayList.iterator();it.hasNext();){
-            if(it.next().isExtraAssignment()) countExtraAssignments++;
+        for (Iterator<Assignment> it = mAssignmentArrayList.iterator(); it.hasNext(); ) {
+            if (it.next().isExtraAssignment()) countExtraAssignments++;
         }
 
         //Number of assignments left for this semester

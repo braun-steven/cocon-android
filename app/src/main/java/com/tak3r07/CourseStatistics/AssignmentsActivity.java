@@ -1,7 +1,6 @@
 package com.tak3r07.CourseStatistics;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,13 +28,13 @@ import java.util.ArrayList;
 public class AssignmentsActivity extends ActionBarActivity {
 
 
-    private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";
+    private final String COURSE_TAG_ID = "COURSE_TAG_ID";
     private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
 
 
     private RecyclerViewAssignmentAdapter mAssignmentAdapter;
-    private int coursePositionInArray;
-    private ArrayList<Course> mCourseArrayList;
+    private Course currentCourse;
+    private int courseId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,32 +45,25 @@ public class AssignmentsActivity extends ActionBarActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
         setSupportActionBar(toolbar);
 
-        if (savedInstanceState != null) {
-
-            //Get back Course-Arraylist from savedInstanceState
-            mCourseArrayList = (ArrayList<Course>) savedInstanceState.getSerializable(COURSE_ARRAY_LIST);
-
-        } else {
-            //Restore from data
-            mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
-        }
-
 
         //Get intent and implement received data
         Intent intent = getIntent();
 
         //position of the course which was opened
-        coursePositionInArray = intent.getExtras().getInt(COURSE_TAG_POSITION);
+        courseId = intent.getExtras().getInt(COURSE_TAG_ID);
+        currentCourse = new DatabaseHelper(getApplicationContext())
+                .getCourse(courseId);
 
 
         //Set activity title
-        this.setTitle(mCourseArrayList.get(coursePositionInArray).getCourseName());
+        this.setTitle(currentCourse.getCourseName());
 
 
         //RecyclerView Setup
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_assignments);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mAssignmentAdapter = new RecyclerViewAssignmentAdapter(mCourseArrayList, coursePositionInArray, getApplicationContext(), this);
+        mAssignmentAdapter =
+                new RecyclerViewAssignmentAdapter(getApplicationContext(), currentCourse, this);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mAssignmentAdapter);
@@ -126,13 +117,13 @@ public class AssignmentsActivity extends ActionBarActivity {
                 //First check if there are already too many assignments
                 //Count extra-assignments
                 int countExtraAssignments = 0;
-                for (Assignment aMAssignmentArrayList : mCourseArrayList.get(coursePositionInArray).getAssignments()) {
+                for (Assignment aMAssignmentArrayList : currentCourse.getAssignments()) {
                     if (aMAssignmentArrayList.isExtraAssignment()) countExtraAssignments++;
                 }
 
                 CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
 
-                if (mCourseArrayList.get(coursePositionInArray).getNumberOfAssignments() - (mCourseArrayList.get(coursePositionInArray).getAssignments().size() - countExtraAssignments) > 0 || mCheckBox.isChecked()) {
+                if (currentCourse.getNumberOfAssignments() - (currentCourse.getAssignments().size() - countExtraAssignments) > 0 || mCheckBox.isChecked()) {
                     //Get EditText views
                     EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
 
@@ -148,14 +139,17 @@ public class AssignmentsActivity extends ActionBarActivity {
                         // Index is lists' last element index + 1 (so another item is added)
                         int index;
                         //First check if list is empty
-                        if (mCourseArrayList.get(coursePositionInArray).getAssignments().isEmpty()) {
+                        if (currentCourse.getAssignments().isEmpty()) {
                             index = 1;
                         } else {
-                            index = mCourseArrayList.get(coursePositionInArray).getAssignments().get(mCourseArrayList.get(coursePositionInArray).getAssignments().size() - 1).getIndex() + 1;
+                            index = currentCourse.getAssignments().get(currentCourse.getAssignments().size() - 1).getIndex() + 1;
                         }
 
+
+                        int NEW_ASSIGNMENT = -1;
+
                         //Create new assignment from pulled data
-                        Assignment newAssignment = new Assignment(index, mCourseArrayList.get(coursePositionInArray).getReachablePointsPerAssignment(), achievedPoints);
+                        Assignment newAssignment = new Assignment(NEW_ASSIGNMENT, index, currentCourse.getReachablePointsPerAssignment(), achievedPoints, currentCourse.getId());
 
                         //Check if this is an extra assignment
                         if (mCheckBox.isChecked()) {
@@ -189,12 +183,14 @@ public class AssignmentsActivity extends ActionBarActivity {
     //Add assignment to adapter (Eventually add to course necessary?)
     public void addAssignment(Assignment assignment) {
         mAssignmentAdapter.addAssignment(assignment);
+        currentCourse.addAssignment(assignment);
 
         //Update Overview
         initOverview();
 
-        //save in data
-        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
+        //Store assignment in database
+        DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+        dbHelper.addAssignment(assignment);
 
         Toast.makeText(getApplicationContext(), getString(R.string.new_assignment_added), Toast.LENGTH_SHORT).show();
     }
@@ -211,25 +207,10 @@ public class AssignmentsActivity extends ActionBarActivity {
     }
 
     public void onBackPressed() {
-
-        //Save data
-        CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
-
         //Set result and finish
         Intent data = new Intent();
         setResult(RESULT_OK, data);
         finish();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save the user's current state
-        // Save array list
-        savedInstanceState.putSerializable(COURSE_ARRAY_LIST, mCourseArrayList);
-
-
-        // Always call the superclass so it can save the view hierarchy state
-        super.onSaveInstanceState(savedInstanceState);
     }
 
     public void onEditCourseClick(MenuItem item) {
@@ -238,7 +219,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         intent.setClass(getApplicationContext(), EditCourseActivity.class);
 
         //Add Course-Number
-        intent.putExtra(COURSE_TAG_POSITION, coursePositionInArray);
+        intent.putExtra(COURSE_TAG_ID, currentCourse.getId());
         startActivityForResult(intent, 0);
     }
 
@@ -247,13 +228,13 @@ public class AssignmentsActivity extends ActionBarActivity {
         if (resultCode == RESULT_OK) {
 
 
-            //Restore data from saved data
-            mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
-            //mAssignmentAdapter.updateCourses(mCourseArrayList);
+            // Restore from storage
+            DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+            currentCourse = dbHelper.getCourse(courseId);
 
             //Set new Title
 
-            setTitle(mCourseArrayList.get(coursePositionInArray).getCourseName());
+            setTitle(currentCourse.getCourseName());
 
             //Notify adapter for changes
             mAssignmentAdapter.notifyDataSetChanged();
@@ -266,8 +247,9 @@ public class AssignmentsActivity extends ActionBarActivity {
     //Restore data if resumed
     @Override
     protected void onResume() {
-        //Restore data
-        mCourseArrayList = CourseDataHandler.restore(getApplicationContext(),mCourseArrayList);
+        // Restore from storage
+        DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+        currentCourse = dbHelper.getCourse(courseId);
         super.onResume();
     }
 
@@ -283,20 +265,20 @@ public class AssignmentsActivity extends ActionBarActivity {
 
 
         //Overall
-        mTextViewOverall.setText(mCourseArrayList.get(coursePositionInArray).getAverage().toString() + " % - " + mCourseArrayList.get(coursePositionInArray).getTotalPoints() + "/" + mCourseArrayList.get(coursePositionInArray).getNumberOfAssignments() * mCourseArrayList.get(coursePositionInArray).getReachablePointsPerAssignment());
+        mTextViewOverall.setText(currentCourse.getAverage().toString() + " % - " + currentCourse.getTotalPoints() + "/" + currentCourse.getNumberOfAssignments() * currentCourse.getReachablePointsPerAssignment());
 
         //Average
-        mTextViewAverage.setText(mCourseArrayList.get(coursePositionInArray).getOverAllPercentage(true).toString() + " % - " + mCourseArrayList.get(coursePositionInArray).getAveragePointsPerAssignment(true) + "/" + mCourseArrayList.get(coursePositionInArray).getReachablePointsPerAssignment()); //Warning: "getOverAll = average in course classe"
+        mTextViewAverage.setText(currentCourse.getOverAllPercentage(true).toString() + " % - " + currentCourse.getAveragePointsPerAssignment(true) + "/" + currentCourse.getReachablePointsPerAssignment()); //Warning: "getOverAll = average in course classe"
 
         //Nedded Points per assignment until 50% is reached
-        mTextViewNecPoiPerAss.setText(mCourseArrayList.get(coursePositionInArray).getNecessaryPointsPerAssignmentUntilFin().toString());
+        mTextViewNecPoiPerAss.setText(currentCourse.getNecessaryPointsPerAssignmentUntilFin().toString());
 
         //Number of assignments until 50% is reached
-        mTextViewAssUntilFin.setText(String.valueOf(mCourseArrayList.get(coursePositionInArray).getNumberOfAssUntilFin()));
+        mTextViewAssUntilFin.setText(String.valueOf(currentCourse.getNumberOfAssUntilFin()));
 
         //Graph
         ArrayList<DataPoint> dataPoints = new ArrayList<DataPoint>();
-        for (Assignment currentAssignment : mCourseArrayList.get(coursePositionInArray).getAssignments()) {
+        for (Assignment currentAssignment : currentCourse.getAssignments()) {
             //exclude extra assignments
             if (!currentAssignment.isExtraAssignment()) {
                 dataPoints.add(new DataPoint(currentAssignment.getIndex(), currentAssignment.getAchievedPoints()));
@@ -306,7 +288,7 @@ public class AssignmentsActivity extends ActionBarActivity {
 
         //Count extra-assignments
         int countExtraAssignments = 0;
-        for (Assignment assignment : mCourseArrayList.get(coursePositionInArray).getAssignments()) {
+        for (Assignment assignment : currentCourse.getAssignments()) {
             if (assignment.isExtraAssignment()) countExtraAssignments++;
         }
 
@@ -324,11 +306,11 @@ public class AssignmentsActivity extends ActionBarActivity {
         graph.addSeries(series);
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinY(0);
-        graph.getViewport().setMaxX(mCourseArrayList.get(coursePositionInArray).getAssignments().size() - countExtraAssignments);
-        graph.getViewport().setMaxY(mCourseArrayList.get(coursePositionInArray).getReachablePointsPerAssignment());
+        graph.getViewport().setMaxX(currentCourse.getAssignments().size() - countExtraAssignments);
+        graph.getViewport().setMaxY(currentCourse.getReachablePointsPerAssignment());
 
 
-        graph.getGridLabelRenderer().setNumHorizontalLabels(mCourseArrayList.get(coursePositionInArray).getAssignments().size() - countExtraAssignments);
+        graph.getGridLabelRenderer().setNumHorizontalLabels(currentCourse.getAssignments().size() - countExtraAssignments);
     }
 
 }

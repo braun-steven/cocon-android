@@ -1,11 +1,9 @@
 package com.tak3r07.CourseStatistics;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,24 +12,14 @@ import android.widget.Toast;
 
 import com.tak3r07.unihelper.R;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 public class EditCourseActivity extends ActionBarActivity {
 
     private final String COURSE_TAG = "COURSE_TAG";
-    private final String COURSE_TAG_POSITION = "COURSE_TAG_POSITION";
+    private final String COURSE_TAG_ID = "COURSE_TAG_ID";
 
     private Course course;
-    private ArrayList<Course> mCourseArrayList = new ArrayList<Course>();
-    private int coursePositionInArray;
     private EditText mNameEditText;
     private EditText mNumberEditText;
     private EditText mMaxPointsEditText;
@@ -47,13 +35,11 @@ public class EditCourseActivity extends ActionBarActivity {
 
         //Get intent data
         Intent intent = getIntent();
-        coursePositionInArray = intent.getExtras().getInt(COURSE_TAG_POSITION);
+        int courseId = intent.getExtras().getInt(COURSE_TAG_ID);
 
-        //restore from data
-        mCourseArrayList = CourseDataHandler.restore(getApplicationContext(), mCourseArrayList);
-
-        //get course in array
-        course = mCourseArrayList.get(coursePositionInArray);
+        // Restore from storage
+        DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+        course = dbHelper.getCourse(courseId);
 
         //Get View-References
         mNameEditText = (EditText) findViewById(R.id.course_editname_edittext);
@@ -117,8 +103,9 @@ public class EditCourseActivity extends ActionBarActivity {
             //Create empty intent
             Intent data = new Intent();
 
-            //Store data
-            CourseDataHandler.save(getApplicationContext(), mCourseArrayList);
+            //Update course
+            DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+            dbHelper.updateCourse(course);
 
             setResult(RESULT_OK, data);
             finish();
