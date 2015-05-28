@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LOG = "DatabaseHelper";
 
     //Database version
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
 
     //Database name
     private static final String DATABASE_NAME = "courses";
@@ -35,6 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_COURSENAME = "course_name";
     private static final String KEY_NUMBER_OF_ASSIGNMENTS = "number_of_assignments";
     private static final String KEY_REACHABLE_POINTS_PER_ASSIGNMENT = "reachable_points_per_assignment";
+    private static final String KEY_COURSE_INDEX = "course_index";
 
     //Column names: assignments
     private static final String KEY_INDEX = "assignment_index";
@@ -49,7 +49,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_ID + " INTEGER PRIMARY KEY,"
             + KEY_COURSENAME + " TEXT,"
             + KEY_NUMBER_OF_ASSIGNMENTS + " INTEGER,"
-            + KEY_REACHABLE_POINTS_PER_ASSIGNMENT + " REAL)";
+            + KEY_REACHABLE_POINTS_PER_ASSIGNMENT + " REAL,"
+            + KEY_COURSE_INDEX + " INTEGER)";
 
     private static final String CREATE_ASSIGNMENT_TABLE = "CREATE TABLE " + TABLE_ASSIGNMENTS + "("
             + KEY_ID + " INTEGER PRIMARY KEY,"
@@ -66,9 +67,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_COURSE_TABLE);
-        Log.d(LOG, "Table: COURSES created: " + CREATE_COURSE_TABLE);
         db.execSQL(CREATE_ASSIGNMENT_TABLE);
-        Log.d(LOG, "Table: ASSIGNMENTS created: " + CREATE_ASSIGNMENT_TABLE);
     }
 
     @Override
@@ -91,6 +90,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_COURSENAME, course.getCourseName());
         values.put(KEY_NUMBER_OF_ASSIGNMENTS, course.getNumberOfAssignments());
         values.put(KEY_REACHABLE_POINTS_PER_ASSIGNMENT, course.getReachablePointsPerAssignment());
+        values.put(KEY_COURSE_INDEX, course.getIndex());
 
         //Insert Row
         db.insert(TABLE_COURSES, null, values);
@@ -120,8 +120,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Insert Row
 
         long result = db.insert(TABLE_ASSIGNMENTS, null, values);
-        Log.d("DEBUG", "INSERTION: result = " + result + "\n " + "values" + values.toString());
-
         db.close();
     }
 
@@ -134,7 +132,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         KEY_ID,
                         KEY_COURSENAME,
                         KEY_NUMBER_OF_ASSIGNMENTS,
-                        KEY_REACHABLE_POINTS_PER_ASSIGNMENT
+                        KEY_REACHABLE_POINTS_PER_ASSIGNMENT,
+                        KEY_COURSE_INDEX
                 },
                 KEY_ID + "=?",
                 new String[]{String.valueOf(id)},
@@ -144,7 +143,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.moveToFirst();
         }
 
-        Course course = new Course(cursor.getString(1));
+        Course course = new Course(cursor.getString(1), cursor.getInt(4));
         course.setId(id);
         course.setNumberOfAssignments(Integer.parseInt(cursor.getString(2)));
         course.setReachablePointsPerAssignment(Double.parseDouble(cursor.getString(3)));
@@ -153,6 +152,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //get assignments
         course.setAssignments(getAssignmentsOfCourse(id));
         db.close();
+        cursor.close();
         return course;
     }
 
@@ -191,12 +191,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         db.close();
+        cursor.close();
         return assignments;
     }
 
     //Update everything
     public void updateCourses(List<Course> courses) {
-        Log.d(LOG, "entered updateCourses()");
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_COURSES);
         db.execSQL("DELETE FROM " + TABLE_ASSIGNMENTS);
@@ -209,11 +209,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<Course> getAllCourses() {
-        Log.d(LOG, "entered getAllCourses()");
         ArrayList<Course> courses = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         //Select all query
-        String selectQuery = "SELECT " + KEY_ID + " FROM " + TABLE_COURSES;
+        String selectQuery =
+                "SELECT " + KEY_ID
+                + " FROM " + TABLE_COURSES
+                + " ORDER BY " + KEY_COURSE_INDEX + " ASC";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -228,6 +230,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         db.close();
+        cursor.close();
 
         return courses;
     }
@@ -258,6 +261,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_COURSENAME, course.getCourseName());
         values.put(KEY_NUMBER_OF_ASSIGNMENTS, course.getNumberOfAssignments());
         values.put(KEY_REACHABLE_POINTS_PER_ASSIGNMENT, course.getReachablePointsPerAssignment());
+        values.put(KEY_COURSE_INDEX, course.getIndex());
 
         return db.update(TABLE_COURSES, values, KEY_ID + " = ?", new String[]{String.valueOf(course.getId())});
     }
@@ -279,9 +283,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         int result = db.delete(TABLE_ASSIGNMENTS, KEY_ID + " = ?", new String[]{String.valueOf(assignment.getId())});
         db.close();
-        Log.d("DEBUG", "ASSIGNMENT DELETED: result = " + result +
-                " Index: " + String.valueOf(assignment.getId()) +
-                ", Points:" + assignment.getAchievedPoints());
 
         return result > 0;
     }

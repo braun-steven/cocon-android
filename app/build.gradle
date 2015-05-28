@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.0.1"
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "com.tak3r07.unihelper"
-        minSdkVersion 15
-        targetSdkVersion 21
-        versionCode 152
-        versionName "1.5.2"
+        minSdkVersion 16
+        targetSdkVersion 22
+        versionCode 153
+        versionName "1.5.3"
     }
     buildTypes {
         release {
@@ -21,9 +21,10 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:support-v4:22.0.0'
+    compile 'com.android.support:support-v4:22.1.1'
     compile 'com.android.support:recyclerview-v7:21.0.3'
     compile 'com.android.support:cardview-v7:21.0.3'
-    compile "com.android.support:appcompat-v7:22.0.0"
+    compile "com.android.support:appcompat-v7:22.1.1"
     compile 'com.jjoe64:graphview:4.0.0'
+    compile 'com.bartoszlipinski.recyclerviewheader:library:1.2.0'
 }

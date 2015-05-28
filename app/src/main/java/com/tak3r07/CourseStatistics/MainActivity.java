@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.bartoszlipinski.recyclerviewheader.RecyclerViewHeader;
 import com.tak3r07.unihelper.R;
 
 import java.io.File;
@@ -67,6 +68,7 @@ public class MainActivity extends ActionBarActivity {
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
         mCourseAdapter = new RecyclerViewCourseAdapter(getApplicationContext());
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        //mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getApplicationContext()));
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mCourseAdapter);
         mRecyclerView.setLongClickable(true);
@@ -74,6 +76,11 @@ public class MainActivity extends ActionBarActivity {
         mRecyclerView.setHasFixedSize(true);
 
 
+
+        //Add header for column descriptions
+        RecyclerViewHeader header =
+                RecyclerViewHeader.fromXml(getApplicationContext(), R.layout.layout_courselist_header);
+        header.attachTo(mRecyclerView);
         mCourseAdapter.notifyDataSetChanged();
 
 
@@ -170,7 +177,8 @@ public class MainActivity extends ActionBarActivity {
                 Toast.makeText(getApplicationContext(), getString(R.string.a_course_same_name), Toast.LENGTH_LONG).show();
             } else {
                 //Add course
-                Course course = new Course(title);
+                int index = mCourseArrayList.size();
+                Course course = new Course(title, index);
                 course.setReachablePointsPerAssignment(reachablePointsPerAssignment);
                 mCourseAdapter.addCourse(course);
 

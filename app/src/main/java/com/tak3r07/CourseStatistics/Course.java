@@ -23,8 +23,11 @@ public class Course implements Serializable {
     private Double reachablePointsPerAssignment;
 
     private int id;
+    private int index;
 
-    public Course(String courseName) {
+    public Course(String courseName, int index) {
+        //Set index
+        this.index = index;
 
         //Sets course name
         setCourseName(courseName);
@@ -58,7 +61,7 @@ public class Course implements Serializable {
     }
 
     //Calculate overall percentage of current assignments (= average)
-    public Double getOverAllPercentage(boolean extraAssignments) {
+    public Double getAverage(boolean extraAssignments) {
         double overAllAchievedPoints = 0;
         double overAllMaxPoints = 0;
 
@@ -81,18 +84,18 @@ public class Course implements Serializable {
             }
         }
         //Round on 4 digits
-        double overAllPercentage = Math.round(overAllAchievedPoints / overAllMaxPoints * 1000) / 10d;
+        double average = Math.round(overAllAchievedPoints / overAllMaxPoints * 1000) / 10d;
 
 
         //return result
-        return overAllPercentage;
+        return average;
 
     }
 
     /**
      * calculate average : (all points of current assignments) / ((max points per assignment) * (number of assignments))
      */
-    public Double getAverage() {
+    public Double getProgress() {
         double overAllAchievedPoints = 0;
 
         //Iterate on the array and sum up all its max and achieved points
@@ -111,6 +114,9 @@ public class Course implements Serializable {
         return average;
     }
 
+    public int getIndex(){
+        return this.index;
+    }
 
     public String getCourseName() {
         return courseName;
@@ -166,12 +172,12 @@ public class Course implements Serializable {
      * Simple Clone code (deep copy)
      */
     public Course clone() {
-        Course clone = new Course(courseName);
-        clone.setReachablePointsPerAssignment(reachablePointsPerAssignment);
-        clone.setNumberOfAssignments(numberOfAssignments);
+        Course clone = new Course(this.courseName, this.index);
+        clone.setReachablePointsPerAssignment(this.reachablePointsPerAssignment);
+        clone.setNumberOfAssignments(this.numberOfAssignments);
 
         ArrayList<Assignment> cloneList = new ArrayList<Assignment>();
-        for (Assignment a : mAssignmentArrayList) {
+        for (Assignment a : this.mAssignmentArrayList) {
             cloneList.add(a);
         }
 
@@ -247,7 +253,7 @@ public class Course implements Serializable {
      * Returns Average Points per Assignment
      */
     public Double getAveragePointsPerAssignment(boolean extraAssignments) {
-        return Math.round(getOverAllPercentage(extraAssignments) * getReachablePointsPerAssignment() * 1) / 100d;
+        return Math.round(getAverage(extraAssignments) * getReachablePointsPerAssignment() * 1) / 100d;
     }
 
     /**

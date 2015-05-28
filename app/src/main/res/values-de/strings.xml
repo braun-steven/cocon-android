@@ -54,4 +54,7 @@
     <string name="dialog_edit_assignment_save">Speichern</string>
     <string name="dialog_edit_assignment_title">Übungsblatt bearbeiten</string>
     <string name="yes">yes</string>
+    <string name="courselist_head_coursename">Kursname</string>
+    <string name="courselist_header_progress">Fortschritt</string>
+    <string name="courselist_header_average">\u00d8</string>
 </resources>

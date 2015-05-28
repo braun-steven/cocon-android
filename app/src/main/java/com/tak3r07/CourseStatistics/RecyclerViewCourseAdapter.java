@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,11 +39,10 @@ public class RecyclerViewCourseAdapter
             implements View.OnClickListener, View.OnLongClickListener {
 
         //Initialize views in Viewholder
-        TextView mTextViewFirst;
-        TextView mTextViewSecond;
+        TextView mTextViewName;
+        TextView mTextViewProgress;
         //ImageView mImageView;
-        TextView mLetter;
-        TextView mEndPercentageTextView;
+        TextView mTextViewAverage;
         //Context to refer to app context (for intent, dialog etc)
         Context context;
         //Adapter to notifiy data set changed
@@ -59,11 +58,10 @@ public class RecyclerViewCourseAdapter
             this.mCourseAdapter = mCourseAdapter;
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
-            mTextViewFirst = (TextView) itemView.findViewById(R.id.course_firstLine);
-            mTextViewSecond = (TextView) itemView.findViewById(R.id.course_secondLine);
+            mTextViewName = (TextView) itemView.findViewById(R.id.course_textview_name);
+            mTextViewProgress = (TextView) itemView.findViewById(R.id.course_letter);
             //mImageView = (ImageView) itemView.findViewById(R.id.icon);
-            mEndPercentageTextView = (TextView) itemView.findViewById(R.id.end_percentage_textview);
-            mLetter = (TextView) itemView.findViewById(R.id.course_letter);
+            mTextViewAverage = (TextView) itemView.findViewById(R.id.end_percentage_textview);
         }
 
 
@@ -93,7 +91,7 @@ public class RecyclerViewCourseAdapter
 
             //Set title and message
             alert.setTitle(context.getString(R.string.delete));
-            alert.setMessage(context.getString(R.string.do_you_want_to_delete) + mTextViewFirst.getText().toString() + "?");
+            alert.setMessage(context.getString(R.string.do_you_want_to_delete) + mTextViewName.getText().toString() + "?");
 
             //Set positive button behaviour
             alert.setPositiveButton(context.getString(R.string.delete), new DialogInterface.OnClickListener() {
@@ -105,7 +103,7 @@ public class RecyclerViewCourseAdapter
                     //Delete course and notify
                     Toast.makeText(
                             context,
-                            mTextViewFirst.getText().toString() + context.getString(R.string.deleted),
+                            mTextViewName.getText().toString() + context.getString(R.string.deleted),
                             Toast.LENGTH_LONG).show();
 
                     //Delete from database
@@ -138,12 +136,11 @@ public class RecyclerViewCourseAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //Inflate layout
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_course_alternative,
+                .inflate(R.layout.list_item_course_altern,
                         parent,
                         false);
-        ViewHolder vh = new ViewHolder(itemView, context, this);
 
-        return vh;
+        return new ViewHolder(itemView, context, this);
     }
 
 
@@ -151,20 +148,13 @@ public class RecyclerViewCourseAdapter
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         Course course = mCourseArrayList.get(position);
-        //Set Icon
-        Character firstChar = course.getCourseName().toLowerCase().charAt(0);
-        holder.mLetter.setText(firstChar.toString().toUpperCase());
-        holder.mLetter.setWidth(holder.mLetter.getLineHeight());
-        //holder.mImageView.setImageResource(getLetterIconId(firstChar));
         //Set text
-        holder.mTextViewFirst.setText(course.getCourseName());
-        holder.mTextViewSecond.setText(
-                "\u00d8 " + course.getOverAllPercentage(true).toString() + " %");
-        holder.mEndPercentageTextView.setText(course.getAverage().toString() + " %");
+        holder.mTextViewName.setText(course.getCourseName());
+        holder.mTextViewProgress.setText(course.getAverage(true).toString().split("\\.")[0]);
+        holder.mTextViewAverage.setText(course.getProgress().toString() + " %");
 
-        //Set Percentage Color
-        holder.mEndPercentageTextView.setTextColor(getColorForPercentage(course.getAverage()));
-
+        //Set OverAllPercentage background Color
+        holder.mTextViewProgress.setBackground(getDrawableColorForPercentage(course.getAverage(true)));
 
     }
 
@@ -176,15 +166,16 @@ public class RecyclerViewCourseAdapter
     /**
      * This method receives a percentage and retrieves a color
      */
-    public int getColorForPercentage(Double percentage) {
+    public Drawable getDrawableColorForPercentage(Double percentage) {
 
-        if (percentage < 10) return context.getResources().getColor(R.color.red_500);
-        if (percentage < 20) return context.getResources().getColor(R.color.deep_orange_500);
-        if (percentage < 30) return context.getResources().getColor(R.color.orange_500);
-        if (percentage < 40) return context.getResources().getColor(R.color.yellow_500);
-        if (percentage < 50) return context.getResources().getColor(R.color.light_green_500);
-        if (percentage > 50) return context.getResources().getColor(R.color.green_500);
-        return Color.BLACK;
+        if (percentage < 30) return context.getResources().getDrawable(R.drawable.circular_shape_red);
+        if (percentage < 40) return context.getResources().getDrawable(R.drawable.circular_shape_deep_orange);
+        if (percentage < 55) return context.getResources().getDrawable(R.drawable.circular_shape_orange);
+        if (percentage < 65) return context.getResources().getDrawable(R.drawable.circular_shape_yellow);
+        if (percentage < 80) return context.getResources().getDrawable(R.drawable.circular_shape_lime);
+        if (percentage >= 80) return context.getResources().getDrawable(R.drawable.circular_shape_green);
+
+        return context.getResources().getDrawable(R.drawable.circular_shape_red);
     }
 
     //Adds Course
