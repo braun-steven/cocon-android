@@ -3,6 +3,7 @@ package com.tak3r07.CourseStatistics;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -29,9 +30,6 @@ public class AssignmentsActivity extends ActionBarActivity {
 
 
     private final String COURSE_TAG_ID = "COURSE_TAG_ID";
-    private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
-
-
     private RecyclerViewAssignmentAdapter mAssignmentAdapter;
     private Course currentCourse;
     private int courseId;
@@ -68,6 +66,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mAssignmentAdapter);
         mRecyclerView.setLongClickable(true);
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getApplicationContext()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
 
@@ -277,6 +276,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         mTextViewAssUntilFin.setText(String.valueOf(currentCourse.getNumberOfAssUntilFin()));
 
         //Graph
+
         ArrayList<DataPoint> dataPoints = new ArrayList<DataPoint>();
         for (Assignment currentAssignment : currentCourse.getAssignments()) {
             //exclude extra assignments
@@ -298,7 +298,7 @@ public class AssignmentsActivity extends ActionBarActivity {
             points[i] = dataPoints.get(i);
         }
         GraphView graph = (GraphView) findViewById(R.id.graph);
-        PointsGraphSeries<DataPoint> series = new PointsGraphSeries<DataPoint>(points);
+        PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(points);
         series.setSize(8);
 
         //Setup Graph
@@ -311,6 +311,7 @@ public class AssignmentsActivity extends ActionBarActivity {
 
 
         graph.getGridLabelRenderer().setNumHorizontalLabels(currentCourse.getAssignments().size() - countExtraAssignments);
+
     }
 
 }

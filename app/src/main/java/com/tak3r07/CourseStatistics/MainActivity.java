@@ -68,7 +68,7 @@ public class MainActivity extends ActionBarActivity {
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
         mCourseAdapter = new RecyclerViewCourseAdapter(getApplicationContext());
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        //mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getApplicationContext()));
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getApplicationContext()));
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mCourseAdapter);
         mRecyclerView.setLongClickable(true);

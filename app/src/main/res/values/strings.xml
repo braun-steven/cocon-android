@@ -15,7 +15,7 @@
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
     <string name="course_name_textview">Name:</string>
-    <string name="max_points_textview">Max. points \nper Assignment:</string>
+    <string name="max_points_textview">Max. points per Assignment:</string>
     <string name="edit_course_text">Edit course</string>
     <string name="title_activity_edit_course">Edit Course</string>
     <string name="text_extra_assignment_checkbox">This is an extra Assignment</string>

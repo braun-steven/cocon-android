@@ -34,7 +34,7 @@
     <string name="hello_world">Hallo Welt!</string>
     <string name="invalid_values">Ungültige Werte</string>
     <string name="max_points_text">Max. Punkte:</string>
-    <string name="max_points_textview">Max. Punkte \npro Blatt</string>
+    <string name="max_points_textview">Max. Punkte pro Blatt</string>
     <string name="name">Name</string>
     <string name="new_assignment">Neues Übungsblatt</string>
     <string name="new_assignment_added">Neues Übungsblatt wurde hinzugefügt</string>
