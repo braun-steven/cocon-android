@@ -18,7 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LOG = "DatabaseHelper";
 
     //Database version
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 7;
 
     //Database name
     private static final String DATABASE_NAME = "courses";
@@ -35,6 +35,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_NUMBER_OF_ASSIGNMENTS = "number_of_assignments";
     private static final String KEY_REACHABLE_POINTS_PER_ASSIGNMENT = "reachable_points_per_assignment";
     private static final String KEY_COURSE_INDEX = "course_index";
+    private static final String KEY_HAS_FIXED_POINTS = "has_fixed_points";
 
     //Column names: assignments
     private static final String KEY_INDEX = "assignment_index";
@@ -50,7 +51,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_COURSENAME + " TEXT,"
             + KEY_NUMBER_OF_ASSIGNMENTS + " INTEGER,"
             + KEY_REACHABLE_POINTS_PER_ASSIGNMENT + " REAL,"
-            + KEY_COURSE_INDEX + " INTEGER)";
+            + KEY_COURSE_INDEX + " INTEGER,"
+            + KEY_HAS_FIXED_POINTS + " INTEGER)";
 
     private static final String CREATE_ASSIGNMENT_TABLE = "CREATE TABLE " + TABLE_ASSIGNMENTS + "("
             + KEY_ID + " INTEGER PRIMARY KEY,"
@@ -73,11 +75,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COURSES);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ASSIGNMENTS);
-
-        //create new tables
-        onCreate(db);
+        /*
+        Each case 'n' describes an upgrade from db-version 'n' to 'n+1'
+         */
+        while(oldVersion < newVersion) {
+            switch (oldVersion) {
+                case 6:
+                    //Upgrade from 6 to 7
+                    db.execSQL("ALTER TABLE " + TABLE_COURSES
+                            + "ADD " + KEY_HAS_FIXED_POINTS + " INTEGER");
+                    break;
+            }
+            oldVersion++;
+        }
     }
 
     //add course
@@ -85,12 +95,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         //Put all members of course into contentvalues
-        ContentValues values = new ContentValues();
-        values.put(KEY_ID, course.getId());
-        values.put(KEY_COURSENAME, course.getCourseName());
-        values.put(KEY_NUMBER_OF_ASSIGNMENTS, course.getNumberOfAssignments());
-        values.put(KEY_REACHABLE_POINTS_PER_ASSIGNMENT, course.getReachablePointsPerAssignment());
-        values.put(KEY_COURSE_INDEX, course.getIndex());
+        ContentValues values = getCourseContentValues(course);
 
         //Insert Row
         db.insert(TABLE_COURSES, null, values);
@@ -109,13 +114,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
         //Put all members of assignment into contentvalues
-        ContentValues values = new ContentValues();
-        values.put(KEY_ID, assignment.getId());
-        values.put(KEY_INDEX, assignment.getIndex());
-        values.put(KEY_MAX_POINTS, assignment.getMaxPoints());
-        values.put(KEY_ACHIEVED_POINTS, assignment.getAchievedPoints());
-        values.put(KEY_IS_EXTRA_ASSIGNMENT, assignment.isExtraAssignment());
-        values.put(KEY_COURSE_ID, assignment.getCourse_id());
+        ContentValues values = getAssignmentsContentValues(assignment);
 
         //Insert Row
 
@@ -133,7 +132,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         KEY_COURSENAME,
                         KEY_NUMBER_OF_ASSIGNMENTS,
                         KEY_REACHABLE_POINTS_PER_ASSIGNMENT,
-                        KEY_COURSE_INDEX
+                        KEY_COURSE_INDEX,
+                        KEY_HAS_FIXED_POINTS
                 },
                 KEY_ID + "=?",
                 new String[]{String.valueOf(id)},
@@ -147,7 +147,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         course.setId(id);
         course.setNumberOfAssignments(Integer.parseInt(cursor.getString(2)));
         course.setReachablePointsPerAssignment(Double.parseDouble(cursor.getString(3)));
-
+        course.hasFixedPoints(Boolean.parseBoolean(cursor.getString(5)));
 
         //get assignments
         course.setAssignments(getAssignmentsOfCourse(id));
@@ -162,7 +162,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         ArrayList<Assignment> assignments = new ArrayList<>();
 
-        //Query to search for alls assignments with the given course_id
+        //Query to search for all assignments with the given course_id
         Cursor cursor = db.query(TABLE_ASSIGNMENTS,
                 new String[]{
                         KEY_ID,
@@ -211,11 +211,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<Course> getAllCourses() {
         ArrayList<Course> courses = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
+
         //Select all query
         String selectQuery =
                 "SELECT " + KEY_ID
-                + " FROM " + TABLE_COURSES
-                + " ORDER BY " + KEY_COURSE_INDEX + " ASC";
+                        + " FROM " + TABLE_COURSES
+                        + " ORDER BY " + KEY_COURSE_INDEX + " ASC";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -238,7 +239,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //update a single assignment
     public int updateAssignment(Assignment assignment) {
         SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = getAssignmentsContentValues(assignment);
 
+
+        return db.update(TABLE_ASSIGNMENTS, values, KEY_ID + " = ?", new String[]{String.valueOf(assignment.getId())});
+    }
+
+    private ContentValues getAssignmentsContentValues(Assignment assignment) {
         //Put all members of assignment into contentvalues
         ContentValues values = new ContentValues();
         values.put(KEY_ID, assignment.getId());
@@ -247,14 +254,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_ACHIEVED_POINTS, assignment.getAchievedPoints());
         values.put(KEY_IS_EXTRA_ASSIGNMENT, assignment.isExtraAssignment());
         values.put(KEY_COURSE_ID, assignment.getCourse_id());
-
-        return db.update(TABLE_ASSIGNMENTS, values, KEY_ID + " = ?", new String[]{String.valueOf(assignment.getId())});
+        return values;
     }
 
     //update a single course
     public int updateCourse(Course course) {
         SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = getCourseContentValues(course);
 
+
+        return db.update(TABLE_COURSES, values, KEY_ID + " = ?", new String[]{String.valueOf(course.getId())});
+    }
+
+    private ContentValues getCourseContentValues(Course course) {
         //Put all members of course into contentvalues
         ContentValues values = new ContentValues();
         values.put(KEY_ID, course.getId());
@@ -262,8 +274,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_NUMBER_OF_ASSIGNMENTS, course.getNumberOfAssignments());
         values.put(KEY_REACHABLE_POINTS_PER_ASSIGNMENT, course.getReachablePointsPerAssignment());
         values.put(KEY_COURSE_INDEX, course.getIndex());
-
-        return db.update(TABLE_COURSES, values, KEY_ID + " = ?", new String[]{String.valueOf(course.getId())});
+        values.put(KEY_HAS_FIXED_POINTS, course.hasFixedPoints());
+        return values;
     }
 
     //Delete Course
