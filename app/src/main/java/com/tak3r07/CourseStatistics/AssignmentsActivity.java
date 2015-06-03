@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -298,6 +299,13 @@ public class AssignmentsActivity extends ActionBarActivity {
             points[i] = dataPoints.get(i);
         }
         GraphView graph = (GraphView) findViewById(R.id.graph);
+
+        //if only 1 assignment has been added, hide the graph
+        if(currentCourse.getAssignments().size() < 2){
+            ((ViewManager)graph.getParent()).removeView(graph);
+            return;
+        }
+
         PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(points);
         series.setSize(8);
 
