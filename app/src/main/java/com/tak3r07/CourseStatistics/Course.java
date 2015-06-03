@@ -25,6 +25,9 @@ public class Course implements Serializable {
     private int id;
     private int index;
 
+    //Defines wether all assignments of this course have the same reachablePointsPerAssignment
+    private boolean hasFixedPoints;
+
     public Course(String courseName, int index) {
         //Set index
         this.index = index;
@@ -112,6 +115,14 @@ public class Course implements Serializable {
 
         //return result
         return average;
+    }
+
+    public boolean hasFixedPoints() {
+        return hasFixedPoints;
+    }
+
+    public void hasFixedPoints(boolean hasFixedPoints) {
+        this.hasFixedPoints = hasFixedPoints;
     }
 
     public int getIndex(){
