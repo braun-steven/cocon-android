@@ -8,11 +8,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bartoszlipinski.recyclerviewheader.RecyclerViewHeader;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.PointsGraphSeries;
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
@@ -21,12 +26,15 @@ import java.util.ArrayList;
  * Created by tak3r07 on 12/8/14.
  * Adapter for RecyclerView in MainActivity
  */
-public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<RecyclerViewAssignmentAdapter.ViewHolder> {
+public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     private Context context;
     private final AssignmentsActivity assignmentsActivity;
-    private Course currentCourse;
+    private static Course currentCourse;
+
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ITEM = 1;
 
     RecyclerViewAssignmentAdapter(Context context,
                                   Course currentCourse,
@@ -39,7 +47,31 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    public static class VHHeader extends RecyclerView.ViewHolder {
+        int type = TYPE_HEADER;
+
+        //Refer to TextView objects
+        TextView mTextViewAverage;
+        TextView mTextViewNecPoiPerAss;
+        TextView mTextViewAssUntilFin;
+        TextView mTextViewOverall;
+        GraphView graph;
+
+        public VHHeader(View itemView) {
+            super(itemView);
+
+            //Refer to TextView objects
+            mTextViewAverage = (TextView) itemView.findViewById(R.id.course_overview_average);
+            mTextViewNecPoiPerAss = (TextView) itemView.findViewById(R.id.course_overview_nec_pointspass);
+            mTextViewAssUntilFin = (TextView) itemView.findViewById(R.id.course_overview_assignments_until_finished);
+            mTextViewOverall = (TextView) itemView.findViewById(R.id.course_overview_overall_percentage_text);
+            graph = (GraphView) itemView.findViewById(R.id.graph);
+        }
+    }
+
+    public static class VHItem extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+        //Holder type
+        int type = TYPE_ITEM;
 
         //Initialize views in Viewholder
         TextView mTextViewTitle;
@@ -54,7 +86,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         AssignmentsActivity assignmentsActivity;
 
         //Holds views
-        public ViewHolder(View itemView, Context context, RecyclerViewAssignmentAdapter mAssignmentsAdapter, AssignmentsActivity activity) {
+        public VHItem(View itemView, Context context, RecyclerViewAssignmentAdapter mAssignmentsAdapter, AssignmentsActivity activity) {
 
             super(itemView);
             this.assignmentsActivity = activity;
@@ -107,14 +139,9 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                     DatabaseHelper dbHelper = new DatabaseHelper(context);
                     boolean result = dbHelper.deleteAssignment(currentAssignment);
 
-                    Toast.makeText(context, result ? "Delete successful" : "Delete failed", Toast.LENGTH_SHORT).show();
-
                     //Remove Assignment
                     mAssignmentsAdapter.removeAssignment(getPosition());
-
-
-                    //Update Overview tile
-                    assignmentsActivity.initOverview();
+                    mAssignmentsAdapter.notifyDataSetChanged();
                 }
             });
 
@@ -172,8 +199,8 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                                     currentAssignment.setExtraAssignment(false, mAssignmentsAdapter.currentCourse.getReachablePointsPerAssignment());
                                 }
 
-                                //Update Overview tile
-                                assignmentsActivity.initOverview();
+                                //Update
+                                mAssignmentsAdapter.notifyDataSetChanged();
 
                                 //Update Listitem
                                 //Set text
@@ -223,39 +250,124 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //Inflate layout
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_assignment, parent, false);
+        View itemView = null;
+        switch (viewType) {
+            case TYPE_ITEM:
+                itemView = LayoutInflater
+                        .from(parent.getContext())
+                        .inflate(R.layout.list_item_assignment, parent, false);
+                return new VHItem(itemView, context, this, assignmentsActivity);
 
-        return new ViewHolder(itemView, context, this, assignmentsActivity);
+            case TYPE_HEADER:
+                itemView = LayoutInflater
+                        .from(parent.getContext())
+                        .inflate(R.layout.assignments_header, parent, false);
+                return new VHHeader(itemView);
+
+        }
+        throw new RuntimeException(
+                "there is no type that matches the type "
+                        + viewType
+                        + " + make sure your using types correctly");
+
     }
 
 
     //Sets up the view
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
-        //Store current assignment
-        Assignment currentAssignment = currentCourse.getAssignments().get(position);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+
+        if (holder instanceof VHItem) {
+            VHItem itemHolder = (VHItem) holder;
+            //Store current assignment
+            Assignment currentAssignment = currentCourse.getAssignments().get(position-1); // -1 since first position is header
 
 
-        //Set text
-        holder.mTextViewTitle.setText(context.getString(R.string.assignment_number) + currentAssignment.getIndex());
-        holder.mTextViewPoints.setText(currentAssignment.getAchievedPoints() + " / " + currentAssignment.getMaxPoints());
+            //Set text
+            itemHolder.mTextViewTitle.setText(context.getString(R.string.assignment_number) + currentAssignment.getIndex());
+            itemHolder.mTextViewPoints.setText(currentAssignment.getAchievedPoints() + " / " + currentAssignment.getMaxPoints());
 
-        //Test if Assignment is Extraassignment:
-        if (currentAssignment.isExtraAssignment()) {
-            holder.mTextViewPercentage.setText("+");
+            //Test if Assignment is Extraassignment:
+            if (currentAssignment.isExtraAssignment()) {
+                itemHolder.mTextViewPercentage.setText("+");
+            } else {
+                //Else set usual text
+                itemHolder.mTextViewPercentage.setText(currentAssignment.getPercentage().toString() + " %");
+
+            }
         } else {
-            //Else set usual text
-            holder.mTextViewPercentage.setText(currentAssignment.getPercentage().toString() + " %");
+            if (holder instanceof VHHeader) {
+                VHHeader headerHolder = (VHHeader) holder;
+                //Set texts
+                //Overall
+                headerHolder.mTextViewOverall.setText(currentCourse.getProgress().toString()
+                        + " % - " + currentCourse.getTotalPoints()
+                        + "/"
+                        + currentCourse.getNumberOfAssignments() * currentCourse.getReachablePointsPerAssignment());
 
+                //Average
+                headerHolder.mTextViewAverage.setText(currentCourse.getAverage(true).toString()
+                        + " % - " + currentCourse.getAveragePointsPerAssignment(true)
+                        + "/" + currentCourse.getReachablePointsPerAssignment());
+
+                //Nedded Points per assignment until 50% is reached
+                headerHolder.mTextViewNecPoiPerAss.setText(currentCourse.getNecessaryPointsPerAssignmentUntilFin().toString());
+
+                //Number of assignments until 50% is reached
+                headerHolder.mTextViewAssUntilFin.setText(String.valueOf(currentCourse.getNumberOfAssUntilFin()));
+
+                //Graph
+
+                ArrayList<DataPoint> dataPoints = new ArrayList<DataPoint>();
+                for (Assignment currentAssignment : currentCourse.getAssignments()) {
+                    //exclude extra assignments
+                    if (!currentAssignment.isExtraAssignment()) {
+                        dataPoints.add(new DataPoint(currentAssignment.getIndex(), currentAssignment.getAchievedPoints()));
+                    }
+                }
+
+
+                //Count extra-assignments
+                int countExtraAssignments = 0;
+                for (Assignment assignment : currentCourse.getAssignments()) {
+                    if (assignment.isExtraAssignment()) countExtraAssignments++;
+                }
+
+
+                DataPoint[] points = new DataPoint[dataPoints.size()];
+                for (int i = 0; i < dataPoints.size(); i++) {
+                    points[i] = dataPoints.get(i);
+                }
+
+                //if only 1 assignment has been added, hide the graph
+                if (currentCourse.getAssignments().size() < 2) {
+                    ((ViewManager) headerHolder.graph.getParent()).removeView(headerHolder.graph);
+                    return;
+                }
+
+                PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(points);
+                series.setSize(8);
+
+                //Setup Graph
+                headerHolder.graph.removeAllSeries();
+                headerHolder.graph.addSeries(series);
+                headerHolder.graph.getViewport().setYAxisBoundsManual(true);
+                headerHolder.graph.getViewport().setMinY(0);
+                headerHolder.graph.getViewport().setMaxX(currentCourse.getAssignments().size() - countExtraAssignments);
+                headerHolder.graph.getViewport().setMaxY(currentCourse.getReachablePointsPerAssignment());
+                headerHolder.graph.getGridLabelRenderer().setNumHorizontalLabels(currentCourse.getAssignments().size() - countExtraAssignments);
+
+            }
         }
+
 
     }
 
     @Override
     public int getItemCount() {
-        return currentCourse.getAssignments().size();
+        return currentCourse.getAssignments().size()+1;
     }
 
     public void addAssignment(Assignment assignment) {
@@ -270,6 +382,22 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
     public ArrayList<Assignment> getAssignments() {
         return currentCourse.getAssignments();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (isPositionHeader(position))
+            return TYPE_HEADER;
+
+        return TYPE_ITEM;
+    }
+
+    private boolean isPositionHeader(int position) {
+        return position == 0;
+    }
+
+    private Assignment getItem(int position){
+        return currentCourse.getAssignments().get(position -1 ); // -1 since first position is header
     }
 
 }

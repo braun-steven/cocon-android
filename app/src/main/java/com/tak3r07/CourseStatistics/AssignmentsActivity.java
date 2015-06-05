@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bartoszlipinski.recyclerviewheader.RecyclerViewHeader;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.PointsGraphSeries;
@@ -33,6 +34,7 @@ public class AssignmentsActivity extends ActionBarActivity {
     private final String COURSE_TAG_ID = "COURSE_TAG_ID";
     private RecyclerViewAssignmentAdapter mAssignmentAdapter;
     private Course currentCourse;
+    private boolean hasFixedPoints;
     private int courseId;
 
     @Override
@@ -52,6 +54,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         courseId = intent.getExtras().getInt(COURSE_TAG_ID);
         currentCourse = new DatabaseHelper(getApplicationContext())
                 .getCourse(courseId);
+        hasFixedPoints = currentCourse.hasFixedPoints();
 
 
         //Set activity title
@@ -70,9 +73,6 @@ public class AssignmentsActivity extends ActionBarActivity {
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getApplicationContext()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
-
-        //Initialize "Overview"-Cardview
-        initOverview();
     }
 
 
@@ -185,8 +185,6 @@ public class AssignmentsActivity extends ActionBarActivity {
         mAssignmentAdapter.addAssignment(assignment);
         currentCourse.addAssignment(assignment);
 
-        //Update Overview
-        initOverview();
 
         //Store assignment in database
         DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
@@ -238,9 +236,6 @@ public class AssignmentsActivity extends ActionBarActivity {
 
             //Notify adapter for changes
             mAssignmentAdapter.notifyDataSetChanged();
-
-            //Update overview
-            initOverview();
         }
     }
 
@@ -252,74 +247,4 @@ public class AssignmentsActivity extends ActionBarActivity {
         currentCourse = dbHelper.getCourse(courseId);
         super.onResume();
     }
-
-
-    public void initOverview() {
-        //Refer to TextView objects
-        TextView mTextViewAverage = (TextView) findViewById(R.id.course_overview_average);
-        TextView mTextViewNecPoiPerAss = (TextView) findViewById(R.id.course_overview_nec_pointspass);
-        TextView mTextViewAssUntilFin = (TextView) findViewById(R.id.course_overview_assignments_until_finished);
-        TextView mTextViewOverall = (TextView) findViewById(R.id.course_overview_overall_percentage_text);
-
-        //Set texts
-
-
-        //Overall
-        mTextViewOverall.setText(currentCourse.getProgress().toString() + " % - " + currentCourse.getTotalPoints() + "/" + currentCourse.getNumberOfAssignments() * currentCourse.getReachablePointsPerAssignment());
-
-        //Average
-        mTextViewAverage.setText(currentCourse.getAverage(true).toString() + " % - " + currentCourse.getAveragePointsPerAssignment(true) + "/" + currentCourse.getReachablePointsPerAssignment()); //Warning: "getOverAll = average in course classe"
-
-        //Nedded Points per assignment until 50% is reached
-        mTextViewNecPoiPerAss.setText(currentCourse.getNecessaryPointsPerAssignmentUntilFin().toString());
-
-        //Number of assignments until 50% is reached
-        mTextViewAssUntilFin.setText(String.valueOf(currentCourse.getNumberOfAssUntilFin()));
-
-        //Graph
-
-        ArrayList<DataPoint> dataPoints = new ArrayList<DataPoint>();
-        for (Assignment currentAssignment : currentCourse.getAssignments()) {
-            //exclude extra assignments
-            if (!currentAssignment.isExtraAssignment()) {
-                dataPoints.add(new DataPoint(currentAssignment.getIndex(), currentAssignment.getAchievedPoints()));
-            }
-        }
-
-
-        //Count extra-assignments
-        int countExtraAssignments = 0;
-        for (Assignment assignment : currentCourse.getAssignments()) {
-            if (assignment.isExtraAssignment()) countExtraAssignments++;
-        }
-
-
-        DataPoint[] points = new DataPoint[dataPoints.size()];
-        for (int i = 0; i < dataPoints.size(); i++) {
-            points[i] = dataPoints.get(i);
-        }
-        GraphView graph = (GraphView) findViewById(R.id.graph);
-
-        //if only 1 assignment has been added, hide the graph
-        if(currentCourse.getAssignments().size() < 2){
-            ((ViewManager)graph.getParent()).removeView(graph);
-            return;
-        }
-
-        PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(points);
-        series.setSize(8);
-
-        //Setup Graph
-        graph.removeAllSeries();
-        graph.addSeries(series);
-        graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(0);
-        graph.getViewport().setMaxX(currentCourse.getAssignments().size() - countExtraAssignments);
-        graph.getViewport().setMaxY(currentCourse.getReachablePointsPerAssignment());
-
-
-        graph.getGridLabelRenderer().setNumHorizontalLabels(currentCourse.getAssignments().size() - countExtraAssignments);
-
-    }
-
 }
