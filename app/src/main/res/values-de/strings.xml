@@ -58,5 +58,4 @@
     <string name="courselist_header_progress">Fortschritt</string>
     <string name="courselist_header_average">\u00d8</string>
     <string name="checkbox_text_hasfixedpoints">Dieser Kurs hat auf jedem Übungsblatt die selbe Anzahl an max. erreichbaren Punkten</string>
-    <string name="max_points"></string>
 </resources>

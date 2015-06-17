@@ -189,14 +189,23 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                     mEditTextAchievedPoints.setHint(currentAssignment.getAchievedPoints() + "");
                     mEditTextMaxPoints.setHint(currentAssignment.getMaxPoints() + "");
 
+
                     alert.setPositiveButton(context.getString(R.string.dialog_edit_assignment_save), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
 
 
                             //Get data from edittext
                             String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',', '.');
-                            String maxPointsString = mEditTextMaxPoints.getText().toString().replace(',', '.');;
+                            String maxPointsString = mEditTextMaxPoints.getText().toString().replace(',', '.');
 
+                            //If no new maxPoints is entered: get the old one
+                            if(maxPointsString.isEmpty()){
+                                maxPointsString = String.valueOf(currentAssignment.getMaxPoints());
+                            }
+                            //If no new achievedPoints is entered: get the old one
+                            if(achievedPointsString.isEmpty()){
+                                achievedPointsString = String.valueOf(currentAssignment.getAchievedPoints());
+                            }
 
                             //Check if the entered Values are numeric (doubles)
                             if (AssignmentsActivity.isNumeric(achievedPointsString) && AssignmentsActivity.isNumeric(maxPointsString)) {
@@ -333,10 +342,8 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         } else {
             if (holder instanceof VHHeader) {
                 VHHeader headerHolder = (VHHeader) holder;
-                //Set texts
-                //Overall
 
-                //TODO: UPDATE
+                //SetupHeader
                 if(currentCourse.hasFixedPoints()){
                     setupFixedPointsHeaderHolder(headerHolder);
                 } else{
