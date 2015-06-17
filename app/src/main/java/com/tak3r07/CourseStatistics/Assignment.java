@@ -8,7 +8,6 @@ import java.util.Random;
  */
 public class Assignment implements Serializable {
 
-    String TAG = "UEBUNGSPUNKTE-Log";
     static final long serialVersionUID = 62872256170663659L;
 
     //Index of the Assignment
@@ -31,10 +30,10 @@ public class Assignment implements Serializable {
      * Constructor for new Assignments
      *
      * @param id             -1 = new Assignment, else = read from DATABASE
-     * @param index
-     * @param maxPoints
-     * @param achievedPoints
-     * @param course_id
+     * @param index index in assignments list
+     * @param maxPoints maximum reachable points
+     * @param achievedPoints achieved points in this assignment
+     * @param course_id reference to the course
      */
     public Assignment(int id, int index, double maxPoints, double achievedPoints, int course_id) {
         setIndex(index);
@@ -89,10 +88,6 @@ public class Assignment implements Serializable {
         return course_id;
     }
 
-    public double getMaxPoints() {
-        return maxPoints;
-    }
-
     public void setMaxPoints(double maxPoints) {
         this.maxPoints = maxPoints;
     }
@@ -117,14 +112,13 @@ public class Assignment implements Serializable {
         return isExtraAssignment;
     }
 
-    public void setExtraAssignment(boolean isExtraAssignment) {
+    public void isExtraAssignment(boolean isExtraAssignment) {
 
         this.isExtraAssignment = isExtraAssignment;
         this.maxPoints = 0d;
     }
 
-    public void setExtraAssignment(boolean isExtraAssignment, double maxPoints) {
-        this.isExtraAssignment = isExtraAssignment;
-        this.maxPoints = maxPoints;
+    public double getMaxPoints(){
+        return this.maxPoints;
     }
 }

@@ -18,7 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LOG = "DatabaseHelper";
 
     //Database version
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
 
     //Database name
     private static final String DATABASE_NAME = "courses";
@@ -33,7 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //Column names: courses
     private static final String KEY_COURSENAME = "course_name";
     private static final String KEY_NUMBER_OF_ASSIGNMENTS = "number_of_assignments";
-    private static final String KEY_REACHABLE_POINTS_PER_ASSIGNMENT = "reachable_points_per_assignment";
+    private static final String KEY_MAX_POINTS_COURSE = "reachable_points_per_assignment";
     private static final String KEY_COURSE_INDEX = "course_index";
     private static final String KEY_HAS_FIXED_POINTS = "has_fixed_points";
 
@@ -50,7 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_ID + " INTEGER PRIMARY KEY,"
             + KEY_COURSENAME + " TEXT,"
             + KEY_NUMBER_OF_ASSIGNMENTS + " INTEGER,"
-            + KEY_REACHABLE_POINTS_PER_ASSIGNMENT + " REAL,"
+            + KEY_MAX_POINTS_COURSE + " REAL,"
             + KEY_COURSE_INDEX + " INTEGER,"
             + KEY_HAS_FIXED_POINTS + " INTEGER)";
 
@@ -81,10 +81,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         while(oldVersion < newVersion) {
             switch (oldVersion) {
                 case 6:
-                    //Upgrade from 6 to 7
-                    db.execSQL("ALTER TABLE " + TABLE_COURSES
-                            + "ADD " + KEY_HAS_FIXED_POINTS + " INTEGER");
-                    break;
+                case 7:
             }
             oldVersion++;
         }
@@ -131,9 +128,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         KEY_ID,
                         KEY_COURSENAME,
                         KEY_NUMBER_OF_ASSIGNMENTS,
-                        KEY_REACHABLE_POINTS_PER_ASSIGNMENT,
-                        KEY_COURSE_INDEX,
-                        KEY_HAS_FIXED_POINTS
+                        KEY_MAX_POINTS_COURSE,
+                        KEY_COURSE_INDEX
                 },
                 KEY_ID + "=?",
                 new String[]{String.valueOf(id)},
@@ -143,11 +139,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.moveToFirst();
         }
 
-        Course course = new Course(cursor.getString(1), cursor.getInt(4));
+        String courseName = cursor.getString(1);
+        int numberOfAssignments = Integer.parseInt(cursor.getString(2));
+
+        //Get max points
+        double maxPoints;
+        String maxPointsString = cursor.getString(3);
+        if(maxPointsString == null) {
+            maxPoints = 0;
+        } else {
+            maxPoints = Double.parseDouble(maxPointsString);
+        }
+
+        int index = cursor.getInt(4);
+
+        Course course;
+        //If maxPoints was a "Null-value" in the database, create a DynamicPointsCourse
+        if (maxPoints == 0){
+            course = new DynamicPointsCourse(courseName, index);
+        } else {
+            course = new FixedPointsCourse(courseName, index, maxPoints);
+        }
         course.setId(id);
-        course.setNumberOfAssignments(Integer.parseInt(cursor.getString(2)));
-        course.setReachablePointsPerAssignment(Double.parseDouble(cursor.getString(3)));
-        course.hasFixedPoints(Boolean.parseBoolean(cursor.getString(5)));
+        course.setNumberOfAssignments(numberOfAssignments);
 
         //get assignments
         course.setAssignments(getAssignmentsOfCourse(id));
@@ -245,6 +259,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.update(TABLE_ASSIGNMENTS, values, KEY_ID + " = ?", new String[]{String.valueOf(assignment.getId())});
     }
 
+    /**
+     * Creates ContentValues which provides the content of a assignment
+     * @param assignment The assignment for which the contentValues should be created
+     * @return Contentvalues
+     */
+
     private ContentValues getAssignmentsContentValues(Assignment assignment) {
         //Put all members of assignment into contentvalues
         ContentValues values = new ContentValues();
@@ -266,23 +286,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.update(TABLE_COURSES, values, KEY_ID + " = ?", new String[]{String.valueOf(course.getId())});
     }
 
+    /**
+     * Creates ContentValues which provides the content of a course
+     * @param course The course for which the contentValues should be created
+     * @return Contentvalues
+     */
     private ContentValues getCourseContentValues(Course course) {
         //Put all members of course into contentvalues
+
+
+
         ContentValues values = new ContentValues();
         values.put(KEY_ID, course.getId());
         values.put(KEY_COURSENAME, course.getCourseName());
         values.put(KEY_NUMBER_OF_ASSIGNMENTS, course.getNumberOfAssignments());
-        values.put(KEY_REACHABLE_POINTS_PER_ASSIGNMENT, course.getReachablePointsPerAssignment());
         values.put(KEY_COURSE_INDEX, course.getIndex());
-        values.put(KEY_HAS_FIXED_POINTS, course.hasFixedPoints());
+
+
+        /*
+        If course is a "FixedPointsCourse" -> insert course.getMaxPoints
+        Else insert "Null-Value"
+         */
+        double maxPoints;
+        if (course.hasFixedPoints()){
+            maxPoints = ((FixedPointsCourse)course).getMaxPoints();
+            values.put(KEY_MAX_POINTS_COURSE, maxPoints);
+        }else{
+            values.putNull(KEY_MAX_POINTS_COURSE);
+        }
+
         return values;
     }
 
-    //Delete Course
-    public void deleteCourse(Course course) {
+
+    /**
+     * Delete specific course
+     * @param course which is to be deleted
+     * @return result whether delete has failed(false) or not (true)
+     */
+    public boolean deleteCourse(Course course) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_COURSES, KEY_ID + " = ?", new String[]{String.valueOf(course.getId())});
+        int result = db.delete(
+                TABLE_COURSES,
+                KEY_ID + " = ?",
+                new String[]{String.valueOf(course.getId())});
         db.close();
+        return result > 0;
     }
 
     /**
@@ -293,7 +342,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public boolean deleteAssignment(Assignment assignment) {
         SQLiteDatabase db = this.getWritableDatabase();
-        int result = db.delete(TABLE_ASSIGNMENTS, KEY_ID + " = ?", new String[]{String.valueOf(assignment.getId())});
+        int result = db.delete(
+                TABLE_ASSIGNMENTS,
+                KEY_ID + " = ?",
+                new String[]{String.valueOf(assignment.getId())});
         db.close();
 
         return result > 0;

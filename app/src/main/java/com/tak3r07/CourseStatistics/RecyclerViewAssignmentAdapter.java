@@ -8,13 +8,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bartoszlipinski.recyclerviewheader.RecyclerViewHeader;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.PointsGraphSeries;
@@ -32,6 +30,8 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
     private Context context;
     private final AssignmentsActivity assignmentsActivity;
     private static Course currentCourse;
+    private ArrayList<Assignment> mAssignments;
+    private static boolean hasFixedPoints;
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
@@ -41,37 +41,41 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                                   AssignmentsActivity assignmentsActivity) {
         this.context = context;
         this.assignmentsActivity = assignmentsActivity;
-        this.currentCourse = currentCourse;
-        if (currentCourse.getAssignments() == null) {
+        RecyclerViewAssignmentAdapter.currentCourse = currentCourse;
+        this.mAssignments = currentCourse.getAssignments();
+        if (mAssignments == null) {
             throw new IllegalArgumentException("assignments ArrayList must not be null");
         }
+
+        hasFixedPoints = (currentCourse instanceof FixedPointsCourse);
     }
 
     public static class VHHeader extends RecyclerView.ViewHolder {
-        int type = TYPE_HEADER;
 
         //Refer to TextView objects
         TextView mTextViewAverage;
         TextView mTextViewNecPoiPerAss;
         TextView mTextViewAssUntilFin;
         TextView mTextViewOverall;
+        TextView mTextViewProgress;
         GraphView graph;
 
-        public VHHeader(View itemView) {
-            super(itemView);
+        public VHHeader(View view) {
+            super(view);
 
             //Refer to TextView objects
-            mTextViewAverage = (TextView) itemView.findViewById(R.id.course_overview_average);
-            mTextViewNecPoiPerAss = (TextView) itemView.findViewById(R.id.course_overview_nec_pointspass);
-            mTextViewAssUntilFin = (TextView) itemView.findViewById(R.id.course_overview_assignments_until_finished);
-            mTextViewOverall = (TextView) itemView.findViewById(R.id.course_overview_overall_percentage_text);
-            graph = (GraphView) itemView.findViewById(R.id.graph);
+            mTextViewAverage = (TextView) view.findViewById(R.id.course_overview_average);
+            mTextViewNecPoiPerAss = (TextView) view.findViewById(R.id.course_overview_nec_pointspass);
+            mTextViewAssUntilFin = (TextView) view.findViewById(R.id.course_overview_assignments_until_finished);
+            mTextViewOverall = (TextView) view.findViewById(R.id.course_overview_overall_percentage_text);
+            graph = (GraphView) view.findViewById(R.id.graph);
+            if(!currentCourse.hasFixedPoints()){
+                mTextViewProgress = (TextView) view.findViewById(R.id.textView_progress);
+            }
         }
     }
 
     public static class VHItem extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        //Holder type
-        int type = TYPE_ITEM;
 
         //Initialize views in Viewholder
         TextView mTextViewTitle;
@@ -122,25 +126,22 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
             //Set positive button behaviour
             alert.setPositiveButton(context.getString(R.string.delete), new DialogInterface.OnClickListener() {
+
+
                 public void onClick(DialogInterface dialog, int whichButton) {
 
                     //Get current assignment
-                    Assignment currentAssignment = mAssignmentsAdapter.getAssignments().get(getPosition());
+                    Assignment currentAssignment = mAssignmentsAdapter.getAssignments().get(getItemPosition(getPosition()));
 
                     //Delete assignment and notify
                     Toast.makeText(context, mTextViewTitle.getText().toString() + context.getString(R.string.deleted), Toast.LENGTH_LONG).show();
-
-                    //LOGGING
-                    Log.d("DEBUG", "Going to remove assignment: " +
-                            ", Index: " + currentAssignment.getId() +
-                            ", Points:" + currentAssignment.getAchievedPoints());
 
                     //Save changes in Database
                     DatabaseHelper dbHelper = new DatabaseHelper(context);
                     boolean result = dbHelper.deleteAssignment(currentAssignment);
 
                     //Remove Assignment
-                    mAssignmentsAdapter.removeAssignment(getPosition());
+                    mAssignmentsAdapter.removeAssignment(getItemPosition(getPosition()));
                     mAssignmentsAdapter.notifyDataSetChanged();
                 }
             });
@@ -161,12 +162,21 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                     alert.setMessage(context.getString(R.string.enter_assignment_points));
 
                     // Set an custom dialog view to get user input
-                    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     final View view = View.inflate(v.getContext(), R.layout.dialog_add_assignment, null);
                     alert.setView(view);
 
                     //Get assignment reference
-                    final Assignment currentAssignment = mAssignmentsAdapter.currentCourse.getAssignment(getPosition());
+                    final Assignment currentAssignment = currentCourse.getAssignment(getItemPosition(getPosition()));
+
+                    final EditText mEditTextMaxPoints = (EditText) view.findViewById(R.id.editText_maxPoints);
+                    final TextView textView = (TextView) view.findViewById(R.id.textView_maxPoints);
+
+                    //If this course has fixed Points, dont show the possibilities of setting maxPoints
+                    if(hasFixedPoints){
+                        mEditTextMaxPoints.setHeight(0);
+                        textView.setHeight(0);
+
+                    }
 
                     //Checkbox reference
                     final CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
@@ -174,7 +184,10 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
                     //Get EditText views
                     final EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
+
+                    //Set hints
                     mEditTextAchievedPoints.setHint(currentAssignment.getAchievedPoints() + "");
+                    mEditTextMaxPoints.setHint(currentAssignment.getMaxPoints() + "");
 
                     alert.setPositiveButton(context.getString(R.string.dialog_edit_assignment_save), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
@@ -182,11 +195,21 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
                             //Get data from edittext
                             String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',', '.');
+                            String maxPointsString = mEditTextMaxPoints.getText().toString().replace(',', '.');;
+
 
                             //Check if the entered Values are numeric (doubles)
-                            if (AssignmentsActivity.isNumeric(achievedPointsString)) {
+                            if (AssignmentsActivity.isNumeric(achievedPointsString) && AssignmentsActivity.isNumeric(maxPointsString)) {
 
                                 Double achievedPoints = Double.parseDouble(achievedPointsString);
+
+                                Double maxPoints;
+                                if(hasFixedPoints){
+                                    maxPoints = currentCourse.toFPC().getMaxPoints();
+                                } else{
+
+                                    maxPoints = Double.parseDouble(maxPointsString);
+                                }
 
                                 //Set new achieved points value
                                 currentAssignment.setAchievedPoints(achievedPoints);
@@ -194,9 +217,10 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
                                 //Set extra assignment if checked
                                 if (mCheckBox.isChecked()) {
-                                    currentAssignment.setExtraAssignment(true);
+                                    currentAssignment.isExtraAssignment(true);
                                 } else {
-                                    currentAssignment.setExtraAssignment(false, mAssignmentsAdapter.currentCourse.getReachablePointsPerAssignment());
+                                    currentAssignment.isExtraAssignment(false);
+                                    currentAssignment.setMaxPoints(maxPoints);
                                 }
 
                                 //Update
@@ -252,18 +276,27 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //Inflate layout
-        View itemView = null;
+        View itemView;
         switch (viewType) {
             case TYPE_ITEM:
                 itemView = LayoutInflater
                         .from(parent.getContext())
                         .inflate(R.layout.list_item_assignment, parent, false);
+
                 return new VHItem(itemView, context, this, assignmentsActivity);
 
             case TYPE_HEADER:
+                //Get correct header for dynamic/fixed points
+                int layout;
+                if(currentCourse.hasFixedPoints()){
+                    layout = R.layout.assignments_header_fixed_points;
+                } else {
+                    layout = R.layout.assignments_header_dynamic_points;
+                }
                 itemView = LayoutInflater
                         .from(parent.getContext())
-                        .inflate(R.layout.assignments_header, parent, false);
+                        .inflate(layout, parent, false);
+
                 return new VHHeader(itemView);
 
         }
@@ -282,7 +315,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         if (holder instanceof VHItem) {
             VHItem itemHolder = (VHItem) holder;
             //Store current assignment
-            Assignment currentAssignment = currentCourse.getAssignments().get(position-1); // -1 since first position is header
+            Assignment currentAssignment = mAssignments.get(position - 1); // -1 since first position is header
 
 
             //Set text
@@ -302,62 +335,13 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                 VHHeader headerHolder = (VHHeader) holder;
                 //Set texts
                 //Overall
-                headerHolder.mTextViewOverall.setText(currentCourse.getProgress().toString()
-                        + " % - " + currentCourse.getTotalPoints()
-                        + "/"
-                        + currentCourse.getNumberOfAssignments() * currentCourse.getReachablePointsPerAssignment());
 
-                //Average
-                headerHolder.mTextViewAverage.setText(currentCourse.getAverage(true).toString()
-                        + " % - " + currentCourse.getAveragePointsPerAssignment(true)
-                        + "/" + currentCourse.getReachablePointsPerAssignment());
-
-                //Nedded Points per assignment until 50% is reached
-                headerHolder.mTextViewNecPoiPerAss.setText(currentCourse.getNecessaryPointsPerAssignmentUntilFin().toString());
-
-                //Number of assignments until 50% is reached
-                headerHolder.mTextViewAssUntilFin.setText(String.valueOf(currentCourse.getNumberOfAssUntilFin()));
-
-                //Graph
-
-                ArrayList<DataPoint> dataPoints = new ArrayList<DataPoint>();
-                for (Assignment currentAssignment : currentCourse.getAssignments()) {
-                    //exclude extra assignments
-                    if (!currentAssignment.isExtraAssignment()) {
-                        dataPoints.add(new DataPoint(currentAssignment.getIndex(), currentAssignment.getAchievedPoints()));
-                    }
+                //TODO: UPDATE
+                if(currentCourse.hasFixedPoints()){
+                    setupFixedPointsHeaderHolder(headerHolder);
+                } else{
+                    setupDynamicPointsHeaderHolder(headerHolder);
                 }
-
-
-                //Count extra-assignments
-                int countExtraAssignments = 0;
-                for (Assignment assignment : currentCourse.getAssignments()) {
-                    if (assignment.isExtraAssignment()) countExtraAssignments++;
-                }
-
-
-                DataPoint[] points = new DataPoint[dataPoints.size()];
-                for (int i = 0; i < dataPoints.size(); i++) {
-                    points[i] = dataPoints.get(i);
-                }
-
-                //if only 1 assignment has been added, hide the graph
-                if (currentCourse.getAssignments().size() < 2) {
-                    ((ViewManager) headerHolder.graph.getParent()).removeView(headerHolder.graph);
-                    return;
-                }
-
-                PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(points);
-                series.setSize(8);
-
-                //Setup Graph
-                headerHolder.graph.removeAllSeries();
-                headerHolder.graph.addSeries(series);
-                headerHolder.graph.getViewport().setYAxisBoundsManual(true);
-                headerHolder.graph.getViewport().setMinY(0);
-                headerHolder.graph.getViewport().setMaxX(currentCourse.getAssignments().size() - countExtraAssignments);
-                headerHolder.graph.getViewport().setMaxY(currentCourse.getReachablePointsPerAssignment());
-                headerHolder.graph.getGridLabelRenderer().setNumHorizontalLabels(currentCourse.getAssignments().size() - countExtraAssignments);
 
             }
         }
@@ -367,21 +351,22 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
     @Override
     public int getItemCount() {
-        return currentCourse.getAssignments().size()+1;
+        return mAssignments.size()+1;
     }
 
     public void addAssignment(Assignment assignment) {
-        currentCourse.getAssignments().add(assignment);
-        notifyItemInserted(currentCourse.getAssignments().size());
+        mAssignments.add(assignment);
+        notifyItemInserted(mAssignments.size());
     }
 
     public void removeAssignment(int position) {
-        currentCourse.getAssignments().remove(position);
+        mAssignments.remove(position);
         notifyItemRemoved(position);
+        notifyDataSetChanged();
     }
 
     public ArrayList<Assignment> getAssignments() {
-        return currentCourse.getAssignments();
+        return mAssignments;
     }
 
     @Override
@@ -396,8 +381,131 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         return position == 0;
     }
 
-    private Assignment getItem(int position){
-        return currentCourse.getAssignments().get(position -1 ); // -1 since first position is header
+
+    /**
+     * Returns correct item position since first item is header
+     * @return item positon
+     */
+    public static int getItemPosition(int position){
+        return position -1;
+    }
+
+    public void setupFixedPointsHeaderHolder(VHHeader headerHolder){
+
+        FixedPointsCourse fpc = currentCourse.toFPC();
+
+
+        headerHolder.mTextViewOverall.setText(fpc.getProgress().toString()
+                + " % - " + fpc.getTotalPoints()
+                + "/"
+                + fpc.getNumberOfAssignments() * fpc.getMaxPoints());
+
+        //Average
+        headerHolder.mTextViewAverage.setText(fpc.getAverage(true).toString()
+                + " % - " + fpc.getAveragePointsPerAssignment(true)
+                + "/" + fpc.getMaxPoints());
+
+        //Nedded Points per assignment until 50% is reached
+        headerHolder.mTextViewNecPoiPerAss.setText(fpc.getNecessaryPointsPerAssignmentUntilFin().toString());
+
+        //Number of assignments until 50% is reached
+        headerHolder.mTextViewAssUntilFin.setText(String.valueOf(fpc.getNumberOfAssUntilFin()));
+
+        //Graph
+
+        ArrayList<DataPoint> dataPoints = new ArrayList<>();
+        for (Assignment currentAssignment : mAssignments) {
+            //exclude extra assignments
+            if (!currentAssignment.isExtraAssignment()) {
+                dataPoints.add(new DataPoint(currentAssignment.getIndex(), currentAssignment.getAchievedPoints()));
+            }
+        }
+
+
+        //Count extra-assignments
+        int countExtraAssignments = getCountExtraAssignments();
+
+
+        DataPoint[] points = getDataPoints(dataPoints);
+
+        //if only 1 assignment has been added, hide the graph
+        if (hideGraphIfTooLessAssignments(headerHolder)) return;
+
+        PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(points);
+        series.setSize(8);
+
+        //Setup Graph
+        headerHolder.graph.removeAllSeries();
+        headerHolder.graph.addSeries(series);
+        headerHolder.graph.getViewport().setYAxisBoundsManual(true);
+        headerHolder.graph.getViewport().setMinY(0);
+        headerHolder.graph.getViewport().setMaxX(mAssignments.size() - countExtraAssignments);
+        headerHolder.graph.getViewport().setMaxY(fpc.getMaxPoints());
+        headerHolder.graph.getGridLabelRenderer().setNumHorizontalLabels(mAssignments.size() - countExtraAssignments);
+    }
+    public void setupDynamicPointsHeaderHolder(VHHeader headerHolder){
+        headerHolder.mTextViewAverage.setText(currentCourse.getAverage(true) + " %");
+        headerHolder.mTextViewProgress.setText(currentCourse.getProgress() + " %");
+
+
+        //Graph
+
+        ArrayList<DataPoint> dataPoints = new ArrayList<>();
+        for (Assignment currentAssignment : mAssignments) {
+            //exclude extra assignments
+            if (!currentAssignment.isExtraAssignment()) {
+                dataPoints.add(new DataPoint(currentAssignment.getIndex(), currentAssignment.getPercentage()));
+            }
+        }
+        int countExtraAssignments = getCountExtraAssignments();
+
+
+        DataPoint[] points = getDataPoints(dataPoints);
+
+        //if only 1 assignment has been added, hide the graph
+        if (hideGraphIfTooLessAssignments(headerHolder)) return;
+
+        PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(points);
+        series.setSize(8);
+
+        //Setup Graph
+        headerHolder.graph.removeAllSeries();
+        headerHolder.graph.addSeries(series);
+        headerHolder.graph.getViewport().setYAxisBoundsManual(true);
+        headerHolder.graph.getViewport().setMinY(0);
+        headerHolder.graph.getViewport().setMaxX(mAssignments.size() - countExtraAssignments);
+        //Max is 100%
+        headerHolder.graph.getViewport().setMaxY(100);
+        headerHolder.graph.getGridLabelRenderer().setNumHorizontalLabels(mAssignments.size() - countExtraAssignments);
+
+    }
+
+    public boolean hideGraphIfTooLessAssignments(VHHeader headerHolder) {
+        if (mAssignments.size() < 2) {
+            //hide
+            headerHolder.graph.setVisibility(View.INVISIBLE);
+            return true;
+        } else {
+            headerHolder.graph.setVisibility(View.VISIBLE);
+        }
+        return false;
+    }
+
+    public DataPoint[] getDataPoints(ArrayList<DataPoint> dataPoints) {
+        DataPoint[] points = new DataPoint[dataPoints.size()];
+        for (int i = 0; i < dataPoints.size(); i++) {
+            points[i] = dataPoints.get(i);
+        }
+        return points;
+    }
+
+    public int getCountExtraAssignments() {
+        //Count extra-assignments
+        int countExtraAssignments = 0;
+        for (Assignment assignment : mAssignments) {
+            if (assignment.isExtraAssignment()) countExtraAssignments++;
+        }
+        return countExtraAssignments;
     }
 
 }

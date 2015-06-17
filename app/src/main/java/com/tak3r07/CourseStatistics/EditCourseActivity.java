@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -50,8 +51,21 @@ public class EditCourseActivity extends ActionBarActivity {
         //Setup Text
         mNameEditText.setText(course.getCourseName());
         mNumberEditText.setText(String.valueOf(course.getNumberOfAssignments()));
-        mMaxPointsEditText.setText(course.getReachablePointsPerAssignment().toString());
 
+        //FPC: Set maxPoints
+        //DPC: Remove edittext + description
+        if(course.hasFixedPoints()) {
+            mMaxPointsEditText.setText(course.toFPC().getMaxPoints().toString());
+        } else {
+
+            ViewManager viewManager = (ViewManager) mMaxPointsEditText.getParent();
+
+            //remove edittext
+            viewManager.removeView(mMaxPointsEditText);
+            //remove description
+            viewManager.removeView(findViewById(R.id.textView3));
+
+        }
 
     }
 
@@ -83,7 +97,7 @@ public class EditCourseActivity extends ActionBarActivity {
     public void onClickSave(View view) {
         String name = mNameEditText.getText().toString();
         int numberOfAssignments = Integer.parseInt(mNumberEditText.getText().toString());
-        double reachablePointsPerAssignment = Double.parseDouble(mMaxPointsEditText.getText().toString());
+
 
 
         //Count extra-assignments
@@ -98,8 +112,12 @@ public class EditCourseActivity extends ActionBarActivity {
             //Save new values in course
             course.setCourseName(name);
             course.setNumberOfAssignments(numberOfAssignments);
-            course.setReachablePointsPerAssignment(reachablePointsPerAssignment);
 
+            //FPC: Add maxpoints
+            if(course.hasFixedPoints()) {
+                double maxPoints = Double.parseDouble(mMaxPointsEditText.getText().toString());
+                course.toFPC().setMaxPoints(maxPoints);
+            }
             //Create empty intent
             Intent data = new Intent();
 

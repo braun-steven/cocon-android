@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp" >
+    android:padding="24dp" >
         <TextView
             android:id="@+id/course_name"
             android:layout_width="wrap_content"
@@ -28,5 +28,13 @@
             android:id="@+id/max_reachable_points_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/checkbox_text_hasfixedpoints"
+        android:id="@+id/checkBox_fixed_points"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
 
 </LinearLayout>

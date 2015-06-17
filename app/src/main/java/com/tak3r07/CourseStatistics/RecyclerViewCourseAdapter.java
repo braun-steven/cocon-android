@@ -183,6 +183,11 @@ public class RecyclerViewCourseAdapter
         if (course != null) {
             mCourseArrayList.add(course);
             notifyItemInserted(mCourseArrayList.size());
+
+            //save in data
+            DatabaseHelper dbHelper = new DatabaseHelper(context);
+            dbHelper.addCourse(course);
+
         }
     }
 

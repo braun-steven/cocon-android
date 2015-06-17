@@ -3,7 +3,6 @@ package com.tak3r07.CourseStatistics;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -19,10 +18,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bartoszlipinski.recyclerviewheader.RecyclerViewHeader;
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.PointsGraphSeries;
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
@@ -34,7 +29,7 @@ public class AssignmentsActivity extends ActionBarActivity {
     private final String COURSE_TAG_ID = "COURSE_TAG_ID";
     private RecyclerViewAssignmentAdapter mAssignmentAdapter;
     private Course currentCourse;
-    private boolean hasFixedPoints;
+    private ArrayList<Assignment> mAssignments;
     private int courseId;
 
     @Override
@@ -54,7 +49,10 @@ public class AssignmentsActivity extends ActionBarActivity {
         courseId = intent.getExtras().getInt(COURSE_TAG_ID);
         currentCourse = new DatabaseHelper(getApplicationContext())
                 .getCourse(courseId);
-        hasFixedPoints = currentCourse.hasFixedPoints();
+
+
+        //Get assignments
+        mAssignments = currentCourse.getAssignments();
 
 
         //Set activity title
@@ -111,49 +109,80 @@ public class AssignmentsActivity extends ActionBarActivity {
         final View view = View.inflate(this, R.layout.dialog_add_assignment, null);
         alert.setView(view);
 
+        final EditText mEditTextMaxPoints = (EditText) view.findViewById(R.id.editText_maxPoints);
+        final TextView textView = (TextView) view.findViewById(R.id.textView_maxPoints);
+
+        //If this course has fixed Points, dont show the possibilities of setting maxPoints
+        if (currentCourse.hasFixedPoints()) {
+            ViewManager viewManager = (ViewManager) mEditTextMaxPoints.getParent();
+            viewManager.removeView(mEditTextMaxPoints);
+            viewManager.removeView(textView);
+        }
+
         alert.setPositiveButton(getString(R.string.add), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 //First check if there are already too many assignments
                 //Count extra-assignments
                 int countExtraAssignments = 0;
-                for (Assignment aMAssignmentArrayList : currentCourse.getAssignments()) {
+                for (Assignment aMAssignmentArrayList : mAssignments) {
                     if (aMAssignmentArrayList.isExtraAssignment()) countExtraAssignments++;
                 }
 
                 CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
 
-                if (currentCourse.getNumberOfAssignments() - (currentCourse.getAssignments().size() - countExtraAssignments) > 0 || mCheckBox.isChecked()) {
+                if (currentCourse.getNumberOfAssignments() - (mAssignments.size() - countExtraAssignments) > 0 || mCheckBox.isChecked()) {
                     //Get EditText views
                     EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
+                    EditText mEditTextMaxPoints = (EditText) view.findViewById(R.id.editText_maxPoints);
 
-                    //Get data from edittext
+                    //Get data from edittexts
                     String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',', '.');
+                    String maxPointsString = "";
+                    if (!currentCourse.hasFixedPoints()) {
+                        maxPointsString = mEditTextMaxPoints.getText().toString().replace(',', '.');
+                    }
 
-                    //Check if the entered Values are numeric (doubles)
-                    if (isNumeric(achievedPointsString)) {
+                    //Check if the entered Values are numeric (doubles) and (or) maxPointsString is empty
+                    if (isNumeric(achievedPointsString) && (isNumeric(maxPointsString) || maxPointsString.equals(""))) {
 
                         Double achievedPoints = Double.parseDouble(achievedPointsString);
+                        Double maxPoints;
+                        if (currentCourse.hasFixedPoints()) {
+                            maxPoints = currentCourse.toFPC().getMaxPoints();
+                        } else {
+
+                            maxPoints = Double.parseDouble(maxPointsString);
+                        }
 
 
                         // Index is lists' last element index + 1 (so another item is added)
                         int index;
                         //First check if list is empty
-                        if (currentCourse.getAssignments().isEmpty()) {
+                        if (mAssignments.isEmpty()) {
                             index = 1;
                         } else {
-                            index = currentCourse.getAssignments().get(currentCourse.getAssignments().size() - 1).getIndex() + 1;
+
+                            //get List-size
+                            int size = mAssignments.size();
+                            index = mAssignments.get(size - 1).getIndex() + 1;
                         }
 
 
                         int NEW_ASSIGNMENT = -1;
 
+
                         //Create new assignment from pulled data
-                        Assignment newAssignment = new Assignment(NEW_ASSIGNMENT, index, currentCourse.getReachablePointsPerAssignment(), achievedPoints, currentCourse.getId());
+                        Assignment newAssignment = new Assignment(
+                                NEW_ASSIGNMENT,
+                                index,
+                                maxPoints,
+                                achievedPoints,
+                                currentCourse.getId());
 
                         //Check if this is an extra assignment
                         if (mCheckBox.isChecked()) {
-                            newAssignment.setExtraAssignment(true);
+                            newAssignment.isExtraAssignment(true);
                         }
 
                         //add new assignment
@@ -189,6 +218,9 @@ public class AssignmentsActivity extends ActionBarActivity {
         //Store assignment in database
         DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
         dbHelper.addAssignment(assignment);
+
+        //Update list
+        mAssignmentAdapter.notifyDataSetChanged();
 
         Toast.makeText(getApplicationContext(), getString(R.string.new_assignment_added), Toast.LENGTH_SHORT).show();
     }

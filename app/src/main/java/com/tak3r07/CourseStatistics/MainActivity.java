@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -76,7 +77,6 @@ public class MainActivity extends ActionBarActivity {
         mRecyclerView.setHasFixedSize(true);
 
 
-
         //Add header for column descriptions
         RecyclerViewHeader header =
                 RecyclerViewHeader.fromXml(getApplicationContext(), R.layout.layout_courselist_header);
@@ -122,28 +122,52 @@ public class MainActivity extends ActionBarActivity {
         final View view = View.inflate(this, R.layout.dialog_add_course, null);
         alert.setView(view);
 
+
+        //Checkbox
+        final CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_fixed_points);
+        mCheckBox.setChecked(true);
+        //Get views
+        final EditText mCourseNameEditText = (EditText) view.findViewById(R.id.course_name_edittext);
+        final EditText mReachablePointsEditText = (EditText) view.findViewById(R.id.max_reachable_points_edittext);
+
+        //Toggle Edittext on checkbox toggle
+        mCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = mCheckBox.isChecked();
+                //Toggle Eddittext
+                mReachablePointsEditText.setEnabled(isChecked);
+            }
+        });
+
         //Add Course Operation
         alert.setPositiveButton(getString(R.string.add), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                //Get views
-                EditText mCourseNameEditText = (EditText) view.findViewById(R.id.course_name_edittext);
-                EditText mReachablePointsEditText = (EditText) view.findViewById(R.id.max_reachable_points_edittext);
+
 
                 //Get values
                 String courseName = mCourseNameEditText.getText().toString();
                 String reachablePointsString = mReachablePointsEditText.getText().toString().replace(',', '.');
+                Boolean hasFixedPoints = mCheckBox.isChecked();
 
-                //Convert
-                if (AssignmentsActivity.isNumeric(reachablePointsString)) {
-                    Double reachablePoints = Double.parseDouble(reachablePointsString);
+                if(hasFixedPoints){
+                    //Convert
+                    if (AssignmentsActivity.isNumeric(reachablePointsString)) {
+                        Double reachablePoints = Double.parseDouble(reachablePointsString);
 
-                    addCourse(courseName, reachablePoints);
+                        addCourse(courseName, reachablePoints, hasFixedPoints);
 
+
+                    } else {
+                        //If data was not numeric
+                        Toast.makeText(getApplicationContext(), getString(R.string.invalid_values), Toast.LENGTH_LONG).show();
+
+                    }
                 } else {
-                    //If data was not numeric
-                    Toast.makeText(getApplicationContext(), getString(R.string.invalid_values), Toast.LENGTH_LONG).show();
-
+                    addCourse(courseName, 0d, hasFixedPoints);
                 }
+
+
 
             }
         });
@@ -158,7 +182,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     //Adds a new course to the mCourseArrayList
-    public void addCourse(String title, Double reachablePointsPerAssignment) {
+    public void addCourse(String title, Double maxPoints, boolean hasFixedPoints) {
         //Check if string is empty
         if (!title.isEmpty()) {
 
@@ -166,31 +190,44 @@ public class MainActivity extends ActionBarActivity {
             boolean courseExists = false;
 
             //Loop to check all coursenames
-            for (int i = 0; i < mCourseArrayList.size(); i++) {
-                if (title.replace(" ", "").equals(mCourseArrayList.get(i).getCourseName().replace(" ", "")))
+            for (Course course : mCourseArrayList) {
+                if (title.replace(" ", "").equals(course.getCourseName().replace(" ", "")))
                     courseExists = true;
             }
 
             //Only create new course if "courseexists" is false
             if (courseExists) {
                 //Notify user
-                Toast.makeText(getApplicationContext(), getString(R.string.a_course_same_name), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.a_course_same_name),
+                        Toast.LENGTH_LONG)
+                        .show();
             } else {
                 //Add course
                 int index = mCourseArrayList.size();
-                Course course = new Course(title, index);
-                course.setReachablePointsPerAssignment(reachablePointsPerAssignment);
-                mCourseAdapter.addCourse(course);
 
-                //save in data
-                DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-                dbHelper.addCourse(course);
+                //If course has fixed points -> create instance of FixedPointsCourse
+                if (hasFixedPoints) {
+                    FixedPointsCourse course = new FixedPointsCourse(title, index, maxPoints);
+                    mCourseAdapter.addCourse(course);
+                } else {
+                    //Else create instance of DynamicPointsCourse
+                    DynamicPointsCourse course = new DynamicPointsCourse(title, index);
+                    mCourseAdapter.addCourse(course);
+                }
 
-                Toast.makeText(getApplicationContext(), getString(R.string.course) + title + getString(R.string.has_been_added), Toast.LENGTH_SHORT).show();
+                //Notify user
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.course) + title + getString(R.string.has_been_added),
+                        Toast.LENGTH_SHORT)
+                        .show();
             }
         } else {
             //Notify about empty string
-            Toast.makeText(getApplicationContext(), getString(R.string.abort_no_title), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),
+                    getString(R.string.abort_no_title),
+                    Toast.LENGTH_SHORT)
+                    .show();
         }
 
     }
@@ -240,9 +277,7 @@ public class MainActivity extends ActionBarActivity {
                 //Get only filename
                 String[] path = file.getPath().split("/");
                 String filename = path[path.length - 1];
-                if (filename.endsWith(".backup") == false) {
-                    continue;
-                } else {
+                if (filename.endsWith(".backup")) {
                     //Add filename to array
                     backupPaths.add(path[path.length - 1]);
                 }
@@ -325,8 +360,8 @@ public class MainActivity extends ActionBarActivity {
                     mCourseArrayList.clear();
 
                     //add each stored course item
-                    for (Iterator<Course> it = newArraylist.iterator(); it.hasNext(); ) {
-                        mCourseArrayList.add(it.next());
+                    for (Course course : newArraylist) {
+                        mCourseArrayList.add(course);
                     }
                     ois.close();
 
@@ -389,8 +424,6 @@ public class MainActivity extends ActionBarActivity {
                         //Notify user about completed backup
                         Toast.makeText(getApplicationContext(), getString(R.string.backup_complete), Toast.LENGTH_LONG).show();
 
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -411,20 +444,14 @@ public class MainActivity extends ActionBarActivity {
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     /* Checks if external storage is available to at least read */
     public boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
     }
 
     //Restore data if resumed
