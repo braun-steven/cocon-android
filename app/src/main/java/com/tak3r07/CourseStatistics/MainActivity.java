@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -217,10 +218,14 @@ public class MainActivity extends ActionBarActivity {
                 }
 
                 //Notify user
-                Toast.makeText(getApplicationContext(),
+                Snackbar.make(getWindow().getDecorView().getRootView(),
                         getString(R.string.course) + title + getString(R.string.has_been_added),
-                        Toast.LENGTH_SHORT)
-                        .show();
+                        Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                }).show();
             }
         } else {
             //Notify about empty string
