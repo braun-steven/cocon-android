@@ -205,7 +205,7 @@ public class MainActivity extends ActionBarActivity {
                         .show();
             } else {
                 //Add course
-                int index = mCourseArrayList.size();
+                final int index = mCourseArrayList.size();
 
                 //If course has fixed points -> create instance of FixedPointsCourse
                 if (hasFixedPoints) {
@@ -221,9 +221,12 @@ public class MainActivity extends ActionBarActivity {
                 Snackbar.make(getWindow().getDecorView().getRootView(),
                         getString(R.string.course) + title + getString(R.string.has_been_added),
                         Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
+                    //Undo: remove course
                     @Override
                     public void onClick(View v) {
-
+                        //Get last element of the list and remove it
+                        int index = mCourseArrayList.size() - 1;
+                        mCourseAdapter.removeCourse(index);
                     }
                 }).show();
             }

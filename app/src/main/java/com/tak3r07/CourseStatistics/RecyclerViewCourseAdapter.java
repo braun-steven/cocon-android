@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,18 +98,12 @@ public class RecyclerViewCourseAdapter
             alert.setPositiveButton(context.getString(R.string.delete), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
-                    //Get current assignment
-                    Course currentCourse = mCourseAdapter.getmCourseArrayList().get(getPosition());
-
                     //Delete course and notify
                     Toast.makeText(
                             context,
                             mTextViewName.getText().toString() + context.getString(R.string.deleted),
                             Toast.LENGTH_LONG).show();
 
-                    //Delete from database
-                    DatabaseHelper dbHelper = new DatabaseHelper(context);
-                    dbHelper.deleteCourse(currentCourse);
 
                     //Remove Course
                     mCourseAdapter.removeCourse(getPosition());
@@ -193,9 +188,21 @@ public class RecyclerViewCourseAdapter
 
     //Removes Course
     public void removeCourse(int position) {
+        Log.d("Tak3r07", "Removing at pos: " + position + ", size: " + mCourseArrayList.size());
         if (position >= 0) {
+            //Delete from database
+            DatabaseHelper dbHelper = new DatabaseHelper(context);
+            dbHelper.deleteCourse(mCourseArrayList.get(position));
+
+            //Delete from internal arraylist
             mCourseArrayList.remove(position);
+
+            //Animate
             notifyItemRemoved(position);
+
+        } else {
+            //Log error
+            Log.e("Tak3r07", "position = " + position + " < 0");
         }
     }
 
@@ -205,5 +212,13 @@ public class RecyclerViewCourseAdapter
 
     public void setmCourseArrayList(ArrayList<Course> mCourseArrayList) {
         this.mCourseArrayList = mCourseArrayList;
+    }
+
+    /**
+     * Returns correct item position since first item is header
+     * @return item positon
+     */
+    public static int getItemPosition(int position){
+        return position -1;
     }
 }
