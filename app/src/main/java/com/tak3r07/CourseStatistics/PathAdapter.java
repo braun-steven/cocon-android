@@ -19,7 +19,7 @@ public class PathAdapter<String> extends ArrayAdapter<String> {
     private ArrayList<String> backupList;
 
     public PathAdapter(Context context, ArrayList<String> backupList) {
-        super(context,0, backupList);
+        super(context, 0, backupList);
         this.backupList = backupList;
     }
 
@@ -34,7 +34,7 @@ public class PathAdapter<String> extends ArrayAdapter<String> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_backupdialog, parent, false);
         }
         // Lookup view for data population
-        TextView pathTextView = (TextView)convertView.findViewById(R.id.backuppath_textView);
+        TextView pathTextView = (TextView) convertView.findViewById(R.id.backuppath_textView);
 
         // Populate the data into the template view using the data object
         pathTextView.setText((CharSequence) backupPath);

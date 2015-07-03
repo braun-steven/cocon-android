@@ -1,8 +1,6 @@
 package com.tak3r07.CourseStatistics;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Random;
 
 /**
  * Created by tak3r07 on 6/15/15.
@@ -10,7 +8,6 @@ import java.util.Random;
 public class FixedPointsCourse extends Course {
 
     static final long serialVersionUID = 2099962292244075360L;
-
 
 
     private double maxPoints;

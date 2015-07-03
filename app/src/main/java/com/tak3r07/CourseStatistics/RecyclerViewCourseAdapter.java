@@ -28,9 +28,9 @@ public class RecyclerViewCourseAdapter
     private ArrayList<Course> mCourseArrayList;
     private Context context;
 
-    RecyclerViewCourseAdapter(Context context) {
+    RecyclerViewCourseAdapter(Context context, ArrayList<Course> mCourseArrayList) {
         this.context = context;
-        mCourseArrayList = new DatabaseHelper(context).getAllCourses();
+        this.mCourseArrayList = mCourseArrayList;
         if (mCourseArrayList == null) {
             throw new IllegalArgumentException("courses ArrayList must not be null");
         }
@@ -61,7 +61,6 @@ public class RecyclerViewCourseAdapter
             itemView.setOnLongClickListener(this);
             mTextViewName = (TextView) itemView.findViewById(R.id.course_textview_name);
             mTextViewProgress = (TextView) itemView.findViewById(R.id.course_letter);
-            //mImageView = (ImageView) itemView.findViewById(R.id.icon);
             mTextViewAverage = (TextView) itemView.findViewById(R.id.end_percentage_textview);
         }
 
@@ -163,12 +162,18 @@ public class RecyclerViewCourseAdapter
      */
     public Drawable getDrawableColorForPercentage(Double percentage) {
 
-        if (percentage < 30) return context.getResources().getDrawable(R.drawable.circular_shape_red);
-        if (percentage < 40) return context.getResources().getDrawable(R.drawable.circular_shape_deep_orange);
-        if (percentage < 55) return context.getResources().getDrawable(R.drawable.circular_shape_orange);
-        if (percentage < 65) return context.getResources().getDrawable(R.drawable.circular_shape_yellow);
-        if (percentage < 80) return context.getResources().getDrawable(R.drawable.circular_shape_lime);
-        if (percentage >= 80) return context.getResources().getDrawable(R.drawable.circular_shape_green);
+        if (percentage < 30)
+            return context.getResources().getDrawable(R.drawable.circular_shape_red);
+        if (percentage < 40)
+            return context.getResources().getDrawable(R.drawable.circular_shape_deep_orange);
+        if (percentage < 55)
+            return context.getResources().getDrawable(R.drawable.circular_shape_orange);
+        if (percentage < 65)
+            return context.getResources().getDrawable(R.drawable.circular_shape_yellow);
+        if (percentage < 80)
+            return context.getResources().getDrawable(R.drawable.circular_shape_lime);
+        if (percentage >= 80)
+            return context.getResources().getDrawable(R.drawable.circular_shape_green);
 
         return context.getResources().getDrawable(R.drawable.circular_shape_red);
     }
@@ -186,8 +191,14 @@ public class RecyclerViewCourseAdapter
         }
     }
 
-    //Removes Course
+    /**
+     * Removes the course at 'position' from the internal arraylist and from the database
+     * and animates the removal in recyclerview
+     *
+     * @param position Position of course which is to be removed
+     */
     public void removeCourse(int position) {
+        //Log removal
         Log.d("Tak3r07", "Removing at pos: " + position + ", size: " + mCourseArrayList.size());
         if (position >= 0) {
             //Delete from database
@@ -216,9 +227,10 @@ public class RecyclerViewCourseAdapter
 
     /**
      * Returns correct item position since first item is header
+     *
      * @return item positon
      */
-    public static int getItemPosition(int position){
-        return position -1;
+    public static int getItemPosition(int position) {
+        return position - 1;
     }
 }

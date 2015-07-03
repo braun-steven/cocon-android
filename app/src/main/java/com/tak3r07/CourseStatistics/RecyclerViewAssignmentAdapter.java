@@ -69,7 +69,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
             mTextViewAssUntilFin = (TextView) view.findViewById(R.id.course_overview_assignments_until_finished);
             mTextViewOverall = (TextView) view.findViewById(R.id.course_overview_overall_percentage_text);
             graph = (GraphView) view.findViewById(R.id.graph);
-            if(!currentCourse.hasFixedPoints()){
+            if (!currentCourse.hasFixedPoints()) {
                 mTextViewProgress = (TextView) view.findViewById(R.id.textView_progress);
             }
         }
@@ -172,7 +172,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                     final TextView textView = (TextView) view.findViewById(R.id.textView_maxPoints);
 
                     //If this course has fixed Points, dont show the possibilities of setting maxPoints
-                    if(hasFixedPoints){
+                    if (hasFixedPoints) {
                         mEditTextMaxPoints.setHeight(0);
                         textView.setHeight(0);
 
@@ -199,11 +199,11 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                             String maxPointsString = mEditTextMaxPoints.getText().toString().replace(',', '.');
 
                             //If no new maxPoints is entered: get the old one
-                            if(maxPointsString.isEmpty()){
+                            if (maxPointsString.isEmpty()) {
                                 maxPointsString = String.valueOf(currentAssignment.getMaxPoints());
                             }
                             //If no new achievedPoints is entered: get the old one
-                            if(achievedPointsString.isEmpty()){
+                            if (achievedPointsString.isEmpty()) {
                                 achievedPointsString = String.valueOf(currentAssignment.getAchievedPoints());
                             }
 
@@ -213,9 +213,9 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                                 Double achievedPoints = Double.parseDouble(achievedPointsString);
 
                                 Double maxPoints;
-                                if(hasFixedPoints){
+                                if (hasFixedPoints) {
                                     maxPoints = currentCourse.toFPC().getMaxPoints();
-                                } else{
+                                } else {
 
                                     maxPoints = Double.parseDouble(maxPointsString);
                                 }
@@ -297,7 +297,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
             case TYPE_HEADER:
                 //Get correct header for dynamic/fixed points
                 int layout;
-                if(currentCourse.hasFixedPoints()){
+                if (currentCourse.hasFixedPoints()) {
                     layout = R.layout.assignments_header_fixed_points;
                 } else {
                     layout = R.layout.assignments_header_dynamic_points;
@@ -344,9 +344,9 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                 VHHeader headerHolder = (VHHeader) holder;
 
                 //SetupHeader
-                if(currentCourse.hasFixedPoints()){
+                if (currentCourse.hasFixedPoints()) {
                     setupFixedPointsHeaderHolder(headerHolder);
-                } else{
+                } else {
                     setupDynamicPointsHeaderHolder(headerHolder);
                 }
 
@@ -358,7 +358,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
     @Override
     public int getItemCount() {
-        return mAssignments.size()+1;
+        return mAssignments.size() + 1;
     }
 
     public void addAssignment(Assignment assignment) {
@@ -367,6 +367,10 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
     }
 
     public void removeAssignment(int position) {
+        //Log for possible errors
+        Log.d("Tak3r07", "Removing Assignment at pos: " + position
+                + ", arraysize: " + mAssignments.size());
+
         mAssignments.remove(position);
         notifyItemRemoved(position);
         notifyDataSetChanged();
@@ -391,13 +395,14 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
     /**
      * Returns correct item position since first item is header
+     *
      * @return item positon
      */
-    public static int getItemPosition(int position){
-        return position -1;
+    public static int getItemPosition(int position) {
+        return position - 1;
     }
 
-    public void setupFixedPointsHeaderHolder(VHHeader headerHolder){
+    public void setupFixedPointsHeaderHolder(VHHeader headerHolder) {
 
         FixedPointsCourse fpc = currentCourse.toFPC();
 
@@ -450,7 +455,8 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         headerHolder.graph.getViewport().setMaxY(fpc.getMaxPoints());
         headerHolder.graph.getGridLabelRenderer().setNumHorizontalLabels(mAssignments.size() - countExtraAssignments);
     }
-    public void setupDynamicPointsHeaderHolder(VHHeader headerHolder){
+
+    public void setupDynamicPointsHeaderHolder(VHHeader headerHolder) {
         headerHolder.mTextViewAverage.setText(currentCourse.getAverage(true) + " %");
         headerHolder.mTextViewProgress.setText(currentCourse.getProgress() + " %");
 

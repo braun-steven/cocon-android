@@ -30,10 +30,10 @@ public class Assignment implements Serializable {
      * Constructor for new Assignments
      *
      * @param id             -1 = new Assignment, else = read from DATABASE
-     * @param index index in assignments list
-     * @param maxPoints maximum reachable points
+     * @param index          index in assignments list
+     * @param maxPoints      maximum reachable points
      * @param achievedPoints achieved points in this assignment
-     * @param course_id reference to the course
+     * @param course_id      reference to the course
      */
     public Assignment(int id, int index, double maxPoints, double achievedPoints, int course_id) {
         setIndex(index);
@@ -118,7 +118,7 @@ public class Assignment implements Serializable {
         this.maxPoints = 0d;
     }
 
-    public double getMaxPoints(){
+    public double getMaxPoints() {
         return this.maxPoints;
     }
 }

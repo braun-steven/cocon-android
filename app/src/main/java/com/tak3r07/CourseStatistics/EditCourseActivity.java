@@ -31,7 +31,7 @@ public class EditCourseActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_course);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //Get intent data
@@ -54,7 +54,7 @@ public class EditCourseActivity extends ActionBarActivity {
 
         //FPC: Set maxPoints
         //DPC: Remove edittext + description
-        if(course.hasFixedPoints()) {
+        if (course.hasFixedPoints()) {
             mMaxPointsEditText.setText(course.toFPC().getMaxPoints().toString());
         } else {
 
@@ -99,7 +99,6 @@ public class EditCourseActivity extends ActionBarActivity {
         int numberOfAssignments = Integer.parseInt(mNumberEditText.getText().toString());
 
 
-
         //Count extra-assignments
         int countExtraAssignments = 0;
         for (Iterator<Assignment> it = course.getAssignments().iterator(); it.hasNext(); ) {
@@ -114,7 +113,7 @@ public class EditCourseActivity extends ActionBarActivity {
             course.setNumberOfAssignments(numberOfAssignments);
 
             //FPC: Add maxpoints
-            if(course.hasFixedPoints()) {
+            if (course.hasFixedPoints()) {
                 double maxPoints = Double.parseDouble(mMaxPointsEditText.getText().toString());
                 course.toFPC().setMaxPoints(maxPoints);
             }

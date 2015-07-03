@@ -2,13 +2,12 @@ package com.tak3r07.CourseStatistics;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Random;
 
 /**
  * Created by tak3r07 on 11/9/14.
  */
-public abstract class Course implements Serializable{
+public abstract class Course implements Serializable {
     static final long serialVersionUID = 2099962292244075360L;
 
     //Coursename
@@ -118,11 +117,11 @@ public abstract class Course implements Serializable{
         return this.id;
     }
 
-    public FixedPointsCourse toFPC(){
+    public FixedPointsCourse toFPC() {
         return (FixedPointsCourse) this;
     }
 
-    public DynamicPointsCourse toDPC(){
+    public DynamicPointsCourse toDPC() {
         return (DynamicPointsCourse) this;
     }
 

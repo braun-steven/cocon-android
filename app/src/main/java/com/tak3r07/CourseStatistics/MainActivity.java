@@ -3,6 +3,7 @@ package com.tak3r07.CourseStatistics;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
@@ -26,7 +27,6 @@ import com.tak3r07.unihelper.R;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -34,7 +34,7 @@ import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
+import java.util.Collections;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -50,7 +50,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         //Setup toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         if (savedInstanceState != null) {
@@ -68,7 +68,7 @@ public class MainActivity extends ActionBarActivity {
         //RecyclerView Setup
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_courses);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mCourseAdapter = new RecyclerViewCourseAdapter(getApplicationContext());
+        mCourseAdapter = new RecyclerViewCourseAdapter(getApplicationContext(), mCourseArrayList);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getApplicationContext()));
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
@@ -103,11 +103,13 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        /* Uncomment to add Settings
+
         if (id == R.id.action_settings) {
+            Intent intent = new Intent();
+            intent.setClass(getApplicationContext(), SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
-        */
 
         return super.onOptionsItemSelected(item);
     }
@@ -151,7 +153,7 @@ public class MainActivity extends ActionBarActivity {
                 String reachablePointsString = mReachablePointsEditText.getText().toString().replace(',', '.');
                 Boolean hasFixedPoints = mCheckBox.isChecked();
 
-                if(hasFixedPoints){
+                if (hasFixedPoints) {
                     //Convert
                     if (AssignmentsActivity.isNumeric(reachablePointsString)) {
                         Double reachablePoints = Double.parseDouble(reachablePointsString);
@@ -167,7 +169,6 @@ public class MainActivity extends ActionBarActivity {
                 } else {
                     addCourse(courseName, 0d, hasFixedPoints);
                 }
-
 
 
             }
@@ -217,7 +218,7 @@ public class MainActivity extends ActionBarActivity {
                     mCourseAdapter.addCourse(course);
                 }
 
-                //Notify user
+                //Notify user with snackbar
                 Snackbar.make(getWindow().getDecorView().getRootView(),
                         getString(R.string.course) + title + getString(R.string.has_been_added),
                         Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
@@ -290,6 +291,9 @@ public class MainActivity extends ActionBarActivity {
                     backupPaths.add(path[path.length - 1]);
                 }
             }
+
+            //Reverse brings the latest backup to the top
+            Collections.reverse(backupPaths);
 
 
         }

@@ -78,7 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         /*
         Each case 'n' describes an upgrade from db-version 'n' to 'n+1'
          */
-        while(oldVersion < newVersion) {
+        while (oldVersion < newVersion) {
             switch (oldVersion) {
                 case 6:
                 case 7:
@@ -145,7 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Get max points
         double maxPoints;
         String maxPointsString = cursor.getString(3);
-        if(maxPointsString == null) {
+        if (maxPointsString == null) {
             maxPoints = 0;
         } else {
             maxPoints = Double.parseDouble(maxPointsString);
@@ -155,7 +155,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         Course course;
         //If maxPoints was a "Null-value" in the database, create a DynamicPointsCourse
-        if (maxPoints == 0){
+        if (maxPoints == 0) {
             course = new DynamicPointsCourse(courseName, index);
         } else {
             course = new FixedPointsCourse(courseName, index, maxPoints);
@@ -261,6 +261,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Creates ContentValues which provides the content of a assignment
+     *
      * @param assignment The assignment for which the contentValues should be created
      * @return Contentvalues
      */
@@ -288,12 +289,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Creates ContentValues which provides the content of a course
+     *
      * @param course The course for which the contentValues should be created
      * @return Contentvalues
      */
     private ContentValues getCourseContentValues(Course course) {
         //Put all members of course into contentvalues
-
 
 
         ContentValues values = new ContentValues();
@@ -308,10 +309,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Else insert "Null-Value"
          */
         double maxPoints;
-        if (course.hasFixedPoints()){
-            maxPoints = ((FixedPointsCourse)course).getMaxPoints();
+        if (course.hasFixedPoints()) {
+            maxPoints = ((FixedPointsCourse) course).getMaxPoints();
             values.put(KEY_MAX_POINTS_COURSE, maxPoints);
-        }else{
+        } else {
             values.putNull(KEY_MAX_POINTS_COURSE);
         }
 
@@ -321,6 +322,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Delete specific course
+     *
      * @param course which is to be deleted
      * @return result whether delete has failed(false) or not (true)
      */

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -38,7 +39,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         setContentView(R.layout.activity_course);
 
         //setup toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
@@ -222,7 +223,19 @@ public class AssignmentsActivity extends ActionBarActivity {
         //Update list
         mAssignmentAdapter.notifyDataSetChanged();
 
-        Toast.makeText(getApplicationContext(), getString(R.string.new_assignment_added), Toast.LENGTH_SHORT).show();
+
+        //Notify user
+        Snackbar.make(getWindow().getDecorView().getRootView(),
+                getString(R.string.new_assignment_added),
+                Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
+            //Undo: remove course
+            @Override
+            public void onClick(View v) {
+                //Get last element of the list and remove it
+                int index = mAssignments.size() - 1;
+                mAssignmentAdapter.removeAssignment(index);
+            }
+        }).show();
     }
 
 

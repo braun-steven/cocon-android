@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tak3r07.unihelper">
+    package="com.tak3r07.unihelper" >
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -8,10 +8,10 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
         <activity
             android:name="com.tak3r07.CourseStatistics.MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,19 +21,22 @@
         <activity
             android:name="com.tak3r07.CourseStatistics.AssignmentsActivity"
             android:label="@string/title_activity_course"
-            android:parentActivityName="com.tak3r07.CourseStatistics.MainActivity">
+            android:parentActivityName="com.tak3r07.CourseStatistics.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tak3r07.CourseStatistics.MainActivity" />
         </activity>
-
         <activity
             android:name="com.tak3r07.CourseStatistics.EditCourseActivity"
             android:label="@string/title_activity_edit_course"
-            android:parentActivityName="com.tak3r07.CourseStatistics.AssignmentsActivity">
+            android:parentActivityName="com.tak3r07.CourseStatistics.AssignmentsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tak3r07.CourseStatistics.AssignmentsActivity" />
+        </activity>
+        <activity
+            android:name="com.tak3r07.CourseStatistics.SettingsActivity"
+            android:label="@string/title_activity_settings" >
         </activity>
     </application>
 

@@ -24,7 +24,7 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
         int left = parent.getPaddingLeft();
         int right = parent.getWidth() - parent.getPaddingRight();
 
-        int offSet = right/20;
+        int offSet = right / 20;
         right -= offSet;
         left += offSet;
 
