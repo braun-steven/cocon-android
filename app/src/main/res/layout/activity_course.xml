@@ -38,7 +38,9 @@
         android:src="@drawable/ic_fab"
         android:layout_margin="16dp"
         android.support.design:elevation="6dp"
-        android.support.design:pressedTranslationZ="12dp" />
+        android.support.design:pressedTranslationZ="12dp"
+
+        app:layout_behavior="com.tak3r07.CourseStatistics.ScrollAwareFABBehavior"g/>
 
 
 </android.support.design.widget.CoordinatorLayout>

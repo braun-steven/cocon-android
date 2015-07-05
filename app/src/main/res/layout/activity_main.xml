@@ -1,5 +1,5 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:android.support.design="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -45,12 +45,13 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_add_course"
-        android.support.design:borderWidth="0dp"
+        app:borderWidth="0dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:src="@drawable/ic_fab"
         android:layout_margin="16dp"
-        android.support.design:elevation="6dp"
-        android.support.design:pressedTranslationZ="12dp" />
+        app:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+        app:layout_behavior="com.tak3r07.CourseStatistics.ScrollAwareFABBehavior"/>
 </android.support.design.widget.CoordinatorLayout>
