@@ -59,5 +59,6 @@
     <string name="courselist_header_progress">Progress</string>
     <string name="courselist_header_average">\u00d8</string>
     <string name="checkbox_text_hasfixedpoints">This course always has the same number of max. points for each assignment</string>
+    <string name="undo">Undo</string>
 
 </resources>

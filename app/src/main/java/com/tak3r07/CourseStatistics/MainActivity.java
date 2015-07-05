@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -43,6 +45,7 @@ public class MainActivity extends ActionBarActivity {
 
     private ArrayList<Course> mCourseArrayList = new ArrayList<Course>();
     private RecyclerViewCourseAdapter mCourseAdapter;
+    private FloatingActionButton mFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +88,16 @@ public class MainActivity extends ActionBarActivity {
         mCourseAdapter.notifyDataSetChanged();
 
 
+        //Setup FAB
+        //TODO: Extract into method
+        mFab = (FloatingActionButton) findViewById(R.id.fab_add_course);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickAddCourse(null);
+            }
+        });
+
     }
 
 
@@ -104,12 +117,12 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
 
-        if (id == R.id.action_settings) {
+        /*if (id == R.id.action_settings) {
             Intent intent = new Intent();
             intent.setClass(getApplicationContext(), SettingsActivity.class);
             startActivity(intent);
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -121,7 +134,6 @@ public class MainActivity extends ActionBarActivity {
         alert.setMessage(getString(R.string.enter_course_name_and_max_p_p_a));
 
         //Set dialog_add_course layout
-        final LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View view = View.inflate(this, R.layout.dialog_add_course, null);
         alert.setView(view);
 
@@ -219,7 +231,8 @@ public class MainActivity extends ActionBarActivity {
                 }
 
                 //Notify user with snackbar
-                Snackbar.make(getWindow().getDecorView().getRootView(),
+                CoordinatorLayout cl = (CoordinatorLayout) findViewById(R.id.coordinatorlayout_mainactivity);
+                Snackbar.make(cl,
                         getString(R.string.course) + title + getString(R.string.has_been_added),
                         Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
                     //Undo: remove course

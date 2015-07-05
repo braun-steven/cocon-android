@@ -15,10 +15,4 @@
         tools:showAsAction="never"
         android:title="@string/edit_course_text"
         android:onClick="onEditCourseClick" />
-
-    <item
-        android:id="@+id/action_add_assignment"
-        android:onClick="onClickAddAssignment"
-        tools:showAsAction="always"
-        android:title="@string/button_add_assignment" />
 </menu>

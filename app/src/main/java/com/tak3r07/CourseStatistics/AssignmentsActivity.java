@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -32,6 +34,7 @@ public class AssignmentsActivity extends ActionBarActivity {
     private Course currentCourse;
     private ArrayList<Assignment> mAssignments;
     private int courseId;
+    private FloatingActionButton mFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +75,16 @@ public class AssignmentsActivity extends ActionBarActivity {
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getApplicationContext()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
+
+        //Setup FAB
+        //TODO: Extract into method
+        mFab = (FloatingActionButton) findViewById(R.id.fab_add_assignment);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickAddAssignment(null);
+            }
+        });
     }
 
 
@@ -225,9 +238,10 @@ public class AssignmentsActivity extends ActionBarActivity {
 
 
         //Notify user
-        Snackbar.make(getWindow().getDecorView().getRootView(),
+        CoordinatorLayout cl = (CoordinatorLayout) findViewById(R.id.coordinatorlayout_assignmentsactivity);
+        Snackbar.make(cl,
                 getString(R.string.new_assignment_added),
-                Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
+                Snackbar.LENGTH_LONG).setAction(getString(R.string.undo), new View.OnClickListener() {
             //Undo: remove course
             @Override
             public void onClick(View v) {

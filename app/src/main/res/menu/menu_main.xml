@@ -1,27 +1,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_add_course"
-        android:onClick="onClickAddCourse"
-        tools:showAsAction="always"
-        android:title="@string/button_add_text" />
-
+    <!--
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings" />
+        !-->
 
     <item
         android:id="@+id/backup"
+        android:onClick="onClickMenuBackup"
         android:orderInCategory="98"
-        tools:showAsAction="never"
         android:title="@string/backup"
-        android:onClick="onClickMenuBackup" />
+        tools:showAsAction="never" />
     <item
         android:id="@+id/restore"
+        android:onClick="onClickMenuRestore"
         android:orderInCategory="99"
-        tools:showAsAction="never"
         android:title="@string/restore"
-        android:onClick="onClickMenuRestore" />
+        tools:showAsAction="never" />
 </menu>
