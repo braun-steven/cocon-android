@@ -40,7 +40,7 @@
         android.support.design:elevation="6dp"
         android.support.design:pressedTranslationZ="12dp"
 
-        app:layout_behavior="com.tak3r07.CourseStatistics.ScrollAwareFABBehavior"g/>
+        app:layout_behavior="com.tak3r07.CourseStatistics.ScrollAwareFABBehavior"/>
 
 
 </android.support.design.widget.CoordinatorLayout>
