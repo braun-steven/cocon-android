@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "21.1.2"
+    buildToolsVersion '22.0.1'
 
     defaultConfig {
         applicationId "com.tak3r07.unihelper"
@@ -28,4 +28,5 @@ dependencies {
     compile 'com.android.support:design:22.2.0'
     compile 'com.jjoe64:graphview:4.0.0'
     compile 'com.bartoszlipinski.recyclerviewheader:library:1.2.0'
+    compile 'com.yqritc:recyclerview-flexibledivider:1.2.5'
 }

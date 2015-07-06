@@ -39,7 +39,6 @@
         android:layout_margin="16dp"
         app:elevation="6dp"
         app:pressedTranslationZ="12dp"
-
         app:layout_behavior="com.tak3r07.CourseStatistics.ScrollAwareFABBehavior"/>
 
 

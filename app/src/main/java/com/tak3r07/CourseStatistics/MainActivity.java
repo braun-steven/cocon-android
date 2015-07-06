@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.bartoszlipinski.recyclerviewheader.RecyclerViewHeader;
 import com.tak3r07.unihelper.R;
+import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -73,7 +74,7 @@ public class MainActivity extends ActionBarActivity {
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
         mCourseAdapter = new RecyclerViewCourseAdapter(getApplicationContext(), mCourseArrayList);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getApplicationContext()));
+        mRecyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mCourseAdapter);
         mRecyclerView.setLongClickable(true);

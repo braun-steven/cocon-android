@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tak3r07.unihelper.R;
+import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.ArrayList;
 
@@ -72,7 +73,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mAssignmentAdapter);
         mRecyclerView.setLongClickable(true);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getApplicationContext()));
+        mRecyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
 
