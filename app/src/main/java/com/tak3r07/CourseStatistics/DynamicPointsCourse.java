@@ -39,14 +39,6 @@ public class DynamicPointsCourse extends Course {
         return clone;
     }
 
-    @Override
-    public Double getTotalPoints() {
-        double sum = 0;
-        for (Assignment assignment : getAssignments()) {
-            sum += assignment.getAchievedPoints();
-        }
-        return sum;
-    }
 
     @Override
     public Double getProgress() {

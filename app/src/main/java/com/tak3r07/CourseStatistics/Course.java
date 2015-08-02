@@ -128,4 +128,16 @@ public abstract class Course implements Serializable {
     public abstract Double getProgress();
 
     public abstract boolean hasFixedPoints();
+
+    /**
+     * This method counts the number of extra assignment of this course
+     * @return number of extra assignments
+     */
+    public int countExtraAssignments(){
+        int count = 0;
+        for(Assignment a : mAssignmentArrayList){
+            if(a.isExtraAssignment()) count++;
+        }
+        return count;
+    }
 }

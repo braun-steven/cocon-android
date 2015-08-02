@@ -128,10 +128,7 @@ public class FixedPointsCourse extends Course {
         Double achievedPointsAtAll = getTotalPoints();
 
         //Count extra-assignments
-        int countExtraAssignments = 0;
-        for (Assignment assignment : getAssignments()) {
-            if (assignment.isExtraAssignment()) countExtraAssignments++;
-        }
+        int countExtraAssignments = countExtraAssignments();
 
         //Number of assignments left for this semester
         int numberAssignmentsLeft = getNumberOfAssignments() - (getAssignments().size() - countExtraAssignments);
