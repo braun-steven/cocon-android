@@ -1,21 +1,18 @@
 package com.tak3r07.CourseStatistics;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -144,8 +142,10 @@ public class MainActivity extends AppCompatActivity {
         final CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_fixed_points);
         mCheckBox.setChecked(true);
         //Get views
-        final EditText mCourseNameEditText = (EditText) view.findViewById(R.id.course_name_edittext);
-        final EditText mReachablePointsEditText = (EditText) view.findViewById(R.id.max_reachable_points_edittext);
+        final EditText mCourseNameEditText =
+                (EditText) view.findViewById(R.id.course_name_edittext);
+        final EditText mReachablePointsEditText =
+                (EditText) view.findViewById(R.id.max_reachable_points_edittext);
 
         //Toggle Edittext on checkbox toggle
         mCheckBox.setOnClickListener(new View.OnClickListener() {
@@ -164,7 +164,8 @@ public class MainActivity extends AppCompatActivity {
 
                 //Get values
                 String courseName = mCourseNameEditText.getText().toString();
-                String reachablePointsString = mReachablePointsEditText.getText().toString().replace(',', '.');
+                String reachablePointsString =
+                        mReachablePointsEditText.getText().toString().replace(',', '.');
                 Boolean hasFixedPoints = mCheckBox.isChecked();
 
                 if (hasFixedPoints) {
@@ -177,7 +178,9 @@ public class MainActivity extends AppCompatActivity {
 
                     } else {
                         //If data was not numeric
-                        Toast.makeText(getApplicationContext(), getString(R.string.invalid_values), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),
+                                getString(R.string.invalid_values),
+                                Toast.LENGTH_LONG).show();
 
                     }
                 } else {
@@ -233,7 +236,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 //Notify user with snackbar
-                CoordinatorLayout cl = (CoordinatorLayout) findViewById(R.id.coordinatorlayout_mainactivity);
+                CoordinatorLayout cl =
+                        (CoordinatorLayout) findViewById(R.id.coordinatorlayout_mainactivity);
                 Snackbar.make(cl,
                         getString(R.string.course) + title + getString(R.string.has_been_added),
                         Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
@@ -291,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
 
         //check if external storage is readable
         if (isExternalStorageReadable()) {
-            File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files");
+            File myFilesDir = getBackupDir();
 
             //Get all backup files
 
@@ -332,38 +336,7 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                final String fileName = pathAdapter.getItem(position);
-                final File myFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files/" + fileName);
-
-
-                //Open Alert dialog to delete item
-
-                final AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-
-                //Set title and message
-                alert.setTitle(getApplicationContext().getString(R.string.delete));
-                alert.setMessage(getApplicationContext().getString(R.string.do_you_want_to_delete) + fileName + "?");
-
-                //Set positive button behaviour
-                alert.setPositiveButton(getApplicationContext().getString(R.string.delete), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        pathAdapter.remove(fileName);
-                        pathAdapter.notifyDataSetChanged();
-                        myFile.delete();
-                    }
-                });
-
-                alert.setNegativeButton(getApplicationContext().getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-
-                alert.show();
-
-
+                removeBackup(position, pathAdapter);
                 return true;
             }
         });
@@ -373,7 +346,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 try {
-                    File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files");
+                    File myFilesDir = getBackupDir();
                     if (editText.getText().toString().isEmpty())
                         Toast.makeText(getApplicationContext(), "No backup selected", Toast.LENGTH_SHORT).show();
                     //Restore from chosen Backup, which lays in the top textfield
@@ -419,6 +392,43 @@ public class MainActivity extends AppCompatActivity {
         alert.show();
     }
 
+    private void removeBackup(int position, final PathAdapter<String> pathAdapter) {
+        final String fileName = pathAdapter.getItem(position);
+        final File myFile = new File(
+                Environment
+                        .getExternalStorageDirectory()
+                        .getAbsolutePath()
+                        + "/CourseStatistics/files/"
+                        + fileName);
+
+
+        //Open Alert dialog to delete item
+
+        final AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+
+        //Set title and message
+        alert.setTitle(getApplicationContext().getString(R.string.delete));
+        alert.setMessage(getApplicationContext().getString(R.string.do_you_want_to_delete) + fileName + "?");
+
+        //Set positive button behaviour
+        alert.setPositiveButton(getApplicationContext().getString(R.string.delete), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                pathAdapter.remove(fileName);
+                pathAdapter.notifyDataSetChanged();
+                myFile.delete();
+            }
+        });
+
+        alert.setNegativeButton(getApplicationContext().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        alert.show();
+    }
+
     //Restore Button in Menu
     public void onClickMenuBackup(MenuItem item) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -432,14 +442,14 @@ public class MainActivity extends AppCompatActivity {
 
                 //Check for RW permissions
                 if (isExternalStorageWritable()) {
-                    File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CourseStatistics/files");
+                    File myFilesDir = getBackupDir();
                     myFilesDir.mkdirs();
 
                     //Write Course-Array-List to storage
                     try {
                         //add backup-string to date
                         Calendar c = Calendar.getInstance();
-                        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy-HH:mm:ss");
+                        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy-HH:mm:ss", Locale.US);
                         String formattedDate = df.format(c.getTime());
 
                         Toast.makeText(getApplicationContext(), formattedDate, Toast.LENGTH_LONG).show();
@@ -466,6 +476,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
         alert.show();
+    }
+
+    /**
+     * Creates the Path to the Backup directory
+     * @return Path to file dir
+     */
+    @NonNull
+    private File getBackupDir() {
+        return new File(Environment
+                .getExternalStorageDirectory()
+                .getAbsolutePath()
+                + "/CourseStatistics/files");
     }
 
     /* Checks if external storage is available for read and write */
