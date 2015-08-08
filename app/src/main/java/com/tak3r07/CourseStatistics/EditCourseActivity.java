@@ -3,6 +3,7 @@ package com.tak3r07.CourseStatistics;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +16,7 @@ import com.tak3r07.unihelper.R;
 
 import java.util.Iterator;
 
-public class EditCourseActivity extends ActionBarActivity {
+public class EditCourseActivity extends AppCompatActivity {
 
     private final String COURSE_TAG = "COURSE_TAG";
     private final String COURSE_TAG_ID = "COURSE_TAG_ID";
