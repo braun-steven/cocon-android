@@ -32,7 +32,7 @@ public class AssignmentsActivity extends ActionBarActivity {
 
     private final String COURSE_TAG_ID = "COURSE_TAG_ID";
     private RecyclerViewAssignmentAdapter mAssignmentAdapter;
-    private Course currentCourse;
+    private Course mCurrentCourse;
     private ArrayList<Assignment> mAssignments;
     private int courseId;
     private FloatingActionButton mFab;
@@ -52,23 +52,23 @@ public class AssignmentsActivity extends ActionBarActivity {
 
         //position of the course which was opened
         courseId = intent.getExtras().getInt(COURSE_TAG_ID);
-        currentCourse = new DatabaseHelper(getApplicationContext())
+        mCurrentCourse = new DatabaseHelper(getApplicationContext())
                 .getCourse(courseId);
 
 
         //Get assignments
-        mAssignments = currentCourse.getAssignments();
+        mAssignments = mCurrentCourse.getAssignments();
 
 
         //Set activity title
-        this.setTitle(currentCourse.getCourseName());
+        this.setTitle(mCurrentCourse.getCourseName());
 
 
         //RecyclerView Setup
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_assignments);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
         mAssignmentAdapter =
-                new RecyclerViewAssignmentAdapter(getApplicationContext(), currentCourse, this);
+                new RecyclerViewAssignmentAdapter(getApplicationContext(), mCurrentCourse, this);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mAssignmentAdapter);
@@ -128,7 +128,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         final TextView textView = (TextView) view.findViewById(R.id.textView_maxPoints);
 
         //If this course has fixed Points, dont show the possibilities of setting maxPoints
-        if (currentCourse.hasFixedPoints()) {
+        if (mCurrentCourse.hasFixedPoints()) {
             ViewManager viewManager = (ViewManager) mEditTextMaxPoints.getParent();
             viewManager.removeView(mEditTextMaxPoints);
             viewManager.removeView(textView);
@@ -146,25 +146,33 @@ public class AssignmentsActivity extends ActionBarActivity {
 
                 CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
 
-                if (currentCourse.getNumberOfAssignments() - (mAssignments.size() - countExtraAssignments) > 0 || mCheckBox.isChecked()) {
+                if (mCurrentCourse.getNumberOfAssignments()
+                        - (mAssignments.size() - countExtraAssignments)
+                        > 0 || mCheckBox.isChecked()) {
                     //Get EditText views
-                    EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
-                    EditText mEditTextMaxPoints = (EditText) view.findViewById(R.id.editText_maxPoints);
+                    EditText mEditTextAchievedPoints
+                            = (EditText) view.findViewById(R.id.editText_achievedPoints);
+                    EditText mEditTextMaxPoints
+                            = (EditText) view.findViewById(R.id.editText_maxPoints);
 
                     //Get data from edittexts
-                    String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',', '.');
+                    String achievedPointsString
+                            = mEditTextAchievedPoints.getText().toString().replace(',', '.');
                     String maxPointsString = "";
-                    if (!currentCourse.hasFixedPoints()) {
+                    if (!mCurrentCourse.hasFixedPoints()) {
                         maxPointsString = mEditTextMaxPoints.getText().toString().replace(',', '.');
                     }
 
-                    //Check if the entered Values are numeric (doubles) and (or) maxPointsString is empty
-                    if (isNumeric(achievedPointsString) && (isNumeric(maxPointsString) || maxPointsString.equals(""))) {
+                    //Check if the entered Values are
+                    // numeric (doubles) and (or) maxPointsString is empty
+                    if (isNumeric(achievedPointsString)
+                            && (isNumeric(maxPointsString)
+                            || maxPointsString.equals(""))) {
 
                         Double achievedPoints = Double.parseDouble(achievedPointsString);
                         Double maxPoints;
-                        if (currentCourse.hasFixedPoints()) {
-                            maxPoints = currentCourse.toFPC().getMaxPoints();
+                        if (mCurrentCourse.hasFixedPoints()) {
+                            maxPoints = mCurrentCourse.toFPC().getMaxPoints();
                         } else {
 
                             maxPoints = Double.parseDouble(maxPointsString);
@@ -193,7 +201,7 @@ public class AssignmentsActivity extends ActionBarActivity {
                                 index,
                                 maxPoints,
                                 achievedPoints,
-                                currentCourse.getId());
+                                mCurrentCourse.getId());
 
                         //Check if this is an extra assignment
                         if (mCheckBox.isChecked()) {
@@ -204,12 +212,16 @@ public class AssignmentsActivity extends ActionBarActivity {
                         addAssignment(newAssignment);
                     } else {
                         //If data was not numeric
-                        Toast.makeText(getApplicationContext(), getString(R.string.invalid_values), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),
+                                getString(R.string.invalid_values),
+                                Toast.LENGTH_LONG).show();
 
                     }
                 } else {
                     //already too many assignments
-                    Toast.makeText(getApplicationContext(), getString(R.string.reached_assignments_limit), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),
+                            getString(R.string.reached_assignments_limit),
+                            Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -227,7 +239,7 @@ public class AssignmentsActivity extends ActionBarActivity {
     //Add assignment to adapter (Eventually add to course necessary?)
     public void addAssignment(Assignment assignment) {
         mAssignmentAdapter.addAssignment(assignment);
-        currentCourse.addAssignment(assignment);
+        mCurrentCourse.addAssignment(assignment);
 
 
         //Store assignment in database
@@ -239,7 +251,8 @@ public class AssignmentsActivity extends ActionBarActivity {
 
 
         //Notify user
-        CoordinatorLayout cl = (CoordinatorLayout) findViewById(R.id.coordinatorlayout_assignmentsactivity);
+        CoordinatorLayout cl =
+                (CoordinatorLayout) findViewById(R.id.coordinatorlayout_assignmentsactivity);
         Snackbar.make(cl,
                 getString(R.string.new_assignment_added),
                 Snackbar.LENGTH_LONG).setAction(getString(R.string.undo), new View.OnClickListener() {
@@ -277,7 +290,7 @@ public class AssignmentsActivity extends ActionBarActivity {
         intent.setClass(getApplicationContext(), EditCourseActivity.class);
 
         //Add Course-Number
-        intent.putExtra(COURSE_TAG_ID, currentCourse.getId());
+        intent.putExtra(COURSE_TAG_ID, mCurrentCourse.getId());
         startActivityForResult(intent, 0);
     }
 
@@ -288,11 +301,11 @@ public class AssignmentsActivity extends ActionBarActivity {
 
             // Restore from storage
             DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-            currentCourse = dbHelper.getCourse(courseId);
+            mCurrentCourse = dbHelper.getCourse(courseId);
 
             //Set new Title
 
-            setTitle(currentCourse.getCourseName());
+            setTitle(mCurrentCourse.getCourseName());
 
             //Notify adapter for changes
             mAssignmentAdapter.notifyDataSetChanged();
@@ -304,7 +317,7 @@ public class AssignmentsActivity extends ActionBarActivity {
     protected void onResume() {
         // Restore from storage
         DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-        currentCourse = dbHelper.getCourse(courseId);
+        mCurrentCourse = dbHelper.getCourse(courseId);
         super.onResume();
     }
 }
