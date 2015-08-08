@@ -1,54 +1,49 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="16dp">
+    android:layout_margin="16dp">
 
 
-            <TextView
-                android:id="@+id/points_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="marquee"
-                android:singleLine="true"
-                android:text="Description"
-                style="@style/Base.TextAppearance.AppCompat.Subhead"
-                android:textSize="12sp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginTop="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginBottom="16dp"/>
+    <TextView
+        android:id="@+id/assignment_title"
+        style="@style/Base.TextAppearance.AppCompat.Subhead"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignWithParentIfMissing="true"
 
-            <TextView
-                android:id="@+id/assignment_title"
-                style="@style/Base.TextAppearance.AppCompat.Subhead"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignWithParentIfMissing="true"
-                android:gravity="center_vertical"
-                android:text="Example application"
-                android:textSize="16sp"
-                android:layout_alignParentStart="false"
-                android:layout_alignParentLeft="false"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:layout_marginRight="16dp" />
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="center_vertical"
+        android:text="Example application"
+        android:textSize="16sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Percentage"
-                android:id="@+id/percentage_textview"
-                android:layout_toStartOf="@id/points_textview"
-                android:layout_toLeftOf="@id/points_textview"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="16dp" />
+    <TextView
+        android:id="@+id/points_textview"
+        style="@style/Base.TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:text="Description"
+        android:textSize="12sp"
+        android:layout_marginRight="16dp"
+
+        android:layout_below="@+id/assignment_title"
+        android:layout_alignLeft="@+id/assignment_title"
+        android:layout_alignStart="@+id/assignment_title" />
+
+
+    <TextView
+        android:id="@+id/percentage_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Percentage"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_centerVertical="true"
+        android:layout_alignRight="@+id/assignment_title"
+        android:layout_alignEnd="@+id/assignment_title" />
 
 </RelativeLayout>
