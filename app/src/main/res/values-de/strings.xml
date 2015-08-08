@@ -16,7 +16,7 @@
     <string name="confirm">Bestätigen</string>
     <string name="course">"Kurs: "</string>
     <string name="course_name_textview">Name: </string>
-    <string name="course_overview_assignments_until_finished_textview">#Blätter bis 50%</string>
+    <string name="course_overview_assignments_until_finished_textview">Anzahl Blätter bis 50%</string>
     <string name="course_overview_average_textview">Durchschnitt</string>
     <string name="course_overview_necessary_text">Benötigte Punkte/Blatt</string>
     <string name="course_overview_overall_textview">Gesamt</string>
@@ -25,7 +25,7 @@
     <string name="dialog_negative_button">Abbrechen</string>
     <string name="dialog_positive_button">Erstellen</string>
     <string name="dialog_title_message">Geben Sie einen Kurstitel ein</string>
-    <string name="do_you_want_restore">Wollen Sie Daten aus dem internen Speicher wiederherstellen?</string>
+    <string name="do_you_want_restore">Wählen Sie ein Backup aus</string>
     <string name="do_you_want_to_delete">"Löschen: "</string>
     <string name="edit_course_text">Kurs bearbeiten</string>
     <string name="enter_assignment_points">Geben Sie Ihre Punktzahl ein</string>
@@ -53,10 +53,10 @@
     <string name="edit_assignment">Bearbeiten</string>
     <string name="dialog_edit_assignment_save">Speichern</string>
     <string name="dialog_edit_assignment_title">Übungsblatt bearbeiten</string>
-    <string name="yes">yes</string>
     <string name="courselist_head_coursename">Kursname</string>
     <string name="courselist_header_progress">Fortschritt</string>
     <string name="courselist_header_average">\u00d8</string>
     <string name="checkbox_text_hasfixedpoints">Dieser Kurs hat auf jedem Übungsblatt die selbe Anzahl an max. erreichbaren Punkten</string>
     <string name="undo">Undo</string>
+    <string name="yes">Ja</string>
 </resources>
