@@ -3,6 +3,7 @@ package com.tak3r07.CourseStatistics;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,9 +14,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.PointsGraphSeries;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.LimitLine;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
@@ -58,7 +67,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         TextView mTextViewAssUntilFin;
         TextView mTextViewOverall;
         TextView mTextViewProgress;
-        GraphView graph;
+        BarChart graph;
 
         public VHHeader(View view) {
             super(view);
@@ -68,7 +77,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
             mTextViewNecPoiPerAss = (TextView) view.findViewById(R.id.course_overview_nec_pointspass);
             mTextViewAssUntilFin = (TextView) view.findViewById(R.id.course_overview_assignments_until_finished);
             mTextViewOverall = (TextView) view.findViewById(R.id.course_overview_overall_percentage_text);
-            graph = (GraphView) view.findViewById(R.id.graph);
+            graph = (BarChart) view.findViewById(R.id.chart);
             if (!currentCourse.hasFixedPoints()) {
                 mTextViewProgress = (TextView) view.findViewById(R.id.textView_progress);
             }
@@ -407,15 +416,21 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         FixedPointsCourse fpc = currentCourse.toFPC();
 
 
-        headerHolder.mTextViewOverall.setText(fpc.getProgress().toString()
-                + " % - " + fpc.getTotalPoints()
-                + "/"
-                + fpc.getNumberOfAssignments() * fpc.getMaxPoints());
+        headerHolder.mTextViewOverall.setText(
+                fpc.getProgress().toString()
+                        + " % - "
+                        + fpc.getTotalPoints()
+                        + "/"
+                        + fpc.getNumberOfAssignments() * fpc.getMaxPoints()
+        );
 
         //Average
-        headerHolder.mTextViewAverage.setText(fpc.getAverage(true).toString()
-                + " % - " + fpc.getAveragePointsPerAssignment(true)
-                + "/" + fpc.getMaxPoints());
+        headerHolder.mTextViewAverage.setText(
+                fpc.getAverage(true).toString()
+                        + " % - "
+                        + fpc.getAveragePointsPerAssignment(true)
+                        + "/" + fpc.getMaxPoints()
+        );
 
         //Nedded Points per assignment until 50% is reached
         headerHolder.mTextViewNecPoiPerAss.setText(fpc.getNecessaryPointsPerAssignmentUntilFin().toString());
@@ -423,74 +438,197 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         //Number of assignments until 50% is reached
         headerHolder.mTextViewAssUntilFin.setText(String.valueOf(fpc.getNumberOfAssUntilFin()));
 
-        //Graph
 
-        ArrayList<DataPoint> dataPoints = new ArrayList<>();
-        for (Assignment currentAssignment : mAssignments) {
-            //exclude extra assignments
-            if (!currentAssignment.isExtraAssignment()) {
-                dataPoints.add(new DataPoint(currentAssignment.getIndex(), currentAssignment.getAchievedPoints()));
-            }
-        }
+        setupBarGraph(headerHolder, fpc);
 
 
-        //Count extra-assignments
-        int countExtraAssignments = getCountExtraAssignments();
-
-
-        DataPoint[] points = getDataPoints(dataPoints);
-
-        //if only 1 assignment has been added, hide the graph
-        if (hideGraphIfTooLessAssignments(headerHolder)) return;
-
-        PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(points);
-        series.setSize(8);
-
-        //Setup Graph
-        headerHolder.graph.removeAllSeries();
-        headerHolder.graph.addSeries(series);
-        headerHolder.graph.getViewport().setYAxisBoundsManual(true);
-        headerHolder.graph.getViewport().setMinY(0);
-        headerHolder.graph.getViewport().setMaxX(mAssignments.size() - countExtraAssignments);
-        headerHolder.graph.getViewport().setMaxY(fpc.getMaxPoints());
-        headerHolder.graph.getGridLabelRenderer().setNumHorizontalLabels(mAssignments.size() - countExtraAssignments);
     }
+
 
     public void setupDynamicPointsHeaderHolder(VHHeader headerHolder) {
         headerHolder.mTextViewAverage.setText(currentCourse.getAverage(true) + " %");
         headerHolder.mTextViewProgress.setText(currentCourse.getProgress() + " %");
 
+        setupBarGraph(headerHolder, currentCourse.toDPC());
+    }
 
-        //Graph
+    /**
+     * Setup the graph
+     * @param headerHolder
+     * @param course
+     */
+    private void setupLineGraph(VHHeader headerHolder, Course course) {
 
-        ArrayList<DataPoint> dataPoints = new ArrayList<>();
-        for (Assignment currentAssignment : mAssignments) {
-            //exclude extra assignments
-            if (!currentAssignment.isExtraAssignment()) {
-                dataPoints.add(new DataPoint(currentAssignment.getIndex(), currentAssignment.getPercentage()));
+        //Get chart reference
+        LineChart chart = new LineChart(context);
+
+        //Disable legend
+        chart.getLegend().setEnabled(false);
+
+        //Disable description
+        chart.setDescription("");
+
+        //Disable touch
+        chart.setTouchEnabled(false);
+
+
+        //Create entry and Label arraylist
+        ArrayList<Entry> entries = new ArrayList<>();
+        ArrayList<String> xVals = new ArrayList<>();
+
+        //For each assignment create a new entry and its label
+        for (Assignment a : mAssignments) {
+            Entry e;
+
+            //Check if course is FPC: use absolute points
+            if (course.hasFixedPoints()) {
+                e = new Entry((float) a.getAchievedPoints(), a.getIndex() - 1);
+
+                //If course is DPC: use relative points
+            } else {
+                e = new Entry(a.getPercentage().floatValue(), a.getIndex() - 1);
             }
+
+            //Add new entry
+            entries.add(e);
+            xVals.add(String.valueOf(a.getIndex()));
         }
-        int countExtraAssignments = getCountExtraAssignments();
+
+        //Create line
+        LineDataSet lds = new LineDataSet(entries, null);
+
+        //Setup line settings
+        lds.setAxisDependency(YAxis.AxisDependency.LEFT);
+        lds.setColor(context.getResources().getColor(R.color.red_400));
+        lds.setCircleColor(context.getResources().getColor(R.color.red_500));
+        lds.setCircleColorHole(context.getResources().getColor(R.color.red_400));
+
+        YAxis ryAxis = chart.getAxisRight();
+        ryAxis.setDrawLabels(false);
+
+        YAxis lyAxis = chart.getAxisLeft();
+        lyAxis.setStartAtZero(true);
+        lyAxis.setDrawGridLines(false);
+
+        int labelsPerYAxis = 5;
+        boolean forceLabelCount = true;
+        lyAxis.setLabelCount(labelsPerYAxis, forceLabelCount);
+        if (course.hasFixedPoints()) {
+            lyAxis.setAxisMaxValue(course.toFPC().getMaxPoints().floatValue());
+        } else {
+            float yAxisMaxValue = 100f;
+            lyAxis.setAxisMaxValue(yAxisMaxValue);
+        }
 
 
-        DataPoint[] points = getDataPoints(dataPoints);
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
-        //if only 1 assignment has been added, hide the graph
-        if (hideGraphIfTooLessAssignments(headerHolder)) return;
 
-        PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(points);
-        series.setSize(8);
+        ArrayList<LineDataSet> datasets = new ArrayList<>();
+        datasets.add(lds);
 
-        //Setup Graph
-        headerHolder.graph.removeAllSeries();
-        headerHolder.graph.addSeries(series);
-        headerHolder.graph.getViewport().setYAxisBoundsManual(true);
-        headerHolder.graph.getViewport().setMinY(0);
-        headerHolder.graph.getViewport().setMaxX(mAssignments.size() - countExtraAssignments);
-        //Max is 100%
-        headerHolder.graph.getViewport().setMaxY(100);
-        headerHolder.graph.getGridLabelRenderer().setNumHorizontalLabels(mAssignments.size() - countExtraAssignments);
+        LineData data = new LineData(xVals, datasets);
+        chart.setData(data);
 
+        chart.invalidate();
+    }
+
+    /**
+     * Setup the bargraph
+     * @param headerHolder
+     * @param course
+     */
+    private void setupBarGraph(VHHeader headerHolder, Course course) {
+
+        //Get chart reference
+        BarChart chart = headerHolder.graph;
+
+        //Disable legend
+        chart.getLegend().setEnabled(false);
+
+        //Disable description
+        chart.setDescription("");
+
+        //Disable touch
+        chart.setTouchEnabled(false);
+
+
+        //Create entry and Label arraylist
+        ArrayList<BarEntry> entries = new ArrayList<>();
+        ArrayList<String> xVals = new ArrayList<>();
+        ArrayList<Integer> colors = new ArrayList<>();
+
+        //For each assignment create a new entry and its label
+        for (Assignment a : mAssignments) {
+            BarEntry e;
+
+            //Check if course is FPC: use absolute points
+            if (course.hasFixedPoints()) {
+                e = new BarEntry((float) a.getAchievedPoints(), a.getIndex() - 1);
+
+                //If course is DPC: use relative points
+            } else {
+                e = new BarEntry(a.getPercentage().floatValue(), a.getIndex() - 1);
+            }
+
+            //Add color for this entry
+            if(a.getPercentage() >= course.getAverage(true)){
+                colors.add(context.getResources().getColor(R.color.light_green_400));
+            }else{
+                colors.add(context.getResources().getColor(R.color.red_300));
+            }
+            //Add new entry
+            entries.add(e);
+            xVals.add(String.valueOf(a.getIndex()));
+        }
+
+        //Create line
+        BarDataSet bds = new BarDataSet(entries, null);
+
+        //Setup line settings
+        bds.setAxisDependency(YAxis.AxisDependency.LEFT);
+        bds.setColors(colors);
+
+        YAxis ryAxis = chart.getAxisRight();
+        ryAxis.setDrawLabels(false);
+
+        YAxis lyAxis = chart.getAxisLeft();
+        lyAxis.setStartAtZero(true);
+        lyAxis.setDrawGridLines(false);
+
+        int labelsPerYAxis = 5;
+        boolean forceLabelCount = true;
+        lyAxis.setLabelCount(labelsPerYAxis, forceLabelCount);
+        if (course.hasFixedPoints()) {
+            lyAxis.setAxisMaxValue(course.toFPC().getMaxPoints().floatValue());
+        } else {
+            float yAxisMaxValue = 100f;
+            lyAxis.setAxisMaxValue(yAxisMaxValue);
+        }
+
+        lyAxis = chart.getAxisLeft();
+
+        LimitLine ll = new LimitLine(course.getAverage(true).floatValue(), course.getAverage(true)+"\u2205");
+        ll.setLineColor(context.getResources().getColor(R.color.grey_400));
+        ll.setLineWidth(0.75f);
+        ll.setLabelPosition(LimitLine.LimitLabelPosition.POS_LEFT);
+        ll.setTextColor(context.getResources().getColor(R.color.grey_500));
+        ll.setTextSize(8f);
+
+        lyAxis.addLimitLine(ll);
+
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
+
+        ArrayList<BarDataSet> datasets = new ArrayList<>();
+        datasets.add(bds);
+
+        BarData data = new BarData(xVals, datasets);
+        chart.setData(data);
+
+        chart.invalidate();
     }
 
     public boolean hideGraphIfTooLessAssignments(VHHeader headerHolder) {
@@ -504,13 +642,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         return false;
     }
 
-    public DataPoint[] getDataPoints(ArrayList<DataPoint> dataPoints) {
-        DataPoint[] points = new DataPoint[dataPoints.size()];
-        for (int i = 0; i < dataPoints.size(); i++) {
-            points[i] = dataPoints.get(i);
-        }
-        return points;
-    }
+
 
     public int getCountExtraAssignments() {
         //Count extra-assignments
