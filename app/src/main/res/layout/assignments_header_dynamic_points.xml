@@ -77,7 +77,7 @@
         card_view:cardCornerRadius="0dp"
         card_view:cardElevation="3dp">
 
-        <com.github.mikephil.charting.charts.LineChart
+        <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/chart"
             android:layout_width="match_parent"
             android:layout_height="125dp"
