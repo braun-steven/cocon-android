@@ -17,7 +17,7 @@
     <string name="course_name_textview">Name:</string>
     <string name="max_points_textview">Max. points per assignment:</string>
     <string name="edit_course_text">Edit course</string>
-    <string name="title_activity_edit_course">Edit Course</string>
+    <string name="title_activity_edit_course">Edit course</string>
     <string name="text_extra_assignment_checkbox">This is an extra assignment</string>
     <string name="course_overview_overall_textview">Overall</string>
     <string name="course_overview_necessary_text">Necessary points/assignment</string>
