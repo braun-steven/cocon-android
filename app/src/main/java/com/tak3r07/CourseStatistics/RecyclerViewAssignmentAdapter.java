@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.LimitLine;
@@ -27,6 +28,9 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.tak3r07.unihelper.R;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
@@ -453,88 +457,6 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
     }
 
     /**
-     * Setup the graph
-     * @param headerHolder
-     * @param course
-     */
-    private void setupLineGraph(VHHeader headerHolder, Course course) {
-
-        //Get chart reference
-        LineChart chart = new LineChart(context);
-
-        //Disable legend
-        chart.getLegend().setEnabled(false);
-
-        //Disable description
-        chart.setDescription("");
-
-        //Disable touch
-        chart.setTouchEnabled(false);
-
-
-        //Create entry and Label arraylist
-        ArrayList<Entry> entries = new ArrayList<>();
-        ArrayList<String> xVals = new ArrayList<>();
-
-        //For each assignment create a new entry and its label
-        for (Assignment a : mAssignments) {
-            Entry e;
-
-            //Check if course is FPC: use absolute points
-            if (course.hasFixedPoints()) {
-                e = new Entry((float) a.getAchievedPoints(), a.getIndex() - 1);
-
-                //If course is DPC: use relative points
-            } else {
-                e = new Entry(a.getPercentage().floatValue(), a.getIndex() - 1);
-            }
-
-            //Add new entry
-            entries.add(e);
-            xVals.add(String.valueOf(a.getIndex()));
-        }
-
-        //Create line
-        LineDataSet lds = new LineDataSet(entries, null);
-
-        //Setup line settings
-        lds.setAxisDependency(YAxis.AxisDependency.LEFT);
-        lds.setColor(context.getResources().getColor(R.color.red_400));
-        lds.setCircleColor(context.getResources().getColor(R.color.red_500));
-        lds.setCircleColorHole(context.getResources().getColor(R.color.red_400));
-
-        YAxis ryAxis = chart.getAxisRight();
-        ryAxis.setDrawLabels(false);
-
-        YAxis lyAxis = chart.getAxisLeft();
-        lyAxis.setStartAtZero(true);
-        lyAxis.setDrawGridLines(false);
-
-        int labelsPerYAxis = 5;
-        boolean forceLabelCount = true;
-        lyAxis.setLabelCount(labelsPerYAxis, forceLabelCount);
-        if (course.hasFixedPoints()) {
-            lyAxis.setAxisMaxValue(course.toFPC().getMaxPoints().floatValue());
-        } else {
-            float yAxisMaxValue = 100f;
-            lyAxis.setAxisMaxValue(yAxisMaxValue);
-        }
-
-
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-
-
-        ArrayList<LineDataSet> datasets = new ArrayList<>();
-        datasets.add(lds);
-
-        LineData data = new LineData(xVals, datasets);
-        chart.setData(data);
-
-        chart.invalidate();
-    }
-
-    /**
      * Setup the bargraph
      * @param headerHolder
      * @param course
@@ -553,6 +475,12 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         //Disable touch
         chart.setTouchEnabled(false);
 
+        //Set background color Transparent
+        chart.setGridBackgroundColor(Color.TRANSPARENT);
+
+        //TODO: Translate + extract to string resources
+        //Set no chart data message
+        chart.setNoDataText("No assignments added yet");
 
         //Create entry and Label arraylist
         ArrayList<BarEntry> entries = new ArrayList<>();
@@ -584,15 +512,22 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         }
 
         //Create line
-        BarDataSet bds = new BarDataSet(entries, null);
+        BarDataSet bds = new BarDataSet(entries, "Data");
 
         //Setup line settings
         bds.setAxisDependency(YAxis.AxisDependency.LEFT);
-        bds.setColors(colors);
 
+        //Catch exception which is thrown when no assignments are added yet
+        if(mAssignments.isEmpty() == false) {
+            bds.setColors(colors);
+        }
+
+        //Grab Right YAxis reference and disable it
         YAxis ryAxis = chart.getAxisRight();
         ryAxis.setDrawLabels(false);
 
+
+        //Grab Left YAxis reference
         YAxis lyAxis = chart.getAxisLeft();
         lyAxis.setStartAtZero(true);
         lyAxis.setDrawGridLines(false);
@@ -607,19 +542,39 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
             lyAxis.setAxisMaxValue(yAxisMaxValue);
         }
 
-        lyAxis = chart.getAxisLeft();
 
-        LimitLine ll = new LimitLine(course.getAverage(true).floatValue(), course.getAverage(true)+"\u2205");
-        ll.setLineColor(context.getResources().getColor(R.color.grey_400));
+        //Create limit line at "average"
+        LimitLine ll;
+        //If course is FPC show absolute average in chart
+        if(course.hasFixedPoints()){
+            float limit = course.getAverage(true).floatValue() / 100f * course.toFPC().getMaxPoints().floatValue();
+            String label = new DecimalFormat("####0.00").format(limit) + "\u2205";
+            ll = new LimitLine(limit, label);
+        //Else show relative average in chart
+        } else {
+            ll = new LimitLine(course.getAverage(true).floatValue(),
+                    course.getAverage(true)+"\u2205");
+
+        }
+
+        ll.setLineColor(context.getResources().getColor(R.color.grey_500));
         ll.setLineWidth(0.75f);
         ll.setLabelPosition(LimitLine.LimitLabelPosition.POS_LEFT);
         ll.setTextColor(context.getResources().getColor(R.color.grey_500));
         ll.setTextSize(8f);
 
+        //clear old limit lines
+        lyAxis.removeAllLimitLines();
+        //Add new limit line
         lyAxis.addLimitLine(ll);
+
+        lyAxis.setDrawGridLines(false);
+        ryAxis.setDrawGridLines(false);
+        ryAxis.setDrawAxisLine(false);
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
 
 
         ArrayList<BarDataSet> datasets = new ArrayList<>();
@@ -627,8 +582,12 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
         BarData data = new BarData(xVals, datasets);
         chart.setData(data);
-
+        chart.notifyDataSetChanged();
         chart.invalidate();
+
+        //Animate
+        //chart.animateY( 1000, Easing.EasingOption.Linear);
+
     }
 
     public boolean hideGraphIfTooLessAssignments(VHHeader headerHolder) {
