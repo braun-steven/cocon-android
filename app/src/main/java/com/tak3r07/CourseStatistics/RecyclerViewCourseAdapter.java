@@ -76,7 +76,7 @@ public class RecyclerViewCourseAdapter
 
             //add course position to update assignments when result comes back
             intent.putExtra("COURSE_TAG_ID",
-                    mCourseAdapter.getmCourseArrayList().get(getPosition()).getId());
+                    mCourseAdapter.getmCourseArrayList().get(getLayoutPosition()).getId());
             //Start activity
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
