@@ -2,7 +2,6 @@ package com.tak3r07.CourseStatistics;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -25,6 +24,7 @@ public class EditCourseActivity extends AppCompatActivity {
     private EditText mNameEditText;
     private EditText mNumberEditText;
     private EditText mMaxPointsEditText;
+    private EditText mNecPercentToPassEditText;
 
 
     @Override
@@ -47,11 +47,13 @@ public class EditCourseActivity extends AppCompatActivity {
         mNameEditText = (EditText) findViewById(R.id.course_editname_edittext);
         mNumberEditText = (EditText) findViewById(R.id.edit_text_numberofassignments);
         mMaxPointsEditText = (EditText) findViewById(R.id.edit_text_maxpointsperassignment);
+        mNecPercentToPassEditText = (EditText) findViewById(R.id.edit_text_nec_percent_to_pass);
 
 
         //Setup Text
         mNameEditText.setText(course.getCourseName());
         mNumberEditText.setText(String.valueOf(course.getNumberOfAssignments()));
+        mNecPercentToPassEditText.setText(String.valueOf(course.getNecPercentToPass()));
 
         //FPC: Set maxPoints
         //DPC: Remove edittext + description
@@ -98,12 +100,13 @@ public class EditCourseActivity extends AppCompatActivity {
     public void onClickSave(View view) {
         String name = mNameEditText.getText().toString();
         int numberOfAssignments = Integer.parseInt(mNumberEditText.getText().toString());
+        double necPercentToPass = Double.parseDouble(mNecPercentToPassEditText.getText().toString());
 
 
         //Count extra-assignments
         int countExtraAssignments = 0;
-        for (Iterator<Assignment> it = course.getAssignments().iterator(); it.hasNext(); ) {
-            if (it.next().isExtraAssignment()) countExtraAssignments++;
+        for (Assignment assignment : course.getAssignments()) {
+            if (assignment.isExtraAssignment()) countExtraAssignments++;
         }
 
         //Check if new numberOfAssignments Value is still smaller than the existing size
@@ -112,6 +115,7 @@ public class EditCourseActivity extends AppCompatActivity {
             //Save new values in course
             course.setCourseName(name);
             course.setNumberOfAssignments(numberOfAssignments);
+            course.setNecPercentToPass(necPercentToPass);
 
             //FPC: Add maxpoints
             if (course.hasFixedPoints()) {
