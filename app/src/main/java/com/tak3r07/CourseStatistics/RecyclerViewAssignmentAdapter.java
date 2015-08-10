@@ -501,7 +501,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
             }
 
             //Add color for this entry
-            if(a.getPercentage() >= course.getAverage(true)){
+            if(a.getPercentage() >= course.getNecPercentToPass()*100f){
                 colors.add(context.getResources().getColor(R.color.light_green_400));
             }else{
                 colors.add(context.getResources().getColor(R.color.red_300));
@@ -543,23 +543,24 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         }
 
 
-        //Create limit line at "average"
+        //Create limit line at necessary points to pass
         LimitLine ll;
         //If course is FPC show absolute average in chart
         if(course.hasFixedPoints()){
-            float limit = course.getAverage(true).floatValue() / 100f * course.toFPC().getMaxPoints().floatValue();
-            String label = new DecimalFormat("####0.00").format(limit) + "\u2205";
-            ll = new LimitLine(limit, label);
+            float limit = (float)(course.getNecPercentToPass()*course.toFPC().getMaxPoints());
+            String label = new DecimalFormat("####0.00").format(limit);
+            ll = new LimitLine(limit, "");
         //Else show relative average in chart
         } else {
-            ll = new LimitLine(course.getAverage(true).floatValue(),
-                    course.getAverage(true)+"\u2205");
+            float limit = (float)(course.getNecPercentToPass()*100f);
+            String label = new DecimalFormat("####0.00").format(limit);
+            ll = new LimitLine(limit, "");
 
         }
 
         ll.setLineColor(context.getResources().getColor(R.color.grey_500));
         ll.setLineWidth(0.75f);
-        ll.setLabelPosition(LimitLine.LimitLabelPosition.POS_LEFT);
+        ll.setLabelPosition(LimitLine.LimitLabelPosition.POS_RIGHT);
         ll.setTextColor(context.getResources().getColor(R.color.grey_500));
         ll.setTextSize(8f);
 
