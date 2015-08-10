@@ -26,6 +26,11 @@ public abstract class Course implements Serializable {
     //Item-Index in course-list
     private int index;
 
+
+
+    //Neccessary points to pass the course
+    private double necPercentToPass;
+
     public Course(String courseName, int index) {
         //Initialize
         this.index = index;
@@ -33,6 +38,9 @@ public abstract class Course implements Serializable {
 
         //usually 13 assignments in one semester
         numberOfAssignments = 13;
+
+        //Usually 50% neccessary to pass the course
+        necPercentToPass = 0.5d;
 
         //Set random id
         Random rand = new Random();
@@ -128,6 +136,14 @@ public abstract class Course implements Serializable {
     public abstract Double getProgress();
 
     public abstract boolean hasFixedPoints();
+
+    public double getNecPercentToPass() {
+        return necPercentToPass;
+    }
+
+    public void setNecPercentToPass(double necPercentToPass) {
+        this.necPercentToPass = necPercentToPass;
+    }
 
     /**
      * This method counts the number of extra assignment of this course

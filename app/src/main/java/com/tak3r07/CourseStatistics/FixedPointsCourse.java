@@ -122,7 +122,7 @@ public class FixedPointsCourse extends Course {
     public Double getNecessaryPointsPerAssignmentUntilFin() {
 
         //Necessary points for the whole course to reach 50%
-        Double necPointsAtAll = getNumberOfAssignments() * maxPoints * 0.5;
+        Double necPointsAtAll = getNumberOfAssignments() * maxPoints * getNecPercentToPass();
 
         //yet achieved points
         Double achievedPointsAtAll = getTotalPoints();
