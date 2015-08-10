@@ -18,7 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LOG = "DatabaseHelper";
 
     //Database version
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
 
     //Database name
     private static final String DATABASE_NAME = "courses";
@@ -36,6 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_MAX_POINTS_COURSE = "reachable_points_per_assignment";
     private static final String KEY_COURSE_INDEX = "course_index";
     private static final String KEY_HAS_FIXED_POINTS = "has_fixed_points";
+    private static final String KEY_NEC_PERCENT_TO_PASS = "nec_percent_to_pass";
 
     //Column names: assignments
     private static final String KEY_INDEX = "assignment_index";
@@ -52,7 +53,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_NUMBER_OF_ASSIGNMENTS + " INTEGER,"
             + KEY_MAX_POINTS_COURSE + " REAL,"
             + KEY_COURSE_INDEX + " INTEGER,"
-            + KEY_HAS_FIXED_POINTS + " INTEGER)";
+            + KEY_HAS_FIXED_POINTS + " INTEGER,"
+            + KEY_NEC_PERCENT_TO_PASS + " REAL DEFAULT 0.5)";
 
     private static final String CREATE_ASSIGNMENT_TABLE = "CREATE TABLE " + TABLE_ASSIGNMENTS + "("
             + KEY_ID + " INTEGER PRIMARY KEY,"
@@ -74,16 +76,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        final String DATABASE_ALTER_COURSE_ADD_NEC_PERCENT_TO_PASS = " ALTER TABLE "
+                + TABLE_COURSES + " ADD COLUMN " + KEY_NEC_PERCENT_TO_PASS + " REAL DEFAULT 0.5;";
 
-        /*
-        Each case 'n' describes an upgrade from db-version 'n' to 'n+1'
-         */
-        while (oldVersion < newVersion) {
-            switch (oldVersion) {
-                case 6:
-                case 7:
-            }
-            oldVersion++;
+        //Add necessary percent to pass value to course table
+        if (oldVersion < 9) {
+            db.execSQL(DATABASE_ALTER_COURSE_ADD_NEC_PERCENT_TO_PASS);
         }
     }
 
@@ -129,7 +127,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         KEY_COURSENAME,
                         KEY_NUMBER_OF_ASSIGNMENTS,
                         KEY_MAX_POINTS_COURSE,
-                        KEY_COURSE_INDEX
+                        KEY_COURSE_INDEX,
+                        KEY_NEC_PERCENT_TO_PASS
                 },
                 KEY_ID + "=?",
                 new String[]{String.valueOf(id)},
@@ -153,6 +152,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         int index = cursor.getInt(4);
 
+        double necPercentToPass = Double.parseDouble(cursor.getString(5));
+
         Course course;
         //If maxPoints was a "Null-value" in the database, create a DynamicPointsCourse
         if (maxPoints == 0) {
@@ -162,6 +163,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         course.setId(id);
         course.setNumberOfAssignments(numberOfAssignments);
+        course.setNecPercentToPass(necPercentToPass);
 
         //get assignments
         course.setAssignments(getAssignmentsOfCourse(id));
@@ -302,6 +304,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_COURSENAME, course.getCourseName());
         values.put(KEY_NUMBER_OF_ASSIGNMENTS, course.getNumberOfAssignments());
         values.put(KEY_COURSE_INDEX, course.getIndex());
+        values.put(KEY_NEC_PERCENT_TO_PASS, course.getNecPercentToPass());
 
 
         /*
