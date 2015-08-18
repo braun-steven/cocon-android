@@ -93,9 +93,9 @@ public class FixedPointsCourse extends Course {
         Assignment currentAssignment;
         for (Assignment assignment : getAssignments()) {
 
-            currentAssignment = assignment;
-            if (!currentAssignment.isExtraAssignment()) {
-                currentAssignment.setMaxPoints(maxPoints);
+            //Do not update extraassignments (those max-points are 0)
+            if (!assignment.isExtraAssignment()) {
+                assignment.setMaxPoints(maxPoints);
             }
         }
     }
