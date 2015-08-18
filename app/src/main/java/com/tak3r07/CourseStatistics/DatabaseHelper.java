@@ -62,7 +62,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_MAX_POINTS + " REAL,"
             + KEY_IS_EXTRA_ASSIGNMENT + " INTEGER,"
             + KEY_COURSE_ID + " INTEGER,"
-            + KEY_ACHIEVED_POINTS + " REAL)";
+            + KEY_ACHIEVED_POINTS + " REAL,"
+            + "FOREIGN KEY(" + KEY_COURSE_ID + ") REFERENCES " + TABLE_COURSES +"("+ KEY_COURSE_ID+"))";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
