@@ -199,9 +199,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 int id = Integer.parseInt(cursor.getString(0));
                 int index = Integer.parseInt(cursor.getString(1));
                 double maxPoints = Double.parseDouble(cursor.getString(2));
+                boolean isExtraAssignment = cursor.getInt(3)>0;
                 double achievedPoints = Double.parseDouble(cursor.getString(5));
 
+
                 Assignment assignment = new Assignment(id, index, maxPoints, achievedPoints, course_id);
+                assignment.isExtraAssignment(isExtraAssignment);
                 assignments.add(assignment);
 
             } while (cursor.moveToNext());
