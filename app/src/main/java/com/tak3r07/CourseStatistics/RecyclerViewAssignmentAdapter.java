@@ -524,7 +524,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         bds.setAxisDependency(YAxis.AxisDependency.LEFT);
 
         //Catch exception which is thrown when no assignments are added yet
-        if (mAssignments.isEmpty() == false) {
+        if (!mAssignments.isEmpty()) {
             bds.setColors(colors);
         }
 
@@ -551,18 +551,17 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
         //Create limit line at necessary points to pass
         LimitLine ll;
+        float limit;
         //If course is FPC show absolute average in chart
         if (course.hasFixedPoints()) {
-            float limit = (float) (course.getNecPercentToPass() * course.toFPC().getMaxPoints());
-            String label = new DecimalFormat("####0.00").format(limit);
-            ll = new LimitLine(limit, "");
+            limit = (float) (course.getNecPercentToPass() * course.toFPC().getMaxPoints());
             //Else show relative average in chart
         } else {
-            float limit = (float) (course.getNecPercentToPass() * 100f);
-            String label = new DecimalFormat("####0.00").format(limit);
-            ll = new LimitLine(limit, "");
-
+            limit = (float) (course.getNecPercentToPass() * 100f);
         }
+
+        String label = new DecimalFormat("####0.00").format(limit);
+        ll = new LimitLine(limit, "");
 
         ll.setLineColor(context.getResources().getColor(R.color.grey_500));
         ll.setLineWidth(0.75f);
