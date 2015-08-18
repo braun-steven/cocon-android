@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -190,9 +191,9 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
                     //If this course has fixed Points, dont show the possibilities of setting maxPoints
                     if (hasFixedPoints) {
-                        mEditTextMaxPoints.setHeight(0);
-                        textView.setHeight(0);
-
+                        ViewManager viewManager = (ViewManager) mEditTextMaxPoints.getParent();
+                        viewManager.removeView(mEditTextMaxPoints);
+                        viewManager.removeView(textView);
                     }
 
                     //Checkbox reference
@@ -506,7 +507,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
             }
 
             //Add color for this entry
-            if (a.getPercentage() >= course.getNecPercentToPass() * 100f) {
+            if (a.getPercentage() >= course.getNecPercentToPass() * 100f || a.isExtraAssignment()) {
                 colors.add(context.getResources().getColor(R.color.light_green_400));
             } else {
                 colors.add(context.getResources().getColor(R.color.red_300));
