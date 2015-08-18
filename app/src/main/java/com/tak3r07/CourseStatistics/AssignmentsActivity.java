@@ -84,7 +84,7 @@ public class AssignmentsActivity extends AppCompatActivity {
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onClickAddAssignment(null);
+                onClickAddAssignment();
             }
         });
     }
@@ -115,7 +115,7 @@ public class AssignmentsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onClickAddAssignment(MenuItem item) {
+    public void onClickAddAssignment() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
         alert.setTitle(getString(R.string.new_assignment));
@@ -304,12 +304,16 @@ public class AssignmentsActivity extends AppCompatActivity {
             DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
             mCurrentCourse = dbHelper.getCourse(courseId);
 
+            mAssignmentAdapter.setCurrentCourse(mCurrentCourse);
+
             //Set new Title
 
             setTitle(mCurrentCourse.getCourseName());
 
             //Notify adapter for changes
             mAssignmentAdapter.notifyDataSetChanged();
+            Toast.makeText(AssignmentsActivity.this, "onActivityResultCalled", Toast.LENGTH_SHORT).show();
+
         }
     }
 
