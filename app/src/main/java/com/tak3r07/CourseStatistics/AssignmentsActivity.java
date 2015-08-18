@@ -305,15 +305,14 @@ public class AssignmentsActivity extends AppCompatActivity {
             mCurrentCourse = dbHelper.getCourse(courseId);
 
             mAssignmentAdapter.setCurrentCourse(mCurrentCourse);
-
+            mAssignments = mCurrentCourse.getAssignments();
+            mAssignmentAdapter.setAssignments(mCurrentCourse.getAssignments());
             //Set new Title
 
             setTitle(mCurrentCourse.getCourseName());
 
             //Notify adapter for changes
             mAssignmentAdapter.notifyDataSetChanged();
-            Toast.makeText(AssignmentsActivity.this, "onActivityResultCalled", Toast.LENGTH_SHORT).show();
-
         }
     }
 
