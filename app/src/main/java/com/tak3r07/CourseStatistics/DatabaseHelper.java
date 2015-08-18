@@ -286,6 +286,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = getCourseContentValues(course);
 
+        //Update all assignments
+        for(Assignment a : course.getAssignments()){
+            updateAssignment(a);
+        }
 
         return db.update(TABLE_COURSES, values, KEY_ID + " = ?", new String[]{String.valueOf(course.getId())});
     }
