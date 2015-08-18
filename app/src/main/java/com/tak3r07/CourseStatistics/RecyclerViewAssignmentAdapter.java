@@ -229,17 +229,17 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                             if (AssignmentsActivity.isNumeric(achievedPointsString) && AssignmentsActivity.isNumeric(maxPointsString)) {
 
                                 Double achievedPoints = Double.parseDouble(achievedPointsString);
+                                //Set new achieved points value
+                                currentAssignment.setAchievedPoints(achievedPoints);
+
 
                                 Double maxPoints;
                                 if (hasFixedPoints) {
                                     maxPoints = currentCourse.toFPC().getMaxPoints();
                                 } else {
-
                                     maxPoints = Double.parseDouble(maxPointsString);
                                 }
 
-                                //Set new achieved points value
-                                currentAssignment.setAchievedPoints(achievedPoints);
 
 
                                 //Set extra assignment if checked
