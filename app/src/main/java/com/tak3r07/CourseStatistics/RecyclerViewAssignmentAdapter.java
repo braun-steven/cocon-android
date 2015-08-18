@@ -42,7 +42,11 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
     private Context context;
     private final AssignmentsActivity assignmentsActivity;
+
     private static Course currentCourse;
+
+
+
     private ArrayList<Assignment> mAssignments;
     private static boolean hasFixedPoints;
 
@@ -458,6 +462,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
     /**
      * Setup the bargraph
+     *
      * @param headerHolder
      * @param course
      */
@@ -501,9 +506,9 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
             }
 
             //Add color for this entry
-            if(a.getPercentage() >= course.getNecPercentToPass()*100f){
+            if (a.getPercentage() >= course.getNecPercentToPass() * 100f) {
                 colors.add(context.getResources().getColor(R.color.light_green_400));
-            }else{
+            } else {
                 colors.add(context.getResources().getColor(R.color.red_300));
             }
             //Add new entry
@@ -518,7 +523,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         bds.setAxisDependency(YAxis.AxisDependency.LEFT);
 
         //Catch exception which is thrown when no assignments are added yet
-        if(mAssignments.isEmpty() == false) {
+        if (mAssignments.isEmpty() == false) {
             bds.setColors(colors);
         }
 
@@ -546,13 +551,13 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         //Create limit line at necessary points to pass
         LimitLine ll;
         //If course is FPC show absolute average in chart
-        if(course.hasFixedPoints()){
-            float limit = (float)(course.getNecPercentToPass()*course.toFPC().getMaxPoints());
+        if (course.hasFixedPoints()) {
+            float limit = (float) (course.getNecPercentToPass() * course.toFPC().getMaxPoints());
             String label = new DecimalFormat("####0.00").format(limit);
             ll = new LimitLine(limit, "");
-        //Else show relative average in chart
+            //Else show relative average in chart
         } else {
-            float limit = (float)(course.getNecPercentToPass()*100f);
+            float limit = (float) (course.getNecPercentToPass() * 100f);
             String label = new DecimalFormat("####0.00").format(limit);
             ll = new LimitLine(limit, "");
 
@@ -603,7 +608,6 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
     }
 
 
-
     public int getCountExtraAssignments() {
         //Count extra-assignments
         int countExtraAssignments = 0;
@@ -613,4 +617,11 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         return countExtraAssignments;
     }
 
+    public static void setCurrentCourse(Course currentCourse) {
+        RecyclerViewAssignmentAdapter.currentCourse = currentCourse;
+    }
+
+    public void setAssignments(ArrayList<Assignment> assignments) {
+        this.mAssignments = assignments;
+    }
 }
