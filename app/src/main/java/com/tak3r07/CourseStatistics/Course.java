@@ -156,4 +156,12 @@ public abstract class Course implements Serializable {
         }
         return count;
     }
+
+    /**
+     * This method gives the number of assignments left
+     * @return number of assignments left
+     */
+    public int numberAssignmentsLeft(){
+        return numberOfAssignments - (mAssignmentArrayList.size() - countExtraAssignments());
+    }
 }
