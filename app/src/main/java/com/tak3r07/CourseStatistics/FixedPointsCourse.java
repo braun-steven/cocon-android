@@ -127,17 +127,19 @@ public class FixedPointsCourse extends Course {
         //yet achieved points
         Double achievedPointsAtAll = getTotalPoints();
 
-        //Count extra-assignments
-        int countExtraAssignments = countExtraAssignments();
-
         //Number of assignments left for this semester
-        int numberAssignmentsLeft = getNumberOfAssignments() - (getAssignments().size() - countExtraAssignments);
+        int numberAssignmentsLeft = numberAssignmentsLeft();
 
+        //if numberAssignmentsLeft = 0 use set it to "1" since this will display in the result
+        // the points overall which are left
+        numberAssignmentsLeft = (numberAssignmentsLeft > 0)? numberAssignmentsLeft : 1;
 
+        //Necessary points left to pass the course
         Double numberOfPointsLeft = necPointsAtAll - achievedPointsAtAll;
 
         //Missing points divided by missing assignments
         Double necPointsPerAssUntilFin = Math.round(numberOfPointsLeft / numberAssignmentsLeft * 100) / 100d;
+
 
 
         if (necPointsPerAssUntilFin < 0) return 0.;
