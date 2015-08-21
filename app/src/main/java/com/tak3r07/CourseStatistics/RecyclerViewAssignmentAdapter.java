@@ -47,7 +47,6 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
     private static Course currentCourse;
 
 
-
     private ArrayList<Assignment> mAssignments;
     private static boolean hasFixedPoints;
 
@@ -228,10 +227,6 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                             //Check if the entered Values are numeric (doubles)
                             if (AssignmentsActivity.isNumeric(achievedPointsString) && AssignmentsActivity.isNumeric(maxPointsString)) {
 
-                                Double achievedPoints = Double.parseDouble(achievedPointsString);
-                                //Set new achieved points value
-                                currentAssignment.setAchievedPoints(achievedPoints);
-
 
                                 Double maxPoints;
                                 if (hasFixedPoints) {
@@ -240,15 +235,26 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                                     maxPoints = Double.parseDouble(maxPointsString);
                                 }
 
-
-
                                 //Set extra assignment if checked
                                 if (mCheckBox.isChecked()) {
                                     currentAssignment.isExtraAssignment(true);
                                 } else {
-                                    currentAssignment.isExtraAssignment(false);
-                                    currentAssignment.setMaxPoints(maxPoints);
+                                    //Only allow to uncheck if there are enough assignments left
+                                    // (else one could have 3 of 3 assignments and another extra
+                                    // assignment, then uncheck it and he will have 4 out of 3
+                                    // assignments which is not intended
+                                    if (currentCourse.numberAssignmentsLeft() > 0) {
+                                        currentAssignment.isExtraAssignment(false);
+                                        currentAssignment.setMaxPoints(maxPoints);
+                                    } else {
+                                        Toast.makeText(context, R.string.course_has_max_number_of_assignments, Toast.LENGTH_LONG).show();
+                                        return;
+                                    }
                                 }
+
+                                //Set new achieved points value
+                                Double achievedPoints = Double.parseDouble(achievedPointsString);
+                                currentAssignment.setAchievedPoints(achievedPoints);
 
                                 //Update
                                 mAssignmentsAdapter.notifyDataSetChanged();
