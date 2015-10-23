@@ -39,13 +39,14 @@ import java.util.Collections;
 import java.util.Locale;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CourseNotifiable {
     private final String COURSE_ARRAY_LIST = "COURSE_ARRAY_LIST";
 
 
     private ArrayList<Course> mCourseArrayList = new ArrayList<Course>();
     private RecyclerViewCourseAdapter mCourseAdapter;
     private FloatingActionButton mFab;
+    private DataHelper<MainActivity> dataHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,22 +57,34 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+        /*//Check if Google Playe Services is available
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext())
+                == ConnectionResult.SUCCESS) {
+*/
+
+        //get datahelper instance
+        dataHelper = new DataHelper<MainActivity>(this);
+
+        /*
+         *Dont use since onResume()  always refreshes data from server
+
         if (savedInstanceState != null) {
 
             //Get back Course-Arraylist from savedInstanceState
             mCourseArrayList = (ArrayList<Course>) savedInstanceState.getSerializable(COURSE_ARRAY_LIST);
 
         } else {
-            // Restore from storage
-            DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-            mCourseArrayList = dbHelper.getAllCourses();
+            // Restore courses
+            mCourseArrayList = dataHelper.getAllCourses();
         }
+        */
 
 
         //RecyclerView Setup
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_courses);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mCourseAdapter = new RecyclerViewCourseAdapter(getApplicationContext(), mCourseArrayList);
+        mCourseAdapter = new RecyclerViewCourseAdapter(this, getApplicationContext(), mCourseArrayList);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
@@ -89,7 +102,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Setup FAB
-        //TODO: Extract into method
+        setupFAB();
+
+        /*
+        } else {
+            //TODO: Show error dialog that google play services is not available
+        }*/
+    }
+
+    private void setupFAB() {
         mFab = (FloatingActionButton) findViewById(R.id.fab_add_course);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
                 onClickAddCourse(null);
             }
         });
-
     }
 
 
@@ -225,15 +245,20 @@ public class MainActivity extends AppCompatActivity {
                 //Add course
                 final int index = mCourseArrayList.size();
 
+                long date = Calendar.getInstance().getTimeInMillis();
                 //If course has fixed points -> create instance of FixedPointsCourse
+
+                Course course;
                 if (hasFixedPoints) {
-                    FixedPointsCourse course = new FixedPointsCourse(title, index, maxPoints);
+                    course = new FixedPointsCourse(title, index, maxPoints);
                     mCourseAdapter.addCourse(course);
                 } else {
                     //Else create instance of DynamicPointsCourse
-                    DynamicPointsCourse course = new DynamicPointsCourse(title, index);
+                    course = new DynamicPointsCourse(title, index);
                     mCourseAdapter.addCourse(course);
                 }
+
+                course.setDate(date);
 
                 //Notify user with snackbar
                 CoordinatorLayout cl =
@@ -372,9 +397,8 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), getString(R.string.restore_complete), Toast.LENGTH_LONG).show();
 
 
-                    //Store in database
-                    DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-                    dbHelper.updateCourses(mCourseArrayList);
+                    //Update data
+                    dataHelper.updateAllCourses(mCourseArrayList);
 
                 } catch (ClassNotFoundException | IOException e) {
                     e.printStackTrace();
@@ -480,6 +504,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Creates the Path to the Backup directory
+     *
      * @return Path to file dir
      */
     @NonNull
@@ -507,8 +532,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         //Restore data
-        DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-        mCourseArrayList = dbHelper.getAllCourses();
+        mCourseArrayList = dataHelper.getAllCourses();
 
         //Notify Adapter
         mCourseAdapter.setmCourseArrayList(mCourseArrayList);
@@ -516,4 +540,22 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    public ArrayList<Course> getCourseArrayList() {
+        return this.mCourseArrayList;
+    }
+
+    public void notifiyCoursesChanged() {
+        //Restore data
+        mCourseAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataChanged() {
+        notifiyCoursesChanged();
+    }
+
+    @Override
+    public ArrayList<Course> getCourses() {
+        return getCourseArrayList();
+    }
 }

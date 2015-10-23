@@ -2,6 +2,8 @@ package com.tak3r07.CourseStatistics;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -26,6 +28,9 @@ public abstract class Course implements Serializable {
     //Item-Index in course-list
     private int index;
 
+    //Date of creation
+    private long date;
+
 
 
     //Neccessary points to pass the course
@@ -39,8 +44,11 @@ public abstract class Course implements Serializable {
         //usually 13 assignments in one semester
         numberOfAssignments = 13;
 
-        //Usually 50% neccessary to pass the course
+        //Usually 50% necessary to pass the course
         necPercentToPass = 0.5d;
+
+        //Set date default to 0 and only set to Calendar.getInstance().getTimeInMillis(); when created /updated
+        date = 0;
 
         //Set random id
         Random rand = new Random();
@@ -57,7 +65,7 @@ public abstract class Course implements Serializable {
         }
     }
 
-    //Add new Course
+    //Add new Assignment
     public void addAssignment(Assignment assignment) {
         mAssignmentArrayList.add(assignment);
     }
@@ -163,5 +171,26 @@ public abstract class Course implements Serializable {
      */
     public int numberAssignmentsLeft(){
         return numberOfAssignments - (mAssignmentArrayList.size() - countExtraAssignments());
+    }
+
+    public void setDate(long date){
+        this.date = date;
+    }
+
+    public long getDate(){
+        return this.date;
+    }
+
+    /**
+     * This tells wether "this" was created before or after "otherCourse" chronologically
+     * @param otherCourse
+     * @return
+     */
+    public boolean isOutdated(Course otherCourse){
+        return this.getDate() < otherCourse.getDate();
+    }
+
+    public void updateDate(){
+        setDate(Calendar.getInstance().getTimeInMillis());
     }
 }

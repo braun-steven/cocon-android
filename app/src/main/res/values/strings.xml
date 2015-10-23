@@ -60,5 +60,8 @@
     <string name="checkbox_text_hasfixedpoints">This course always has the same number of max. points for each assignment</string>
     <string name="undo">Undo</string>
     <string name="do_you_want_restore">Choose a backup</string>
+    <string name="nec_percent_to_pass">Necessary percent to pass</string>
+    <string name="course_has_max_number_of_assignments">Your course already has reached the max. number of assignments</string>
+    <string name="no_assignments_added_yet_chart">No assignments added yet</string>
 
 </resources>

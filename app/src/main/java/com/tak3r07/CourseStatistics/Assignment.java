@@ -1,6 +1,7 @@
 package com.tak3r07.CourseStatistics;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Random;
 
 /**
@@ -24,6 +25,9 @@ public class Assignment implements Serializable {
 
     private int id;
 
+    //Date of creation
+    private long date;
+
     private int course_id;
 
     /**
@@ -41,13 +45,16 @@ public class Assignment implements Serializable {
         setAchievedPoints(achievedPoints);
         setCourse_id(course_id);
 
+
         //Check if assignment comes from database or should be created as "new assignment"
         if (id == -1) {
             //Set random id
             Random rand = new Random();
             this.id = rand.nextInt(10000000);
+            setDate(Calendar.getInstance().getTimeInMillis());
         } else {
             setId(id);
+            setDate(0);
         }
 
 
@@ -120,5 +127,12 @@ public class Assignment implements Serializable {
 
     public double getMaxPoints() {
         return this.maxPoints;
+    }
+    public void setDate(long date){
+        this.date = date;
+    }
+
+    public long getDate(){
+        return this.date;
     }
 }

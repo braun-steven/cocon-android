@@ -59,4 +59,5 @@
     <string name="checkbox_text_hasfixedpoints">Dieser Kurs hat auf jedem Übungsblatt die selbe Anzahl an max. erreichbaren Punkten</string>
     <string name="undo">Undo</string>
     <string name="yes">Ja</string>
+    <string name="nec_percent_to_pass">Benötigte Punkte zum Bestehen</string>
 </resources>

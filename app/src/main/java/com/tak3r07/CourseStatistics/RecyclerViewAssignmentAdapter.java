@@ -15,22 +15,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
 import com.tak3r07.unihelper.R;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -45,6 +38,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
     private final AssignmentsActivity assignmentsActivity;
 
     private static Course currentCourse;
+    private static DataHelper<AssignmentsActivity> dataHelper;
 
 
     private ArrayList<Assignment> mAssignments;
@@ -65,6 +59,8 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         }
 
         hasFixedPoints = (currentCourse instanceof FixedPointsCourse);
+
+        dataHelper = new DataHelper<AssignmentsActivity>(assignmentsActivity);
     }
 
     public static class VHHeader extends RecyclerView.ViewHolder {
@@ -154,8 +150,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                     Toast.makeText(context, mTextViewTitle.getText().toString() + context.getString(R.string.deleted), Toast.LENGTH_LONG).show();
 
                     //Save changes in Database
-                    DatabaseHelper dbHelper = new DatabaseHelper(context);
-                    boolean result = dbHelper.deleteAssignment(currentAssignment);
+                    boolean result = dataHelper.deleteAssignment(currentAssignment);
 
                     //Remove Assignment
                     mAssignmentsAdapter.removeAssignment(getItemPosition(getPosition()));
@@ -273,8 +268,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
                                 }
 
-                                DatabaseHelper dbHelper = new DatabaseHelper(context);
-                                dbHelper.updateAssignment(currentAssignment);
+                                dataHelper.updateAssignment(currentAssignment);
                                 Log.d("DATABASE", "Assignment " + currentAssignment.getIndex() + " updated");
 
 
@@ -490,9 +484,8 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         //Set background color Transparent
         chart.setGridBackgroundColor(Color.TRANSPARENT);
 
-        //TODO: Translate + extract to string resources
         //Set no chart data message
-        chart.setNoDataText("No assignments added yet");
+        chart.setNoDataText(context.getString(R.string.no_assignments_added_yet_chart));
 
         //Create entry and Label arraylist
         ArrayList<BarEntry> entries = new ArrayList<>();

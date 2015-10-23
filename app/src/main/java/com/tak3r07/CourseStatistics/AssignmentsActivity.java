@@ -28,7 +28,7 @@ import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 import java.util.ArrayList;
 
 
-public class AssignmentsActivity extends AppCompatActivity {
+public class AssignmentsActivity extends AppCompatActivity implements CourseNotifiable{
 
 
     private final String COURSE_TAG_ID = "COURSE_TAG_ID";
@@ -37,6 +37,7 @@ public class AssignmentsActivity extends AppCompatActivity {
     private ArrayList<Assignment> mAssignments;
     private int courseId;
     private FloatingActionButton mFab;
+    private DataHelper<AssignmentsActivity> dataHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +80,13 @@ public class AssignmentsActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
 
         //Setup FAB
-        //TODO: Extract into method
+        setupFAB();
+
+        //Get datahelper instance
+        dataHelper = new DataHelper<>(this);
+    }
+
+    private void setupFAB() {
         mFab = (FloatingActionButton) findViewById(R.id.fab_add_assignment);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -239,13 +246,14 @@ public class AssignmentsActivity extends AppCompatActivity {
 
     //Add assignment to adapter (Eventually add to course necessary?)
     public void addAssignment(Assignment assignment) {
+        //TODO: Check if "double" adding is necessary?
         mAssignmentAdapter.addAssignment(assignment);
         mCurrentCourse.addAssignment(assignment);
+        mCurrentCourse.updateDate();
 
 
-        //Store assignment in database
-        DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-        dbHelper.addAssignment(assignment);
+        //Store assignment
+        dataHelper.addAssignment(assignment);
 
         //Update list
         mAssignmentAdapter.notifyDataSetChanged();
@@ -301,8 +309,7 @@ public class AssignmentsActivity extends AppCompatActivity {
 
 
             // Restore from storage
-            DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-            mCurrentCourse = dbHelper.getCourse(courseId);
+            mCurrentCourse = dataHelper.getCourse(courseId);
 
             mAssignmentAdapter.setCurrentCourse(mCurrentCourse);
             mAssignments = mCurrentCourse.getAssignments();
@@ -319,9 +326,18 @@ public class AssignmentsActivity extends AppCompatActivity {
     //Restore data if resumed
     @Override
     protected void onResume() {
-        // Restore from storage
-        DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-        mCurrentCourse = dbHelper.getCourse(courseId);
+        // Restore
+        mCurrentCourse = dataHelper.getCourse(courseId);
         super.onResume();
     }
+
+    @Override
+    public void notifyDataChanged() {
+        mAssignmentAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public ArrayList<Course> getCourses() {
+
+        return dataHelper.getAllCourses();}
 }

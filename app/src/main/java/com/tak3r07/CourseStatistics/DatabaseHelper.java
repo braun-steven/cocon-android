@@ -18,7 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LOG = "DatabaseHelper";
 
     //Database version
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
 
     //Database name
     private static final String DATABASE_NAME = "courses";
@@ -28,22 +28,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_ASSIGNMENTS = "assignments";
 
     //Column names: common
-    private static final String KEY_ID = "id";
+    public static final String KEY_ID = "id";
+    public static final String KEY_DATE = "date";
+    public static final String KEY_ASSIGNMENTS = "assignments";
 
     //Column names: courses
-    private static final String KEY_COURSENAME = "course_name";
-    private static final String KEY_NUMBER_OF_ASSIGNMENTS = "number_of_assignments";
-    private static final String KEY_MAX_POINTS_COURSE = "reachable_points_per_assignment";
-    private static final String KEY_COURSE_INDEX = "course_index";
-    private static final String KEY_HAS_FIXED_POINTS = "has_fixed_points";
-    private static final String KEY_NEC_PERCENT_TO_PASS = "nec_percent_to_pass";
+    public static final String KEY_COURSENAME = "course_name";
+    public static final String KEY_NUMBER_OF_ASSIGNMENTS = "number_of_assignments";
+    public static final String KEY_REACHABLE_POINTS_PER_ASSIGNMENT = "reachable_points_per_assignment";
+    public static final String KEY_COURSE_INDEX = "course_index";
+    public static final String KEY_HAS_FIXED_POINTS = "has_fixed_points";
+    public static final String KEY_NEC_PERCENT_TO_PASS = "nec_percent_to_pass";
 
     //Column names: assignments
-    private static final String KEY_INDEX = "assignment_index";
-    private static final String KEY_MAX_POINTS = "max_points";
-    private static final String KEY_ACHIEVED_POINTS = "achieved_points";
-    private static final String KEY_IS_EXTRA_ASSIGNMENT = "is_extra_assignment";
-    private static final String KEY_COURSE_ID = "course_id";
+    public static final String KEY_ASSIGNMENT_INDEX = "assignment_index";
+    public static final String KEY_MAX_POINTS = "max_points";
+    public static final String KEY_ACHIEVED_POINTS = "achieved_points";
+    public static final String KEY_IS_EXTRA_ASSIGNMENT = "is_extra_assignment";
+    public static final String KEY_COURSE_ID = "course_id";
 
 
     //Table create statements
@@ -51,19 +53,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_ID + " INTEGER PRIMARY KEY,"
             + KEY_COURSENAME + " TEXT,"
             + KEY_NUMBER_OF_ASSIGNMENTS + " INTEGER,"
-            + KEY_MAX_POINTS_COURSE + " REAL,"
+            + KEY_REACHABLE_POINTS_PER_ASSIGNMENT + " REAL,"
             + KEY_COURSE_INDEX + " INTEGER,"
             + KEY_HAS_FIXED_POINTS + " INTEGER,"
-            + KEY_NEC_PERCENT_TO_PASS + " REAL DEFAULT 0.5)";
+            + KEY_NEC_PERCENT_TO_PASS + " REAL DEFAULT 0.5,"
+            + KEY_DATE + " INTEGER DEFAULT 0)";
 
     private static final String CREATE_ASSIGNMENT_TABLE = "CREATE TABLE " + TABLE_ASSIGNMENTS + "("
             + KEY_ID + " INTEGER PRIMARY KEY,"
-            + KEY_INDEX + " INTEGER,"
+            + KEY_ASSIGNMENT_INDEX + " INTEGER,"
             + KEY_MAX_POINTS + " REAL,"
             + KEY_IS_EXTRA_ASSIGNMENT + " INTEGER,"
             + KEY_COURSE_ID + " INTEGER,"
             + KEY_ACHIEVED_POINTS + " REAL,"
-            + "FOREIGN KEY(" + KEY_COURSE_ID + ") REFERENCES " + TABLE_COURSES +"("+ KEY_COURSE_ID+"))";
+            + KEY_DATE + " INTEGER DEFAULT 0,"
+            + "FOREIGN KEY(" + KEY_COURSE_ID + ") REFERENCES " + TABLE_COURSES + "(" + KEY_COURSE_ID + "))";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -83,6 +87,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Add necessary percent to pass value to course table
         if (oldVersion < 9) {
             db.execSQL(DATABASE_ALTER_COURSE_ADD_NEC_PERCENT_TO_PASS);
+        }
+
+        //Add date to table course and assignment
+        final String DATABASE_ALTER_COURSE_DATE =
+                "ALTER TABLE " + TABLE_COURSES + " ADD COLUMN " +
+                        KEY_DATE + " INTEGER DEFAULT 0;";
+        final String DATABASE_ALTER_ASSIGNMENTS_DATE =
+                "ALTER TABLE " + TABLE_ASSIGNMENTS + " ADD COLUMN " +
+                        KEY_DATE + " INTEGER DEFAULT 0;";
+
+        if (oldVersion < 10) {
+            db.execSQL(DATABASE_ALTER_COURSE_DATE);
+            db.execSQL(DATABASE_ALTER_ASSIGNMENTS_DATE);
         }
     }
 
@@ -127,9 +144,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         KEY_ID,
                         KEY_COURSENAME,
                         KEY_NUMBER_OF_ASSIGNMENTS,
-                        KEY_MAX_POINTS_COURSE,
+                        KEY_REACHABLE_POINTS_PER_ASSIGNMENT,
                         KEY_COURSE_INDEX,
-                        KEY_NEC_PERCENT_TO_PASS
+                        KEY_NEC_PERCENT_TO_PASS,
+                        KEY_DATE,
+                        KEY_HAS_FIXED_POINTS
                 },
                 KEY_ID + "=?",
                 new String[]{String.valueOf(id)},
@@ -150,22 +169,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             maxPoints = Double.parseDouble(maxPointsString);
         }
-
+        //get index
         int index = cursor.getInt(4);
 
+        //get necPercentToPass
         double necPercentToPass = Double.parseDouble(cursor.getString(5));
 
+        //get date
+        long date = cursor.getLong(6);
+
+        //Get has fixed points (1 == true, 0 == false in sqlite)
+        boolean hasFixedPoints = cursor.getInt(7) == 1;
+
         Course course;
-        //If maxPoints was a "Null-value" in the database, create a DynamicPointsCourse
-        if (maxPoints == 0) {
-            course = new DynamicPointsCourse(courseName, index);
-        } else {
+
+        //Create specific course instance depending on "hasFixedPoints"
+        if (hasFixedPoints) {
             course = new FixedPointsCourse(courseName, index, maxPoints);
+        } else {
+            course = new DynamicPointsCourse(courseName, index);
         }
         course.setId(id);
         course.setNumberOfAssignments(numberOfAssignments);
         course.setNecPercentToPass(necPercentToPass);
-
+        course.setDate(date);
         //get assignments
         course.setAssignments(getAssignmentsOfCourse(id));
         db.close();
@@ -183,15 +210,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.query(TABLE_ASSIGNMENTS,
                 new String[]{
                         KEY_ID,
-                        KEY_INDEX,
+                        KEY_ASSIGNMENT_INDEX,
                         KEY_MAX_POINTS,
                         KEY_IS_EXTRA_ASSIGNMENT,
                         KEY_COURSE_ID,
-                        KEY_ACHIEVED_POINTS
+                        KEY_ACHIEVED_POINTS,
+                        KEY_DATE
                 },
                 KEY_COURSE_ID + "=?",
                 new String[]{String.valueOf(course_id)},
-                null, null, KEY_INDEX, null);
+                null, null, KEY_ASSIGNMENT_INDEX, null);
 
         //Use cursor to get all results from query
         if (cursor.moveToFirst()) {
@@ -199,12 +227,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 int id = Integer.parseInt(cursor.getString(0));
                 int index = Integer.parseInt(cursor.getString(1));
                 double maxPoints = Double.parseDouble(cursor.getString(2));
-                boolean isExtraAssignment = cursor.getInt(3)>0;
+                boolean isExtraAssignment = cursor.getInt(3) > 0;
                 double achievedPoints = Double.parseDouble(cursor.getString(5));
+                long date = cursor.getLong(6);
 
 
                 Assignment assignment = new Assignment(id, index, maxPoints, achievedPoints, course_id);
                 assignment.isExtraAssignment(isExtraAssignment);
+                assignment.setDate(date);
                 assignments.add(assignment);
 
             } while (cursor.moveToNext());
@@ -276,11 +306,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Put all members of assignment into contentvalues
         ContentValues values = new ContentValues();
         values.put(KEY_ID, assignment.getId());
-        values.put(KEY_INDEX, assignment.getIndex());
+        values.put(KEY_ASSIGNMENT_INDEX, assignment.getIndex());
         values.put(KEY_MAX_POINTS, assignment.getMaxPoints());
         values.put(KEY_ACHIEVED_POINTS, assignment.getAchievedPoints());
         values.put(KEY_IS_EXTRA_ASSIGNMENT, assignment.isExtraAssignment());
         values.put(KEY_COURSE_ID, assignment.getCourse_id());
+        values.put(KEY_DATE, assignment.getDate());
         return values;
     }
 
@@ -290,7 +321,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = getCourseContentValues(course);
 
         //Update all assignments
-        for(Assignment a : course.getAssignments()){
+        for (Assignment a : course.getAssignments()) {
             updateAssignment(a);
         }
 
@@ -313,7 +344,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_NUMBER_OF_ASSIGNMENTS, course.getNumberOfAssignments());
         values.put(KEY_COURSE_INDEX, course.getIndex());
         values.put(KEY_NEC_PERCENT_TO_PASS, course.getNecPercentToPass());
-
+        values.put(KEY_DATE, course.getDate());
+        values.put(KEY_HAS_FIXED_POINTS, course.hasFixedPoints());
 
         /*
         If course is a "FixedPointsCourse" -> insert course.getMaxPoints
@@ -322,9 +354,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         double maxPoints;
         if (course.hasFixedPoints()) {
             maxPoints = ((FixedPointsCourse) course).getMaxPoints();
-            values.put(KEY_MAX_POINTS_COURSE, maxPoints);
+            values.put(KEY_REACHABLE_POINTS_PER_ASSIGNMENT, maxPoints);
         } else {
-            values.putNull(KEY_MAX_POINTS_COURSE);
+            values.putNull(KEY_REACHABLE_POINTS_PER_ASSIGNMENT);
         }
 
         return values;

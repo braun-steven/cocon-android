@@ -13,14 +13,16 @@ import android.widget.Toast;
 
 import com.tak3r07.unihelper.R;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Calendar;
 
-public class EditCourseActivity extends AppCompatActivity {
+public class EditCourseActivity extends AppCompatActivity implements CourseNotifiable{
 
     private final String COURSE_TAG = "COURSE_TAG";
     private final String COURSE_TAG_ID = "COURSE_TAG_ID";
 
     private Course course;
+    private DataHelper<EditCourseActivity> dataHelper;
     private EditText mNameEditText;
     private EditText mNumberEditText;
     private EditText mMaxPointsEditText;
@@ -39,9 +41,11 @@ public class EditCourseActivity extends AppCompatActivity {
         Intent intent = getIntent();
         int courseId = intent.getExtras().getInt(COURSE_TAG_ID);
 
+        //Get datahelper instance
+        dataHelper = new DataHelper<>(this);
+
         // Restore from storage
-        DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-        course = dbHelper.getCourse(courseId);
+        course = dataHelper.getCourse(courseId);
 
         //Get View-References
         mNameEditText = (EditText) findViewById(R.id.course_editname_edittext);
@@ -125,9 +129,12 @@ public class EditCourseActivity extends AppCompatActivity {
             //Create empty intent
             Intent data = new Intent();
 
+            //Set new date for update
+            long date = Calendar.getInstance().getTimeInMillis();
+            course.setDate(date);
+
             //Update course
-            DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-            dbHelper.updateCourse(course);
+            dataHelper.updateCourse(course);
 
             setResult(RESULT_OK, data);
             finish();
@@ -143,4 +150,13 @@ public class EditCourseActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void notifyDataChanged() {
+        //Do nothing since this activity does not provide a view
+    }
+
+    @Override
+    public ArrayList<Course> getCourses() {
+        return dataHelper.getAllCourses();
+    }
 }

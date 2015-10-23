@@ -27,10 +27,12 @@ public class RecyclerViewCourseAdapter
 
     private ArrayList<Course> mCourseArrayList;
     private Context context;
+    private DataHelper<MainActivity> dataHelper;
 
-    RecyclerViewCourseAdapter(Context context, ArrayList<Course> mCourseArrayList) {
+    RecyclerViewCourseAdapter(MainActivity activity, Context context, ArrayList<Course> mCourseArrayList) {
         this.context = context;
         this.mCourseArrayList = mCourseArrayList;
+        dataHelper = new DataHelper<>(activity);
         if (mCourseArrayList == null) {
             throw new IllegalArgumentException("courses ArrayList must not be null");
         }
@@ -70,17 +72,22 @@ public class RecyclerViewCourseAdapter
          */
         @Override
         public void onClick(View v) {
+
+            Course course = mCourseAdapter.getmCourseArrayList().get(getLayoutPosition());
+            //Log course
+            MyLogger.logCourse(course);
             //Setup new Intent
             Intent intent = new Intent();
             intent.setClass(context, AssignmentsActivity.class);
 
             //add course position to update assignments when result comes back
             intent.putExtra("COURSE_TAG_ID",
-                    mCourseAdapter.getmCourseArrayList().get(getLayoutPosition()).getId());
+                    course.getId()
+                    );
+
             //Start activity
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-
         }
 
         @Override
@@ -185,8 +192,8 @@ public class RecyclerViewCourseAdapter
             notifyItemInserted(mCourseArrayList.size());
 
             //save in data
-            DatabaseHelper dbHelper = new DatabaseHelper(context);
-            dbHelper.addCourse(course);
+
+            dataHelper.addCourse(course);
 
         }
     }
@@ -202,8 +209,7 @@ public class RecyclerViewCourseAdapter
         Log.d("Tak3r07", "Removing at pos: " + position + ", size: " + mCourseArrayList.size());
         if (position >= 0) {
             //Delete from database
-            DatabaseHelper dbHelper = new DatabaseHelper(context);
-            dbHelper.deleteCourse(mCourseArrayList.get(position));
+            dataHelper.deleteCourse(mCourseArrayList.get(position));
 
             //Delete from internal arraylist
             mCourseArrayList.remove(position);
