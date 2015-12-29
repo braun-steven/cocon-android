@@ -7,7 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewManager;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -16,7 +16,7 @@ import com.tak3r07.unihelper.R;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class EditCourseActivity extends AppCompatActivity implements CourseNotifiable{
+public class EditCourseActivity extends AppCompatActivity implements CourseNotifiable {
 
     private final String COURSE_TAG = "COURSE_TAG";
     private final String COURSE_TAG_ID = "COURSE_TAG_ID";
@@ -27,6 +27,9 @@ public class EditCourseActivity extends AppCompatActivity implements CourseNotif
     private EditText mNumberEditText;
     private EditText mMaxPointsEditText;
     private EditText mNecPercentToPassEditText;
+    private CheckBox mFixedPointsChechbox;
+    private View mTextViewMaxPoints;
+    private boolean hasFixedPoints;
 
 
     @Override
@@ -46,32 +49,59 @@ public class EditCourseActivity extends AppCompatActivity implements CourseNotif
 
         // Restore from storage
         course = dataHelper.getCourse(courseId);
+        hasFixedPoints = course.hasFixedPoints();
 
         //Get View-References
         mNameEditText = (EditText) findViewById(R.id.course_editname_edittext);
         mNumberEditText = (EditText) findViewById(R.id.edit_text_numberofassignments);
         mMaxPointsEditText = (EditText) findViewById(R.id.edit_text_maxpointsperassignment);
         mNecPercentToPassEditText = (EditText) findViewById(R.id.edit_text_nec_percent_to_pass);
+        mFixedPointsChechbox = (CheckBox) findViewById(R.id.checkBox);
+        mTextViewMaxPoints = findViewById(R.id.textView3);
 
 
         //Setup Text
         mNameEditText.setText(course.getCourseName());
         mNumberEditText.setText(String.valueOf(course.getNumberOfAssignments()));
         mNecPercentToPassEditText.setText(String.valueOf(course.getNecPercentToPass()));
+        mFixedPointsChechbox.setChecked(hasFixedPoints);
+
+        //Add onclick listener for checkbox
+        mFixedPointsChechbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toggle
+                toggleDynamicView();
+
+                hasFixedPoints = !hasFixedPoints;
+            }
+        });
 
         //FPC: Set maxPoints
         //DPC: Remove edittext + description
         if (course.hasFixedPoints()) {
             mMaxPointsEditText.setText(course.toFPC().getMaxPoints().toString());
         } else {
+            hideMaxPointsEdit();
 
-            ViewManager viewManager = (ViewManager) mMaxPointsEditText.getParent();
+        }
 
-            //remove edittext
-            viewManager.removeView(mMaxPointsEditText);
-            //remove description
-            viewManager.removeView(findViewById(R.id.textView3));
+    }
+    private void hideMaxPointsEdit(){
+        mTextViewMaxPoints.setVisibility(View.GONE);
+        mMaxPointsEditText.setVisibility(View.GONE);
+    }
 
+    private void showMaxPointsEdit(){
+        mMaxPointsEditText.setVisibility(View.VISIBLE);
+        mTextViewMaxPoints.setVisibility(View.VISIBLE);
+
+    }
+    private void toggleDynamicView() {
+        if (hasFixedPoints) {
+            hideMaxPointsEdit();
+        } else {
+            showMaxPointsEdit();
         }
 
     }
@@ -121,11 +151,7 @@ public class EditCourseActivity extends AppCompatActivity implements CourseNotif
             course.setNumberOfAssignments(numberOfAssignments);
             course.setNecPercentToPass(necPercentToPass);
 
-            //FPC: Add maxpoints
-            if (course.hasFixedPoints()) {
-                double maxPoints = Double.parseDouble(mMaxPointsEditText.getText().toString());
-                course.toFPC().setMaxPoints(maxPoints);
-            }
+
             //Create empty intent
             Intent data = new Intent();
 
@@ -133,8 +159,15 @@ public class EditCourseActivity extends AppCompatActivity implements CourseNotif
             long date = Calendar.getInstance().getTimeInMillis();
             course.setDate(date);
 
-            //Update course
-            dataHelper.updateCourse(course);
+
+            //FPC: Add maxpoints
+            if (hasFixedPoints) {
+                double maxPoints = Double.parseDouble(mMaxPointsEditText.getText().toString());
+                course.toFPC().setMaxPoints(maxPoints);
+                dataHelper.updateCourse(course.toFPC());
+            }else {
+                dataHelper.updateCourse(course.toDPC());
+            }
 
             setResult(RESULT_OK, data);
             finish();

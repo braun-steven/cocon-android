@@ -21,6 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="16dp"
+        android:id="@+id/relative_layout"
         tools:context="com.tak3r07.CourseStatistics.EditCourseActivity">
 
         <LinearLayout
@@ -55,19 +56,21 @@
             android:layout_below="@+id/linearLayout2">
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/textView5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/points_per_assignment"
+                android:text="@string/nec_percent_to_pass"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <EditText
-                android:id="@+id/edit_text_maxpointsperassignment"
-                android:layout_width="match_parent"
+                android:id="@+id/edit_text_nec_percent_to_pass"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="numberDecimal"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:layout_weight="1" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -103,19 +106,21 @@
             android:layout_below="@+id/linearLayout3">
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/nec_percent_to_pass"
+                android:text="@string/points_per_assignment"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <EditText
-                android:id="@+id/edit_text_nec_percent_to_pass"
+                android:id="@+id/edit_text_maxpointsperassignment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="numberDecimal"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:layout_weight="1" />
+
         </LinearLayout>
 
         <Button
@@ -137,5 +142,17 @@
             android:layout_alignParentStart="true"
             android:onClick="onClickCancel"
             android:text="@string/cancel" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/checkbox_text_hasfixedpoints"
+            android:id="@+id/checkBox"
+            android:layout_below="@+id/linearLayout4"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/grey_700"/>
+
     </RelativeLayout>
 </LinearLayout>

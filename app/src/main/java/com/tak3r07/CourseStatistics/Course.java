@@ -133,12 +133,33 @@ public abstract class Course implements Serializable {
         return this.id;
     }
 
+    /**
+     * Creates a FixedPointsCourse of this course
+     * @return new FixedPointsCourse
+     */
     public FixedPointsCourse toFPC() {
-        return (FixedPointsCourse) this;
+        final int maxPoints = 100;
+        FixedPointsCourse fpc = new FixedPointsCourse(courseName, index, maxPoints);
+        fpc.setId(this.id);
+        fpc.setAssignments(this.mAssignmentArrayList);
+        fpc.setDate(this.date);
+        fpc.setNecPercentToPass(this.necPercentToPass);
+        fpc.setNumberOfAssignments(this.numberOfAssignments);
+        return fpc;
     }
 
+    /**
+     * Creates a DynamicPointsCourse of this course
+     * @return new DynamicPointsCourse
+     */
     public DynamicPointsCourse toDPC() {
-        return (DynamicPointsCourse) this;
+        DynamicPointsCourse dpc = new DynamicPointsCourse(courseName, index);
+        dpc.setId(this.id);
+        dpc.setAssignments(this.mAssignmentArrayList);
+        dpc.setNumberOfAssignments(this.numberOfAssignments);
+        dpc.setNecPercentToPass(this.necPercentToPass);
+        dpc.setDate(this.date);
+        return dpc;
     }
 
     public abstract Double getProgress();
