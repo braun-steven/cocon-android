@@ -3,7 +3,6 @@ package com.tak3r07.CourseStatistics;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Random;
 
 /**
@@ -125,12 +124,12 @@ public abstract class Course implements Serializable {
         this.numberOfAssignments = numberOfAssignments;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public int getId() {
         return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     /**
@@ -138,6 +137,7 @@ public abstract class Course implements Serializable {
      * @return new FixedPointsCourse
      */
     public FixedPointsCourse toFPC() {
+        /*
         final int maxPoints = 100;
         FixedPointsCourse fpc = new FixedPointsCourse(courseName, index, maxPoints);
         fpc.setId(this.id);
@@ -145,7 +145,8 @@ public abstract class Course implements Serializable {
         fpc.setDate(this.date);
         fpc.setNecPercentToPass(this.necPercentToPass);
         fpc.setNumberOfAssignments(this.numberOfAssignments);
-        return fpc;
+        */
+        return (FixedPointsCourse) this;
     }
 
     /**
@@ -194,12 +195,12 @@ public abstract class Course implements Serializable {
         return numberOfAssignments - (mAssignmentArrayList.size() - countExtraAssignments());
     }
 
-    public void setDate(long date){
-        this.date = date;
+    public long getDate() {
+        return this.date;
     }
 
-    public long getDate(){
-        return this.date;
+    public void setDate(long date){
+        this.date = date;
     }
 
     /**

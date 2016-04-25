@@ -38,100 +38,14 @@ public class RecyclerViewCourseAdapter
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener, View.OnLongClickListener {
-
-        //Initialize views in Viewholder
-        TextView mTextViewName;
-        TextView mTextViewProgress;
-        //ImageView mImageView;
-        TextView mTextViewAverage;
-        //Context to refer to app context (for intent, dialog etc)
-        Context context;
-        //Adapter to notifiy data set changed
-        RecyclerViewCourseAdapter mCourseAdapter;
-
-        //Holds views
-        public ViewHolder(View itemView,
-                          Context context,
-                          RecyclerViewCourseAdapter mCourseAdapter) {
-
-            super(itemView);
-            this.context = context;
-            this.mCourseAdapter = mCourseAdapter;
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
-            mTextViewName = (TextView) itemView.findViewById(R.id.course_textview_name);
-            mTextViewProgress = (TextView) itemView.findViewById(R.id.course_letter);
-            mTextViewAverage = (TextView) itemView.findViewById(R.id.end_percentage_textview);
-        }
-
-
-        /*
-        OnClick: Course at the specific position shall be opened
-         */
-        @Override
-        public void onClick(View v) {
-
-            Course course = mCourseAdapter.getmCourseArrayList().get(getLayoutPosition());
-            //Log course
-            MyLogger.logCourse(course);
-            //Setup new Intent
-            Intent intent = new Intent();
-            intent.setClass(context, AssignmentsActivity.class);
-
-            //add course position to update assignments when result comes back
-            intent.putExtra("COURSE_TAG_ID",
-                    course.getId()
-                    );
-
-            //Start activity
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            //Open Alert dialog to delete item
-
-            AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
-
-            //Set title and message
-            alert.setTitle(context.getString(R.string.delete));
-            alert.setMessage(context.getString(R.string.do_you_want_to_delete) + mTextViewName.getText().toString() + "?");
-
-            //Set positive button behaviour
-            alert.setPositiveButton(context.getString(R.string.delete), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                    //Delete course and notify
-                    Toast.makeText(
-                            context,
-                            mTextViewName.getText().toString() + context.getString(R.string.deleted),
-                            Toast.LENGTH_LONG).show();
-
-
-                    //Remove Course
-                    mCourseAdapter.removeCourse(getPosition());
-
-                }
-            });
-
-            alert.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // Canceled.
-                }
-            });
-
-            alert.show();
-
-
-            return true;
-        }
-
-
+    /**
+     * Returns correct item position since first item is header
+     *
+     * @return item positon
+     */
+    public static int getItemPosition(int position) {
+        return position - 1;
     }
-
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -189,12 +103,13 @@ public class RecyclerViewCourseAdapter
     public void addCourse(Course course) {
         if (course != null) {
             mCourseArrayList.add(course);
-            notifyItemInserted(mCourseArrayList.size());
+            //Doesnt work atm
+            //notifyItemInserted(mCourseArrayList.size());
+            notifyDataSetChanged();
 
             //save in data
 
             dataHelper.addCourse(course);
-
         }
     }
 
@@ -231,12 +146,97 @@ public class RecyclerViewCourseAdapter
         this.mCourseArrayList = mCourseArrayList;
     }
 
-    /**
-     * Returns correct item position since first item is header
-     *
-     * @return item positon
-     */
-    public static int getItemPosition(int position) {
-        return position - 1;
+    public static class ViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener, View.OnLongClickListener {
+
+        //Initialize views in Viewholder
+        TextView mTextViewName;
+        TextView mTextViewProgress;
+        //ImageView mImageView;
+        TextView mTextViewAverage;
+        //Context to refer to app context (for intent, dialog etc)
+        Context context;
+        //Adapter to notifiy data set changed
+        RecyclerViewCourseAdapter mCourseAdapter;
+
+        //Holds views
+        public ViewHolder(View itemView,
+                          Context context,
+                          RecyclerViewCourseAdapter mCourseAdapter) {
+
+            super(itemView);
+            this.context = context;
+            this.mCourseAdapter = mCourseAdapter;
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+            mTextViewName = (TextView) itemView.findViewById(R.id.course_textview_name);
+            mTextViewProgress = (TextView) itemView.findViewById(R.id.course_letter);
+            mTextViewAverage = (TextView) itemView.findViewById(R.id.end_percentage_textview);
+        }
+
+
+        /*
+        OnClick: Course at the specific position shall be opened
+         */
+        @Override
+        public void onClick(View v) {
+
+            Course course = mCourseAdapter.getmCourseArrayList().get(getLayoutPosition());
+            //Log course
+            MyLogger.logCourse(course);
+            //Setup new Intent
+            Intent intent = new Intent();
+            intent.setClass(context, AssignmentsActivity.class);
+
+            //add course position to update assignments when result comes back
+            intent.putExtra("COURSE_TAG_ID",
+                    course.getId()
+            );
+
+            //Start activity
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            //Open Alert dialog to delete item
+
+            AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+
+            //Set title and message
+            alert.setTitle(context.getString(R.string.delete));
+            alert.setMessage(context.getString(R.string.do_you_want_to_delete) + mTextViewName.getText().toString() + "?");
+
+            //Set positive button behaviour
+            alert.setPositiveButton(context.getString(R.string.delete), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    //Delete course and notify
+                    Toast.makeText(
+                            context,
+                            mTextViewName.getText().toString() + context.getString(R.string.deleted),
+                            Toast.LENGTH_LONG).show();
+
+
+                    //Remove Course
+                    mCourseAdapter.removeCourse(getPosition());
+
+                }
+            });
+
+            alert.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // Canceled.
+                }
+            });
+
+            alert.show();
+
+
+            return true;
+        }
+
+
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Course Statistics</string>
+    <string name="app_name">Cocon</string>
     <string name="a_course_same_name">Ein Kurs mit dem gleichen Namen existiert bereits</string>
     <string name="abort_no_title">Abbruch: Titel fehlt</string>
     <string name="achieved_points_text">Erreichte Punktzahl:</string>
@@ -60,4 +60,6 @@
     <string name="undo">Undo</string>
     <string name="yes">Ja</string>
     <string name="nec_percent_to_pass">Benötigte Punkte zum Bestehen</string>
+    <string name="no_assignments_added_yet_chart">Keine Übungsblätter bisher hinzugefügt</string>
+    <string name="course_has_max_number_of_assignments">Dieser Kurs hat bereits die maximale Anzahl an Übungsblätter erreicht</string>
 </resources>

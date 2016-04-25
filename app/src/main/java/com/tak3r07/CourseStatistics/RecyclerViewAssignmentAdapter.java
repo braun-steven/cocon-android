@@ -34,25 +34,21 @@ import java.util.ArrayList;
 public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
-    private Context context;
-    private final AssignmentsActivity assignmentsActivity;
-
-    private static Course currentCourse;
-    private static DataHelper<AssignmentsActivity> dataHelper;
-
-
-    private ArrayList<Assignment> mAssignments;
-    private static boolean hasFixedPoints;
-
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
+    private static DataHelper<AssignmentsActivity> dataHelper;
+    private static boolean hasFixedPoints;
+    private final AssignmentsActivity assignmentsActivity;
+    private Context context;
+    private Course currentCourse;
+    private ArrayList<Assignment> mAssignments;
 
     RecyclerViewAssignmentAdapter(Context context,
                                   Course currentCourse,
                                   AssignmentsActivity assignmentsActivity) {
         this.context = context;
         this.assignmentsActivity = assignmentsActivity;
-        RecyclerViewAssignmentAdapter.currentCourse = currentCourse;
+        this.currentCourse = currentCourse;
         this.mAssignments = currentCourse.getAssignments();
         if (mAssignments == null) {
             throw new IllegalArgumentException("assignments ArrayList must not be null");
@@ -63,242 +59,14 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         dataHelper = new DataHelper<AssignmentsActivity>(assignmentsActivity);
     }
 
-    public static class VHHeader extends RecyclerView.ViewHolder {
-
-        //Refer to TextView objects
-        TextView mTextViewAverage;
-        TextView mTextViewNecPoiPerAss;
-        TextView mTextViewAssUntilFin;
-        TextView mTextViewOverall;
-        TextView mTextViewProgress;
-        BarChart graph;
-
-        public VHHeader(View view) {
-            super(view);
-
-            //Refer to TextView objects
-            mTextViewAverage = (TextView) view.findViewById(R.id.course_overview_average);
-            mTextViewNecPoiPerAss = (TextView) view.findViewById(R.id.course_overview_nec_pointspass);
-            mTextViewAssUntilFin = (TextView) view.findViewById(R.id.course_overview_assignments_until_finished);
-            mTextViewOverall = (TextView) view.findViewById(R.id.course_overview_overall_percentage_text);
-            graph = (BarChart) view.findViewById(R.id.chart);
-            if (!currentCourse.hasFixedPoints()) {
-                mTextViewProgress = (TextView) view.findViewById(R.id.textView_progress);
-            }
-        }
+    /**
+     * Returns correct item position since first item is header
+     *
+     * @return item positon
+     */
+    public static int getItemPosition(int position) {
+        return position - 1;
     }
-
-    public static class VHItem extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-
-        //Initialize views in Viewholder
-        TextView mTextViewTitle;
-        TextView mTextViewPoints;
-        TextView mTextViewPercentage;
-        //Context to refer to app context (for intent, dialog etc)
-        Context context;
-        //Adapter to notifiy data set changed
-        RecyclerViewAssignmentAdapter mAssignmentsAdapter;
-
-        //Activity to notify Overview for data set change
-        AssignmentsActivity assignmentsActivity;
-
-        //Holds views
-        public VHItem(View itemView, Context context, RecyclerViewAssignmentAdapter mAssignmentsAdapter, AssignmentsActivity activity) {
-
-            super(itemView);
-            this.assignmentsActivity = activity;
-            this.context = context;
-            this.mAssignmentsAdapter = mAssignmentsAdapter;
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
-            mTextViewTitle = (TextView) itemView.findViewById(R.id.assignment_title);
-            mTextViewPoints = (TextView) itemView.findViewById(R.id.points_textview);
-            mTextViewPercentage = (TextView) itemView.findViewById(R.id.percentage_textview);
-        }
-
-
-        /*
-        OnClick: Assignment at the specific position shall be opened
-         */
-        @Override
-        public void onClick(View v) {
-            //@TODO: Implement onlcik
-
-        }
-
-
-        @Override
-        public boolean onLongClick(final View v) {
-            //Open Alert dialog to delete item
-
-            final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
-
-            //Set title and message
-            alert.setTitle(context.getString(R.string.delete));
-            alert.setMessage(context.getString(R.string.do_you_want_to_delete) + mTextViewTitle.getText().toString() + "?");
-
-            //Set positive button behaviour
-            alert.setPositiveButton(context.getString(R.string.delete), new DialogInterface.OnClickListener() {
-
-
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                    //Get current assignment
-                    Assignment currentAssignment = mAssignmentsAdapter.getAssignments().get(getItemPosition(getPosition()));
-
-                    //Delete assignment and notify
-                    Toast.makeText(context, mTextViewTitle.getText().toString() + context.getString(R.string.deleted), Toast.LENGTH_LONG).show();
-
-                    //Save changes in Database
-                    boolean result = dataHelper.deleteAssignment(currentAssignment);
-
-                    //Remove Assignment
-                    mAssignmentsAdapter.removeAssignment(getItemPosition(getPosition()));
-                    mAssignmentsAdapter.notifyDataSetChanged();
-                }
-            });
-
-            alert.setNeutralButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // Canceled.
-
-                }
-            });
-
-            alert.setNegativeButton(context.getString(R.string.edit_assignment), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
-
-                    alert.setTitle(context.getString(R.string.dialog_edit_assignment_title));
-                    alert.setMessage(context.getString(R.string.enter_assignment_points));
-
-                    // Set an custom dialog view to get user input
-                    final View view = View.inflate(v.getContext(), R.layout.dialog_add_assignment, null);
-                    alert.setView(view);
-
-                    //Get assignment reference
-                    final Assignment currentAssignment = currentCourse.getAssignment(getItemPosition(getPosition()));
-
-                    final EditText mEditTextMaxPoints = (EditText) view.findViewById(R.id.editText_maxPoints);
-                    final TextView textView = (TextView) view.findViewById(R.id.textView_maxPoints);
-
-                    //If this course has fixed Points, dont show the possibilities of setting maxPoints
-                    if (hasFixedPoints) {
-                        ViewManager viewManager = (ViewManager) mEditTextMaxPoints.getParent();
-                        viewManager.removeView(mEditTextMaxPoints);
-                        viewManager.removeView(textView);
-                    }
-
-                    //Checkbox reference
-                    final CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
-                    mCheckBox.setChecked(currentAssignment.isExtraAssignment());
-
-                    //Get EditText views
-                    final EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
-
-                    //Set hints
-                    mEditTextAchievedPoints.setHint(currentAssignment.getAchievedPoints() + "");
-                    mEditTextMaxPoints.setHint(currentAssignment.getMaxPoints() + "");
-
-
-                    alert.setPositiveButton(context.getString(R.string.dialog_edit_assignment_save), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-
-
-                            //Get data from edittext
-                            String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',', '.');
-                            String maxPointsString = mEditTextMaxPoints.getText().toString().replace(',', '.');
-
-                            //If no new maxPoints is entered: get the old one
-                            if (maxPointsString.isEmpty()) {
-                                maxPointsString = String.valueOf(currentAssignment.getMaxPoints());
-                            }
-                            //If no new achievedPoints is entered: get the old one
-                            if (achievedPointsString.isEmpty()) {
-                                achievedPointsString = String.valueOf(currentAssignment.getAchievedPoints());
-                            }
-
-                            //Check if the entered Values are numeric (doubles)
-                            if (AssignmentsActivity.isNumeric(achievedPointsString) && AssignmentsActivity.isNumeric(maxPointsString)) {
-
-
-                                Double maxPoints;
-                                if (hasFixedPoints) {
-                                    maxPoints = currentCourse.toFPC().getMaxPoints();
-                                } else {
-                                    maxPoints = Double.parseDouble(maxPointsString);
-                                }
-
-                                //Set extra assignment if checked
-                                if (mCheckBox.isChecked()) {
-                                    currentAssignment.isExtraAssignment(true);
-                                } else {
-                                    //Only allow to uncheck if there are enough assignments left
-                                    // (else one could have 3 of 3 assignments and another extra
-                                    // assignment, then uncheck it and he will have 4 out of 3
-                                    // assignments which is not intended
-                                    if (currentCourse.numberAssignmentsLeft() > 0) {
-                                        currentAssignment.isExtraAssignment(false);
-                                        currentAssignment.setMaxPoints(maxPoints);
-                                    } else {
-                                        Toast.makeText(context, R.string.course_has_max_number_of_assignments, Toast.LENGTH_LONG).show();
-                                        return;
-                                    }
-                                }
-
-                                //Set new achieved points value
-                                Double achievedPoints = Double.parseDouble(achievedPointsString);
-                                currentAssignment.setAchievedPoints(achievedPoints);
-
-                                //Update
-                                mAssignmentsAdapter.notifyDataSetChanged();
-
-                                //Update Listitem
-                                //Set text
-                                mTextViewTitle.setText(context.getString(R.string.assignment_number) + currentAssignment.getIndex());
-                                mTextViewPoints.setText(currentAssignment.getAchievedPoints() + " / " + currentAssignment.getMaxPoints());
-
-                                //Test if Assignment is Extraassignment:
-                                if (currentAssignment.isExtraAssignment()) {
-                                    mTextViewPercentage.setText("+");
-                                } else {
-                                    //Else set usual text
-                                    mTextViewPercentage.setText(currentAssignment.getPercentage().toString() + " %");
-
-                                }
-
-                                dataHelper.updateAssignment(currentAssignment);
-                                Log.d("DATABASE", "Assignment " + currentAssignment.getIndex() + " updated");
-
-
-                            } else {
-                                //If data was not numeric
-                                Toast.makeText(context, context.getString(R.string.invalid_values), Toast.LENGTH_LONG).show();
-
-                            }
-                        }
-                    });
-
-                    alert.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            // Canceled.
-                        }
-                    });
-
-                    alert.show();
-                }
-            });
-
-            alert.show();
-
-
-            return true;
-        }
-
-
-    }
-
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -324,16 +92,14 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                         .from(parent.getContext())
                         .inflate(layout, parent, false);
 
-                return new VHHeader(itemView);
+                return new VHHeader(itemView, currentCourse);
 
         }
         throw new RuntimeException(
                 "there is no type that matches the type "
                         + viewType
                         + " + make sure your using types correctly");
-
     }
-
 
     //Sets up the view
     @Override
@@ -398,6 +164,10 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         return mAssignments;
     }
 
+    public void setAssignments(ArrayList<Assignment> assignments) {
+        this.mAssignments = assignments;
+    }
+
     @Override
     public int getItemViewType(int position) {
         if (isPositionHeader(position))
@@ -410,19 +180,9 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         return position == 0;
     }
 
-
-    /**
-     * Returns correct item position since first item is header
-     *
-     * @return item positon
-     */
-    public static int getItemPosition(int position) {
-        return position - 1;
-    }
-
     public void setupFixedPointsHeaderHolder(VHHeader headerHolder) {
 
-        FixedPointsCourse fpc = currentCourse.toFPC();
+        FixedPointsCourse fpc = (FixedPointsCourse) currentCourse;
 
 
         headerHolder.mTextViewOverall.setText(
@@ -453,12 +213,11 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
     }
 
-
     public void setupDynamicPointsHeaderHolder(VHHeader headerHolder) {
         headerHolder.mTextViewAverage.setText(currentCourse.getAverage(true) + " %");
         headerHolder.mTextViewProgress.setText(currentCourse.getProgress() + " %");
 
-        setupBarGraph(headerHolder, currentCourse.toDPC());
+        setupBarGraph(headerHolder, currentCourse);
     }
 
     /**
@@ -541,7 +300,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         boolean forceLabelCount = true;
         lyAxis.setLabelCount(labelsPerYAxis, forceLabelCount);
         if (course.hasFixedPoints()) {
-            lyAxis.setAxisMaxValue(course.toFPC().getMaxPoints().floatValue());
+            lyAxis.setAxisMaxValue(((FixedPointsCourse) course).getMaxPoints().floatValue());
         } else {
             float yAxisMaxValue = 100f;
             lyAxis.setAxisMaxValue(yAxisMaxValue);
@@ -606,7 +365,6 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         return false;
     }
 
-
     public int getCountExtraAssignments() {
         //Count extra-assignments
         int countExtraAssignments = 0;
@@ -616,11 +374,247 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         return countExtraAssignments;
     }
 
-    public static void setCurrentCourse(Course currentCourse) {
-        RecyclerViewAssignmentAdapter.currentCourse = currentCourse;
+    public void setCurrentCourse(Course currentCourse) {
+        this.currentCourse = currentCourse;
     }
 
-    public void setAssignments(ArrayList<Assignment> assignments) {
-        this.mAssignments = assignments;
+    public static class VHHeader extends RecyclerView.ViewHolder {
+
+        //Refer to TextView objects
+        TextView mTextViewAverage;
+        TextView mTextViewNecPoiPerAss;
+        TextView mTextViewAssUntilFin;
+        TextView mTextViewOverall;
+        TextView mTextViewProgress;
+        BarChart graph;
+
+        Course currentCourse;
+
+        public VHHeader(View view, Course course) {
+            super(view);
+
+            this.currentCourse = course;
+            //Refer to TextView objects
+            mTextViewAverage = (TextView) view.findViewById(R.id.course_overview_average);
+            mTextViewNecPoiPerAss = (TextView) view.findViewById(R.id.course_overview_nec_pointspass);
+            mTextViewAssUntilFin = (TextView) view.findViewById(R.id.course_overview_assignments_until_finished);
+            mTextViewOverall = (TextView) view.findViewById(R.id.course_overview_overall_percentage_text);
+            graph = (BarChart) view.findViewById(R.id.chart);
+            if (!this.currentCourse.hasFixedPoints()) {
+                mTextViewProgress = (TextView) view.findViewById(R.id.textView_progress);
+            }
+        }
+    }
+
+    public static class VHItem extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+
+        //Initialize views in Viewholder
+        TextView mTextViewTitle;
+        TextView mTextViewPoints;
+        TextView mTextViewPercentage;
+        //Context to refer to app context (for intent, dialog etc)
+        Context context;
+        //Adapter to notifiy data set changed
+        RecyclerViewAssignmentAdapter mAssignmentsAdapter;
+
+        //Activity to notify Overview for data set change
+        AssignmentsActivity assignmentsActivity;
+
+
+        //Holds views
+        public VHItem(View itemView, Context context, RecyclerViewAssignmentAdapter mAssignmentsAdapter, AssignmentsActivity activity) {
+
+            super(itemView);
+            this.assignmentsActivity = activity;
+            this.context = context;
+            this.mAssignmentsAdapter = mAssignmentsAdapter;
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+            mTextViewTitle = (TextView) itemView.findViewById(R.id.assignment_title);
+            mTextViewPoints = (TextView) itemView.findViewById(R.id.points_textview);
+            mTextViewPercentage = (TextView) itemView.findViewById(R.id.percentage_textview);
+        }
+
+
+        /*
+        OnClick: Assignment at the specific position shall be opened
+         */
+        @Override
+        public void onClick(View v) {
+            //@TODO: Implement onlcik
+
+        }
+
+
+        @Override
+        public boolean onLongClick(final View v) {
+            //Open Alert dialog to delete item
+
+            final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+
+            //Set title and message
+            alert.setTitle(context.getString(R.string.delete));
+            alert.setMessage(context.getString(R.string.do_you_want_to_delete) + mTextViewTitle.getText().toString() + "?");
+
+            //Set positive button behaviour
+            alert.setPositiveButton(context.getString(R.string.delete), new DialogInterface.OnClickListener() {
+
+
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    //Get current assignment
+                    Assignment currentAssignment = mAssignmentsAdapter.getAssignments().get(getItemPosition(getPosition()));
+
+                    //Delete assignment and notify
+                    Toast.makeText(context, mTextViewTitle.getText().toString() + context.getString(R.string.deleted), Toast.LENGTH_LONG).show();
+
+                    //Save changes in Database
+                    boolean result = dataHelper.deleteAssignment(currentAssignment);
+
+                    //Remove Assignment
+                    mAssignmentsAdapter.removeAssignment(getItemPosition(getPosition()));
+                    mAssignmentsAdapter.notifyDataSetChanged();
+                }
+            });
+
+            alert.setNeutralButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // Canceled.
+
+                }
+            });
+
+            alert.setNegativeButton(context.getString(R.string.edit_assignment), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+
+                    alert.setTitle(context.getString(R.string.dialog_edit_assignment_title));
+                    alert.setMessage(context.getString(R.string.enter_assignment_points));
+
+                    // Set an custom dialog view to get user input
+                    final View view = View.inflate(v.getContext(), R.layout.dialog_add_assignment, null);
+                    alert.setView(view);
+
+                    //Get assignment reference
+                    final Assignment currentAssignment = mAssignmentsAdapter.currentCourse.getAssignment(getItemPosition(getPosition()));
+
+                    final EditText mEditTextMaxPoints = (EditText) view.findViewById(R.id.editText_maxPoints);
+                    final TextView textView = (TextView) view.findViewById(R.id.textView_maxPoints);
+
+                    //If this course has fixed Points, dont show the possibilities of setting maxPoints
+                    if (hasFixedPoints) {
+                        ViewManager viewManager = (ViewManager) mEditTextMaxPoints.getParent();
+                        viewManager.removeView(mEditTextMaxPoints);
+                        viewManager.removeView(textView);
+                    }
+
+                    //Checkbox reference
+                    final CheckBox mCheckBox = (CheckBox) view.findViewById(R.id.checkBox_extra_assignment);
+                    mCheckBox.setChecked(currentAssignment.isExtraAssignment());
+
+                    //Get EditText views
+                    final EditText mEditTextAchievedPoints = (EditText) view.findViewById(R.id.editText_achievedPoints);
+
+                    //Set hints
+                    mEditTextAchievedPoints.setHint(currentAssignment.getAchievedPoints() + "");
+                    mEditTextMaxPoints.setHint(currentAssignment.getMaxPoints() + "");
+
+
+                    alert.setPositiveButton(context.getString(R.string.dialog_edit_assignment_save), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+
+
+                            //Get data from edittext
+                            String achievedPointsString = mEditTextAchievedPoints.getText().toString().replace(',', '.');
+                            String maxPointsString = mEditTextMaxPoints.getText().toString().replace(',', '.');
+
+                            //If no new maxPoints is entered: get the old one
+                            if (maxPointsString.isEmpty()) {
+                                maxPointsString = String.valueOf(currentAssignment.getMaxPoints());
+                            }
+                            //If no new achievedPoints is entered: get the old one
+                            if (achievedPointsString.isEmpty()) {
+                                achievedPointsString = String.valueOf(currentAssignment.getAchievedPoints());
+                            }
+
+                            //Check if the entered Values are numeric (doubles)
+                            if (AssignmentsActivity.isNumeric(achievedPointsString) && AssignmentsActivity.isNumeric(maxPointsString)) {
+
+
+                                Double maxPoints;
+                                if (hasFixedPoints) {
+                                    maxPoints = mAssignmentsAdapter.currentCourse.toFPC().getMaxPoints();
+                                } else {
+                                    maxPoints = Double.parseDouble(maxPointsString);
+                                }
+
+                                //Set extra assignment if checked
+                                if (mCheckBox.isChecked()) {
+                                    currentAssignment.isExtraAssignment(true);
+                                } else {
+                                    //Only allow to uncheck if there are enough assignments left
+                                    // (else one could have 3 of 3 assignments and another extra
+                                    // assignment, then uncheck it and he will have 4 out of 3
+                                    // assignments which is not intended
+                                    if (mAssignmentsAdapter.currentCourse.numberAssignmentsLeft() > 0) {
+                                        currentAssignment.isExtraAssignment(false);
+                                        currentAssignment.setMaxPoints(maxPoints);
+                                    } else {
+                                        Toast.makeText(context, R.string.course_has_max_number_of_assignments, Toast.LENGTH_LONG).show();
+                                        return;
+                                    }
+                                }
+
+                                //Set new achieved points value
+                                Double achievedPoints = Double.parseDouble(achievedPointsString);
+                                currentAssignment.setAchievedPoints(achievedPoints);
+
+                                //Update
+                                mAssignmentsAdapter.notifyDataSetChanged();
+
+                                //Update Listitem
+                                //Set text
+                                mTextViewTitle.setText(context.getString(R.string.assignment_number) + currentAssignment.getIndex());
+                                mTextViewPoints.setText(currentAssignment.getAchievedPoints() + " / " + currentAssignment.getMaxPoints());
+
+                                //Test if Assignment is Extraassignment:
+                                if (currentAssignment.isExtraAssignment()) {
+                                    mTextViewPercentage.setText("+");
+                                } else {
+                                    //Else set usual text
+                                    mTextViewPercentage.setText(currentAssignment.getPercentage().toString() + " %");
+
+                                }
+
+                                dataHelper.updateAssignment(currentAssignment);
+                                Log.d("DATABASE", "Assignment " + currentAssignment.getIndex() + " updated");
+
+
+                            } else {
+                                //If data was not numeric
+                                Toast.makeText(context, context.getString(R.string.invalid_values), Toast.LENGTH_LONG).show();
+
+                            }
+                        }
+                    });
+
+                    alert.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            // Canceled.
+                        }
+                    });
+
+                    alert.show();
+                }
+            });
+
+            alert.show();
+
+
+            return true;
+        }
+
+
     }
 }
