@@ -1,5 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.tak3r07.CourseStatistics.EditCourseActivity">
+    tools:context="com.tak3r07.CourseStatistics.activities.EditCourseActivity">
 
 </menu>

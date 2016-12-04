@@ -1,4 +1,4 @@
-package com.tak3r07.CourseStatistics;
+package com.tak3r07.CourseStatistics.adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -13,6 +13,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tak3r07.CourseStatistics.database.DataHelper;
+import com.tak3r07.CourseStatistics.activities.AssignmentsActivity;
+import com.tak3r07.CourseStatistics.activities.MainActivity;
+import com.tak3r07.CourseStatistics.objects.Course;
+import com.tak3r07.CourseStatistics.utils.MyLogger;
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
@@ -29,7 +34,7 @@ public class RecyclerViewCourseAdapter
     private Context context;
     private DataHelper<MainActivity> dataHelper;
 
-    RecyclerViewCourseAdapter(MainActivity activity, Context context, ArrayList<Course> mCourseArrayList) {
+    public RecyclerViewCourseAdapter(MainActivity activity, Context context, ArrayList<Course> mCourseArrayList) {
         this.context = context;
         this.mCourseArrayList = mCourseArrayList;
         dataHelper = new DataHelper<>(activity);

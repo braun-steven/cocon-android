@@ -1,4 +1,4 @@
-package com.tak3r07.CourseStatistics;
+package com.tak3r07.CourseStatistics.sync;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +11,10 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import com.tak3r07.CourseStatistics.objects.Assignment;
+import com.tak3r07.CourseStatistics.objects.Course;
+import com.tak3r07.CourseStatistics.utils.JSONParser;
+import com.tak3r07.CourseStatistics.utils.Vocab;
 
 import org.json.JSONObject;
 

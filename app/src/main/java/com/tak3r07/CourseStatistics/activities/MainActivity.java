@@ -1,4 +1,4 @@
-package com.tak3r07.CourseStatistics;
+package com.tak3r07.CourseStatistics.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -23,6 +23,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.bartoszlipinski.recyclerviewheader.RecyclerViewHeader;
+import com.tak3r07.CourseStatistics.objects.Course;
+import com.tak3r07.CourseStatistics.sync.CourseNotifiable;
+import com.tak3r07.CourseStatistics.database.DataHelper;
+import com.tak3r07.CourseStatistics.objects.DynamicPointsCourse;
+import com.tak3r07.CourseStatistics.objects.FixedPointsCourse;
+import com.tak3r07.CourseStatistics.adapter.PathAdapter;
+import com.tak3r07.CourseStatistics.adapter.RecyclerViewCourseAdapter;
 import com.tak3r07.unihelper.R;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 

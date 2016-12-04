@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="16dp"
-        tools:context="com.tak3r07.CourseStatistics.EditCourseActivity">
+        tools:context="com.tak3r07.CourseStatistics.activities.EditCourseActivity">
 
         <LinearLayout
             android:id="@+id/linearLayout"

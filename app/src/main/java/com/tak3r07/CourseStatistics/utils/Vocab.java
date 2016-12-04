@@ -1,4 +1,4 @@
-package com.tak3r07.CourseStatistics;
+package com.tak3r07.CourseStatistics.utils;
 
 /**
  * Created by tak on 8/27/15.

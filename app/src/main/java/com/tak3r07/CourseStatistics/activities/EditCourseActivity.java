@@ -1,4 +1,4 @@
-package com.tak3r07.CourseStatistics;
+package com.tak3r07.CourseStatistics.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,10 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.tak3r07.CourseStatistics.objects.Assignment;
+import com.tak3r07.CourseStatistics.objects.Course;
+import com.tak3r07.CourseStatistics.sync.CourseNotifiable;
+import com.tak3r07.CourseStatistics.database.DataHelper;
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;

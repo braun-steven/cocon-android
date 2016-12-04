@@ -1,4 +1,4 @@
-package com.tak3r07.CourseStatistics;
+package com.tak3r07.CourseStatistics.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,13 +21,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tak3r07.CourseStatistics.objects.Assignment;
+import com.tak3r07.CourseStatistics.objects.Course;
+import com.tak3r07.CourseStatistics.sync.CourseNotifiable;
+import com.tak3r07.CourseStatistics.database.DataHelper;
+import com.tak3r07.CourseStatistics.database.DatabaseHelper;
+import com.tak3r07.CourseStatistics.adapter.RecyclerViewAssignmentAdapter;
 import com.tak3r07.unihelper.R;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.ArrayList;
 
 
-public class AssignmentsActivity extends AppCompatActivity implements CourseNotifiable{
+public class AssignmentsActivity extends AppCompatActivity implements CourseNotifiable {
 
 
     private final String COURSE_TAG_ID = "COURSE_TAG_ID";

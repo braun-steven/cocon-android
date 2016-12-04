@@ -1,4 +1,4 @@
-package com.tak3r07.CourseStatistics;
+package com.tak3r07.CourseStatistics.objects;
 
 import java.io.Serializable;
 import java.util.Calendar;

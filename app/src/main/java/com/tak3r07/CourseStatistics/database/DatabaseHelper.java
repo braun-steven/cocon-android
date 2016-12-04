@@ -1,10 +1,15 @@
-package com.tak3r07.CourseStatistics;
+package com.tak3r07.CourseStatistics.database;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.tak3r07.CourseStatistics.objects.Assignment;
+import com.tak3r07.CourseStatistics.objects.Course;
+import com.tak3r07.CourseStatistics.objects.DynamicPointsCourse;
+import com.tak3r07.CourseStatistics.objects.FixedPointsCourse;
 
 import java.util.ArrayList;
 import java.util.List;

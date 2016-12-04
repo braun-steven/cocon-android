@@ -1,6 +1,10 @@
-package com.tak3r07.CourseStatistics;
+package com.tak3r07.CourseStatistics.utils;
 
-import android.provider.ContactsContract;
+import com.tak3r07.CourseStatistics.database.DatabaseHelper;
+import com.tak3r07.CourseStatistics.objects.DynamicPointsCourse;
+import com.tak3r07.CourseStatistics.objects.FixedPointsCourse;
+import com.tak3r07.CourseStatistics.objects.Assignment;
+import com.tak3r07.CourseStatistics.objects.Course;
 
 import org.json.JSONArray;
 import org.json.JSONException;

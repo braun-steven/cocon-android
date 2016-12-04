@@ -1,4 +1,4 @@
-package com.tak3r07.CourseStatistics;
+package com.tak3r07.CourseStatistics.adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -22,6 +22,11 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.tak3r07.CourseStatistics.database.DataHelper;
+import com.tak3r07.CourseStatistics.activities.AssignmentsActivity;
+import com.tak3r07.CourseStatistics.objects.Assignment;
+import com.tak3r07.CourseStatistics.objects.Course;
+import com.tak3r07.CourseStatistics.objects.FixedPointsCourse;
 import com.tak3r07.unihelper.R;
 
 import java.text.DecimalFormat;
@@ -43,9 +48,9 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
     private Course currentCourse;
     private ArrayList<Assignment> mAssignments;
 
-    RecyclerViewAssignmentAdapter(Context context,
-                                  Course currentCourse,
-                                  AssignmentsActivity assignmentsActivity) {
+    public RecyclerViewAssignmentAdapter(Context context,
+                                         Course currentCourse,
+                                         AssignmentsActivity assignmentsActivity) {
         this.context = context;
         this.assignmentsActivity = assignmentsActivity;
         this.currentCourse = currentCourse;

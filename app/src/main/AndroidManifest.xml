@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.tak3r07.CourseStatistics.MainActivity"
+            android:name="com.tak3r07.CourseStatistics.activities.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,20 +24,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.tak3r07.CourseStatistics.AssignmentsActivity"
+            android:name="com.tak3r07.CourseStatistics.activities.AssignmentsActivity"
             android:label="@string/title_activity_course"
-            android:parentActivityName="com.tak3r07.CourseStatistics.MainActivity">
+            android:parentActivityName="com.tak3r07.CourseStatistics.activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tak3r07.CourseStatistics.MainActivity" />
+                android:value="com.tak3r07.CourseStatistics.activities.MainActivity" />
         </activity>
         <activity
-            android:name="com.tak3r07.CourseStatistics.EditCourseActivity"
+            android:name="com.tak3r07.CourseStatistics.activities.EditCourseActivity"
             android:label="@string/title_activity_edit_course"
-            android:parentActivityName="com.tak3r07.CourseStatistics.AssignmentsActivity">
+            android:parentActivityName="com.tak3r07.CourseStatistics.activities.AssignmentsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tak3r07.CourseStatistics.AssignmentsActivity" />
+                android:value="com.tak3r07.CourseStatistics.activities.AssignmentsActivity" />
         </activity>
 
 
