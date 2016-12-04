@@ -20,8 +20,8 @@
     <string name="title_activity_edit_course">Edit course</string>
     <string name="text_extra_assignment_checkbox">This is an extra assignment</string>
     <string name="course_overview_overall_textview">Overall</string>
-    <string name="course_overview_necessary_text">Necessary points/assignment</string>
-    <string name="course_overview_assignments_until_finished_textview">No. assignments until 50%</string>
+    <string name="course_overview_necessary_text">Nec. ppa</string>
+    <string name="course_overview_assignments_until_finished_textview">Assignments until 50%</string>
     <string name="course_overview_average_textview">Average</string>
     <string name="assignment_number">"Assignment nr. "</string>
     <string name="new_assignment">New assignment</string>

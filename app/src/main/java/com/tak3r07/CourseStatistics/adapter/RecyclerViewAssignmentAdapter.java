@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.support.annotation.IntegerRes;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,16 +13,21 @@ import android.view.ViewGroup;
 import android.view.ViewManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
 import com.tak3r07.CourseStatistics.database.DataHelper;
 import com.tak3r07.CourseStatistics.activities.AssignmentsActivity;
 import com.tak3r07.CourseStatistics.objects.Assignment;
@@ -31,6 +37,7 @@ import com.tak3r07.unihelper.R;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by tak3r07 on 12/8/14.
@@ -189,7 +196,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
         FixedPointsCourse fpc = (FixedPointsCourse) currentCourse;
 
-
+        /*
         headerHolder.mTextViewOverall.setText(
                 fpc.getProgress().toString()
                         + " % - "
@@ -204,7 +211,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
                         + " % - "
                         + fpc.getAveragePointsPerAssignment(true)
                         + "/" + fpc.getMaxPoints()
-        );
+        );*/
 
         //Nedded Points per assignment until 50% is reached
         headerHolder.mTextViewNecPoiPerAss.setText(fpc.getNecessaryPointsPerAssignmentUntilFin().toString());
@@ -212,10 +219,51 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         //Number of assignments until 50% is reached
         headerHolder.mTextViewAssUntilFin.setText(String.valueOf(fpc.getNumberOfAssUntilFin()));
 
-
+        setupPiChartAverage(headerHolder, fpc);
+        setupPiChartOverall(headerHolder, fpc);
         setupBarGraph(headerHolder, fpc);
 
 
+    }
+
+    private void setupPiChartAverage(VHHeader headerHolder, FixedPointsCourse fpc) {
+        PieChart pc = headerHolder.pieChartAverage;
+
+        List<Entry> entries = new ArrayList<Entry>();
+        double avg = fpc.getAverage(true);
+        entries.add(new Entry((float)avg, 0));
+        entries.add(new Entry(100 - (float)avg, 1));
+        PieDataSet dataset = new PieDataSet(entries, "");
+        List<Integer> colors = new ArrayList<>();
+        colors.add(context.getResources().getColor(R.color.light_green_400));
+        colors.add(context.getResources().getColor(R.color.red_300));
+        dataset.setColors(colors);
+        PieData dataSet = new PieData(new String[]{"",""}, dataset);
+        pc.setDescription("Average");
+        pc.setData(dataSet);
+        pc.invalidate();
+    }
+    private void setupPiChartOverall(VHHeader headerHolder, FixedPointsCourse fpc) {
+        PieChart pc = headerHolder.pieChartOverall;
+
+        List<Entry> entries = new ArrayList<Entry>();
+        double progress = fpc.getProgress();
+        entries.add(new Entry((float)progress, 0));
+        double nec = fpc.getNecPercentToPass() * 100;
+        float missing = (float) (nec - (float) progress);
+        entries.add(new Entry(missing, 1));
+        float optional = (float) (missing > 0? 100 - nec : 100 - progress);
+        entries.add(new Entry(optional, 2));
+        PieDataSet dataset = new PieDataSet(entries, "");
+        List<Integer> colors = new ArrayList<>();
+        colors.add(context.getResources().getColor(R.color.light_green_400));
+        colors.add(context.getResources().getColor(R.color.orange_300));
+        colors.add(context.getResources().getColor(R.color.grey_300));
+        dataset.setColors(colors);
+        PieData dataSet = new PieData(new String[]{"Achieved","Missing","Optional"}, dataset);
+        pc.setDescription("Overall");
+        pc.setData(dataSet);
+        pc.invalidate();
     }
 
     public void setupDynamicPointsHeaderHolder(VHHeader headerHolder) {
@@ -392,6 +440,8 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         TextView mTextViewOverall;
         TextView mTextViewProgress;
         BarChart graph;
+        PieChart pieChartAverage;
+        PieChart pieChartOverall;
 
         Course currentCourse;
 
@@ -400,10 +450,12 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
             this.currentCourse = course;
             //Refer to TextView objects
-            mTextViewAverage = (TextView) view.findViewById(R.id.course_overview_average);
+            //mTextViewAverage = (TextView) view.findViewById(R.id.course_overview_average);
             mTextViewNecPoiPerAss = (TextView) view.findViewById(R.id.course_overview_nec_pointspass);
             mTextViewAssUntilFin = (TextView) view.findViewById(R.id.course_overview_assignments_until_finished);
-            mTextViewOverall = (TextView) view.findViewById(R.id.course_overview_overall_percentage_text);
+            //mTextViewOverall = (TextView) view.findViewById(R.id.course_overview_overall_percentage_text);
+            pieChartAverage = (PieChart) view.findViewById(R.id.chart_pi_average);
+            pieChartOverall = (PieChart) view.findViewById(R.id.chart_pi_overall);
             graph = (BarChart) view.findViewById(R.id.chart);
             if (!this.currentCourse.hasFixedPoints()) {
                 mTextViewProgress = (TextView) view.findViewById(R.id.textView_progress);
