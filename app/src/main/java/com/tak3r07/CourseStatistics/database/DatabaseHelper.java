@@ -14,6 +14,7 @@ import com.tak3r07.CourseStatistics.objects.FixedPointsCourse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import static com.tak3r07.CourseStatistics.database.DatabaseVocab.*;
 
 /**
@@ -29,7 +30,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //Database name
     private static final String DATABASE_NAME = "courses";
-
 
 
     public DatabaseHelper(Context context) {
@@ -108,7 +108,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         KEY_COURSENAME,
                         KEY_NUMBER_OF_ASSIGNMENTS,
                         KEY_REACHABLE_POINTS_PER_ASSIGNMENT,
-                        KEY_COURSE_INDEX,
                         KEY_NEC_PERCENT_TO_PASS,
                         KEY_DATE,
                         KEY_HAS_FIXED_POINTS
@@ -148,9 +147,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //Create specific course instance depending on "hasFixedPoints"
         if (hasFixedPoints) {
-            course = new FixedPointsCourse(courseName, index, maxPoints);
+            course = new FixedPointsCourse(courseName, maxPoints);
         } else {
-            course = new DynamicPointsCourse(courseName, index);
+            course = new DynamicPointsCourse(courseName);
         }
         course.setId(id);
         course.setNumberOfAssignments(numberOfAssignments);
@@ -229,7 +228,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String selectQuery =
                 "SELECT " + KEY_ID
                         + " FROM " + TABLE_COURSES
-                        + " ORDER BY " + KEY_COURSE_INDEX + " ASC";
+                        + " ORDER BY " + KEY_COURSENAME + " ASC";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -305,7 +304,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_ID, course.getId().toString());
         values.put(KEY_COURSENAME, course.getCourseName());
         values.put(KEY_NUMBER_OF_ASSIGNMENTS, course.getNumberOfAssignments());
-        values.put(KEY_COURSE_INDEX, course.getIndex());
         values.put(KEY_NEC_PERCENT_TO_PASS, course.getNecPercentToPass());
         values.put(KEY_DATE, course.getDate());
         values.put(KEY_HAS_FIXED_POINTS, course.hasFixedPoints());

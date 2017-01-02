@@ -257,11 +257,11 @@ public class MainActivity extends AppCompatActivity implements CourseNotifiable 
 
                 Course course;
                 if (hasFixedPoints) {
-                    course = new FixedPointsCourse(title, index, maxPoints);
+                    course = new FixedPointsCourse(title, maxPoints);
                     mCourseAdapter.addCourse(course);
                 } else {
                     //Else create instance of DynamicPointsCourse
-                    course = new DynamicPointsCourse(title, index);
+                    course = new DynamicPointsCourse(title);
                     mCourseAdapter.addCourse(course);
                 }
 

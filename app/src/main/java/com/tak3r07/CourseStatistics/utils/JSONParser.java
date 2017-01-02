@@ -13,6 +13,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.*;
+
 /**
  * Created by tak on 8/26/15.
  * This class parses jsonstrings to courses and assignments
@@ -29,24 +31,21 @@ public class JSONParser {
         try {
             JSONObject jsonCourse = new JSONObject(jsonString);
 
-            UUID id = UUID.fromString(jsonCourse.getString(DatabaseHelper.KEY_ID));
-            String courseName = jsonCourse.getString(DatabaseHelper.KEY_COURSENAME);
-            int numberOfAssignments = jsonCourse.getInt(DatabaseHelper.KEY_NUMBER_OF_ASSIGNMENTS);
+            UUID id = UUID.fromString(jsonCourse.getString(KEY_ID));
+            String courseName = jsonCourse.getString(KEY_COURSENAME);
+            int numberOfAssignments = jsonCourse.getInt(KEY_NUMBER_OF_ASSIGNMENTS);
 
             //Get max points
-            double maxPoints = jsonCourse.getDouble(DatabaseHelper.KEY_REACHABLE_POINTS_PER_ASSIGNMENT);
-
-            //get index
-            int index = jsonCourse.getInt(DatabaseHelper.KEY_COURSE_INDEX);
+            double maxPoints = jsonCourse.getDouble(KEY_REACHABLE_POINTS_PER_ASSIGNMENT);
 
             //get necPercentToPass
-            double necPercentToPass = jsonCourse.getDouble(DatabaseHelper.KEY_NEC_PERCENT_TO_PASS);
+            double necPercentToPass = jsonCourse.getDouble(KEY_NEC_PERCENT_TO_PASS);
 
             //get date
-            long date = jsonCourse.getLong(DatabaseHelper.KEY_DATE);
+            long date = jsonCourse.getLong(KEY_DATE);
 
             //Get has fixed points (1 == true, 0 == false in sqlite)
-            boolean hasFixedPoints = jsonCourse.getBoolean(DatabaseHelper.KEY_HAS_FIXED_POINTS);
+            boolean hasFixedPoints = jsonCourse.getBoolean(KEY_HAS_FIXED_POINTS);
 
             //Get assignments
             String assignmentsJSONArrayString = jsonCourse.getString("assignments");
@@ -57,9 +56,9 @@ public class JSONParser {
 
             //Create specific course instance depending on "hasFixedPoints"
             if (hasFixedPoints) {
-                course = new FixedPointsCourse(courseName, index, maxPoints);
+                course = new FixedPointsCourse(courseName, maxPoints);
             } else {
-                course = new DynamicPointsCourse(courseName, index);
+                course = new DynamicPointsCourse(courseName);
             }
 
             //Set properties
@@ -117,13 +116,13 @@ public class JSONParser {
             JSONObject jsonAssignment = new JSONObject(jsonString);
 
             //Get all properties from the JSONObject
-            UUID id = UUID.fromString(jsonAssignment.getString(DatabaseHelper.KEY_ID));
-            int index = jsonAssignment.getInt(DatabaseHelper.KEY_ASSIGNMENT_INDEX);
-            double maxPoints = jsonAssignment.getDouble(DatabaseHelper.KEY_MAX_POINTS);
-            boolean isExtraAssignment = jsonAssignment.getBoolean(DatabaseHelper.KEY_IS_EXTRA_ASSIGNMENT);
-            double achievedPoints = jsonAssignment.getDouble(DatabaseHelper.KEY_ACHIEVED_POINTS);
-            long date = jsonAssignment.getLong(DatabaseHelper.KEY_DATE);
-            UUID course_id = UUID.fromString(jsonAssignment.getString(DatabaseHelper.KEY_COURSE_ID));
+            UUID id = UUID.fromString(jsonAssignment.getString(KEY_ID));
+            int index = jsonAssignment.getInt(KEY_ASSIGNMENT_INDEX);
+            double maxPoints = jsonAssignment.getDouble(KEY_MAX_POINTS);
+            boolean isExtraAssignment = jsonAssignment.getBoolean(KEY_IS_EXTRA_ASSIGNMENT);
+            double achievedPoints = jsonAssignment.getDouble(KEY_ACHIEVED_POINTS);
+            long date = jsonAssignment.getLong(KEY_DATE);
+            UUID course_id = UUID.fromString(jsonAssignment.getString(KEY_COURSE_ID));
 
             //Create assignment and set properties
             Assignment assignment = new Assignment(id, index, maxPoints, achievedPoints, course_id);
@@ -167,16 +166,15 @@ public class JSONParser {
     public static JSONObject courseToJSON(Course course) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put(DatabaseHelper.KEY_ID, course.getId());
-            jsonObject.put(DatabaseHelper.KEY_COURSENAME, course.getCourseName());
-            jsonObject.put(DatabaseHelper.KEY_NUMBER_OF_ASSIGNMENTS, course.getNumberOfAssignments());
-            jsonObject.put(DatabaseHelper.KEY_REACHABLE_POINTS_PER_ASSIGNMENT, course.hasFixedPoints() ? course.toFPC().getMaxPoints() : 0);
-            jsonObject.put(DatabaseHelper.KEY_COURSE_INDEX, course.getIndex());
-            jsonObject.put(DatabaseHelper.KEY_HAS_FIXED_POINTS, course.hasFixedPoints());
-            jsonObject.put(DatabaseHelper.KEY_NEC_PERCENT_TO_PASS, course.getNecPercentToPass());
-            jsonObject.put(DatabaseHelper.KEY_DATE, course.getDate());
+            jsonObject.put(KEY_ID, course.getId());
+            jsonObject.put(KEY_COURSENAME, course.getCourseName());
+            jsonObject.put(KEY_NUMBER_OF_ASSIGNMENTS, course.getNumberOfAssignments());
+            jsonObject.put(KEY_REACHABLE_POINTS_PER_ASSIGNMENT, course.hasFixedPoints() ? course.toFPC().getMaxPoints() : 0);
+            jsonObject.put(KEY_HAS_FIXED_POINTS, course.hasFixedPoints());
+            jsonObject.put(KEY_NEC_PERCENT_TO_PASS, course.getNecPercentToPass());
+            jsonObject.put(KEY_DATE, course.getDate());
             JSONArray assignmentJSONArray = assignmentArrayToJSONArray(course.getAssignments());
-            jsonObject.put(DatabaseHelper.KEY_ASSIGNMENTS, assignmentJSONArray);
+            jsonObject.put(KEY_ASSIGNMENTS, assignmentJSONArray);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -187,13 +185,13 @@ public class JSONParser {
     public static JSONObject assignmentToJSON(Assignment assignment){
         JSONObject jsonObject = new JSONObject();
         try{
-            jsonObject.put(DatabaseHelper.KEY_ID, assignment.getId());
-            jsonObject.put(DatabaseHelper.KEY_ASSIGNMENT_INDEX, assignment.getIndex());
-            jsonObject.put(DatabaseHelper.KEY_MAX_POINTS, assignment.getMaxPoints());
-            jsonObject.put(DatabaseHelper.KEY_IS_EXTRA_ASSIGNMENT, assignment.isExtraAssignment());
-            jsonObject.put(DatabaseHelper.KEY_COURSE_ID, assignment.getCourse_id());
-            jsonObject.put(DatabaseHelper.KEY_ACHIEVED_POINTS, assignment.getAchievedPoints());
-            jsonObject.put(DatabaseHelper.KEY_DATE, assignment.getDate());
+            jsonObject.put(KEY_ID, assignment.getId());
+            jsonObject.put(KEY_ASSIGNMENT_INDEX, assignment.getIndex());
+            jsonObject.put(KEY_MAX_POINTS, assignment.getMaxPoints());
+            jsonObject.put(KEY_IS_EXTRA_ASSIGNMENT, assignment.isExtraAssignment());
+            jsonObject.put(KEY_COURSE_ID, assignment.getCourse_id());
+            jsonObject.put(KEY_ACHIEVED_POINTS, assignment.getAchievedPoints());
+            jsonObject.put(KEY_DATE, assignment.getDate());
 
         }catch (JSONException e){
             e.printStackTrace();

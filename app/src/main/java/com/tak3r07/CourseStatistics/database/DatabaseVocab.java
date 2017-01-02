@@ -1,4 +1,4 @@
-package database;
+package com.tak3r07.CourseStatistics.database;
 
 /**
  * Created by tak on 1/2/17.
