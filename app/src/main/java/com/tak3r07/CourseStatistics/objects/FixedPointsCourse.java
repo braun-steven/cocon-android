@@ -13,8 +13,8 @@ public class FixedPointsCourse extends Course {
     private double maxPoints;
 
 
-    public FixedPointsCourse(String courseName, int index, double maxPoints) {
-        super(courseName, index);
+    public FixedPointsCourse(String courseName, double maxPoints) {
+        super(courseName);
 
         //Set maxPoints
         this.maxPoints = maxPoints;
@@ -104,7 +104,7 @@ public class FixedPointsCourse extends Course {
      * Simple Clone code (deep copy)
      */
     public Course clone() {
-        FixedPointsCourse clone = new FixedPointsCourse(getCourseName(), getIndex(), getMaxPoints());
+        FixedPointsCourse clone = new FixedPointsCourse(getCourseName(), getMaxPoints());
         clone.setMaxPoints(this.maxPoints);
         clone.setNumberOfAssignments(getNumberOfAssignments());
 

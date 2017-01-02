@@ -9,8 +9,8 @@ public class DynamicPointsCourse extends Course {
 
     static final long serialVersionUID = 2099962292244075360L;
 
-    public DynamicPointsCourse(String courseName, int index) {
-        super(courseName, index);
+    public DynamicPointsCourse(String courseName) {
+        super(courseName);
 
     }
 
@@ -32,7 +32,7 @@ public class DynamicPointsCourse extends Course {
 
     @Override
     public DynamicPointsCourse clone() {
-        DynamicPointsCourse clone = new DynamicPointsCourse(getCourseName(), getIndex());
+        DynamicPointsCourse clone = new DynamicPointsCourse(getCourseName());
         clone.setAssignments((ArrayList<Assignment>) getAssignments().clone());
         clone.setId(getId());
 

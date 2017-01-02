@@ -25,9 +25,6 @@ public abstract class Course implements Serializable {
     //Unique course-id
     private UUID id;
 
-    //Item-Index in course-list
-    private int index;
-
     //Date of creation
     private long date;
 
@@ -36,9 +33,8 @@ public abstract class Course implements Serializable {
     //Neccessary points to pass the course
     private double necPercentToPass;
 
-    public Course(String courseName, int index) {
+    public Course(String courseName) {
         //Initialize
-        this.index = index;
         this.courseName = courseName;
 
         //usually 13 assignments in one semester
@@ -97,10 +93,6 @@ public abstract class Course implements Serializable {
         return achievedPointsAtAll;
     }
 
-    public int getIndex() {
-        return this.index;
-    }
-
     public String getCourseName() {
         return courseName;
     }
@@ -155,7 +147,7 @@ public abstract class Course implements Serializable {
      * @return new DynamicPointsCourse
      */
     public DynamicPointsCourse toDPC() {
-        DynamicPointsCourse dpc = new DynamicPointsCourse(courseName, index);
+        DynamicPointsCourse dpc = new DynamicPointsCourse(courseName);
         dpc.setId(this.id);
         dpc.setAssignments(this.mAssignmentArrayList);
         dpc.setNumberOfAssignments(this.numberOfAssignments);
