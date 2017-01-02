@@ -1,4 +1,4 @@
-package com.tak3r07.CourseStatistics.database;
+package database;
 
 /**
  * Created by tak on 1/2/17.
@@ -9,6 +9,7 @@ public final class DatabaseVocab {
     //Table names
     public static final String TABLE_COURSES = "courses";
     public static final String TABLE_ASSIGNMENTS = "assignments";
+    public static final String TABLE_USER = "user";
 
     //Column names: common
     public static final String KEY_ID = "id";
@@ -50,4 +51,18 @@ public final class DatabaseVocab {
             + KEY_DATE + " INTEGER DEFAULT 0,"
             + "FOREIGN KEY(" + KEY_COURSE_ID + ") REFERENCES " + TABLE_COURSES + "(" + KEY_COURSE_ID + "))";
 
+    public static final String CREATE_USER_TABLE = "CREATE TABLE " + TABLE_USER + " ("
+            + KEY_ID + " TEXT,"
+            + KEY_COURSE_ID + " TEXT,"
+            + "FOREIGN KEY(" + KEY_COURSE_ID + ") REFERENCES " + TABLE_COURSES + "(" + KEY_COURSE_ID + "))";
+
+    public static final String INDEX_COURSE_ID = "idx_course_id";
+    public static final String INDEX_ASSIGMENT_ID = "idx_assigment_id";
+
+    public static final String CREATE_UNIQUE_INDEX_COURSE =
+            "CREATE UNIQUE INDEX " + INDEX_COURSE_ID + " ON " + TABLE_COURSES + " (" + KEY_ID + ");";
+    public static final String CREATE_UNIQUE_INDEX_ASSIGNMENT =
+            "CREATE UNIQUE INDEX " + INDEX_ASSIGMENT_ID + " ON " + TABLE_ASSIGNMENTS + " (" + KEY_ID + ");";
+    public static final String CREATE_UNIQUE_INDEX_USER_COURSE =
+            "CREATE UNIQUE INDEX " + INDEX_ASSIGMENT_ID + " ON " + TABLE_USER + " (" + KEY_ID + ", " + KEY_COURSE_ID + ");";
 }
