@@ -13,9 +13,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tak3r07.CourseStatistics.database.DataHelper;
 import com.tak3r07.CourseStatistics.activities.AssignmentsActivity;
 import com.tak3r07.CourseStatistics.activities.MainActivity;
+import com.tak3r07.CourseStatistics.database.DataHelper;
 import com.tak3r07.CourseStatistics.objects.Course;
 import com.tak3r07.CourseStatistics.utils.MyLogger;
 import com.tak3r07.unihelper.R;
@@ -195,7 +195,7 @@ public class RecyclerViewCourseAdapter
 
             //add course position to update assignments when result comes back
             intent.putExtra("COURSE_TAG_ID",
-                    course.getId()
+                    course.getId().toString()
             );
 
             //Start activity

@@ -11,14 +11,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.tak3r07.CourseStatistics.database.DataHelper;
 import com.tak3r07.CourseStatistics.objects.Assignment;
 import com.tak3r07.CourseStatistics.objects.Course;
 import com.tak3r07.CourseStatistics.sync.CourseNotifiable;
-import com.tak3r07.CourseStatistics.database.DataHelper;
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.UUID;
 
 public class EditCourseActivity extends AppCompatActivity implements CourseNotifiable {
@@ -161,8 +160,7 @@ public class EditCourseActivity extends AppCompatActivity implements CourseNotif
             Intent data = new Intent();
 
             //Set new date for update
-            long date = Calendar.getInstance().getTimeInMillis();
-            course.setDate(date);
+            course.updateDate();
 
 
             //FPC: Add maxpoints

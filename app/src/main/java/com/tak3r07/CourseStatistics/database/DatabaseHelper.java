@@ -11,11 +11,31 @@ import com.tak3r07.CourseStatistics.objects.Course;
 import com.tak3r07.CourseStatistics.objects.DynamicPointsCourse;
 import com.tak3r07.CourseStatistics.objects.FixedPointsCourse;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.*;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.CREATE_ASSIGNMENT_TABLE;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.CREATE_COURSE_TABLE;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_ACHIEVED_POINTS;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_ASSIGNMENT_INDEX;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_COURSENAME;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_COURSE_ID;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_DATE;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_HAS_FIXED_POINTS;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_ID;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_IS_EXTRA_ASSIGNMENT;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_MAX_POINTS;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_NEC_PERCENT_TO_PASS;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_NUMBER_OF_ASSIGNMENTS;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_REACHABLE_POINTS_PER_ASSIGNMENT;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.TABLE_ASSIGNMENTS;
+import static com.tak3r07.CourseStatistics.database.DatabaseVocab.TABLE_COURSES;
 
 /**
  * Created by tak3r07 on 5/5/15.
@@ -31,9 +51,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //Database name
     private static final String DATABASE_NAME = "courses";
 
+    private Context context;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -131,17 +153,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             maxPoints = Double.parseDouble(maxPointsString);
         }
-        //get index
-        int index = cursor.getInt(4);
-
         //get necPercentToPass
-        double necPercentToPass = Double.parseDouble(cursor.getString(5));
+        double necPercentToPass = Double.parseDouble(cursor.getString(4));
 
         //get date
-        long date = cursor.getLong(6);
+        long date = cursor.getLong(5);
 
         //Get has fixed points (1 == true, 0 == false in sqlite)
-        boolean hasFixedPoints = cursor.getInt(7) == 1;
+        boolean hasFixedPoints = cursor.getInt(6) == 1;
 
         Course course;
 
@@ -344,7 +363,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Delete a specific assignment
      *
      * @param assignment which is to be deleted
-     * @return result wether delete has failed(false) or not(true)
+     * @return result whether delete has failed(false) or not(true)
      */
     public boolean deleteAssignment(Assignment assignment) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -356,4 +375,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return result > 0;
     }
+
+    /**
+     * Reads the user uuid
+     *
+     * @return User uuid
+     */
+    public UUID getUserUUID() {
+
+        String FILENAME = "user.uuid";
+
+        String string = UUID.randomUUID().toString();
+        File file = context.getFileStreamPath(FILENAME);
+        if (!file.exists()) {
+            try {
+
+                FileOutputStream fos = context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                fos.write(string.getBytes());
+                fos.close();
+                return UUID.fromString(string);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String uuidString = br.readLine();
+            return UUID.fromString(uuidString);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

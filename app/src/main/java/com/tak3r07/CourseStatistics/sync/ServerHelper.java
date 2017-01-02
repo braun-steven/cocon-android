@@ -11,11 +11,13 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import com.tak3r07.CourseStatistics.database.DatabaseHelper;
 import com.tak3r07.CourseStatistics.objects.Assignment;
 import com.tak3r07.CourseStatistics.objects.Course;
 import com.tak3r07.CourseStatistics.utils.JSONParser;
 import com.tak3r07.CourseStatistics.utils.Vocab;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -26,12 +28,42 @@ import java.util.ArrayList;
  * This class provides methods to communicate with the application server
  */
 public class ServerHelper {
+    private final Context context;
     private Activity activity;
-    private Context context;
 
     public ServerHelper(Activity activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
+    }
+
+    public static void postAssignment(final Assignment assignment, final String url) {
+
+        new AsyncTask<String, Void, String>() {
+            @Override
+            protected String doInBackground(String... params) {
+                final MediaType JSON
+                        = MediaType.parse("application/json; charset=utf-8");
+
+                OkHttpClient client = new OkHttpClient();
+
+                //Get jsonobject from course
+                JSONObject json = JSONParser.assignmentToJSON(assignment);
+
+                RequestBody body = RequestBody.create(JSON, json.toString());
+                Request request = new Request.Builder()
+                        .url(url)
+                        .post(body)
+                        .build();
+                Response response = null;
+                try {
+                    response = client.newCall(request).execute();
+                    String result = response.body().string();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return "";
+            }
+        }.execute(url);
     }
 
     public void addCourse(Course course) {
@@ -40,14 +72,14 @@ public class ServerHelper {
             return;
         }
 
-        String suffix = "/insertCourse";
+        String suffix = "/updateCourse";
         String url = Vocab.URL_PREFIX + suffix;
         postCourse(course, url);
 
         //Add all its assignments
-        for (Assignment a : course.getAssignments()) {
-            addAssignment(a);
-        }
+        //for (Assignment a : course.getAssignments()) {
+        //    addAssignment(a);
+        //}
     }
 
     public void addAssignment(Assignment assignment) {
@@ -59,7 +91,6 @@ public class ServerHelper {
         String url = Vocab.URL_PREFIX + suffix;
         postAssignment(assignment, url);
     }
-
 
     public void updateAllCourses(ArrayList<Course> courses) {
         if (!canConnect()) {
@@ -73,13 +104,7 @@ public class ServerHelper {
     }
 
     public void updateCourse(Course course) {
-        if (!canConnect()) {
-            alertNoConnection();
-            return;
-        }
-        String suffix = "/updateCourse";
-        String url = Vocab.URL_PREFIX + suffix;
-        postCourse(course, url);
+        addCourse(course);
     }
 
     public void updateAssignment(Assignment assignment) {
@@ -114,7 +139,6 @@ public class ServerHelper {
         delete(url);
     }
 
-
     public void delete(String url){
         new AsyncJSONTask(activity){
             @Override
@@ -124,8 +148,7 @@ public class ServerHelper {
         }.execute(url);
     }
 
-
-    public static void postCourse(final Course course, final String url) {
+    public void postCourse(final Course course, final String url) {
 
         new AsyncTask<String, Void, String>() {
             @Override
@@ -135,8 +158,13 @@ public class ServerHelper {
 
                 OkHttpClient client = new OkHttpClient();
 
-                //Get jsonobject from course
-                JSONObject json = JSONParser.courseToJSON(course);
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("userId", new DatabaseHelper(context).getUserUUID());
+                    json.put("course", JSONParser.courseToJSON(course));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
                 RequestBody body = RequestBody.create(JSON, json.toString());
                 Request request = new Request.Builder()
@@ -154,37 +182,6 @@ public class ServerHelper {
             }
         }.execute(url);
     }
-
-    public static void postAssignment(final Assignment assignment, final String url) {
-
-        new AsyncTask<String, Void, String>() {
-            @Override
-            protected String doInBackground(String... params) {
-                final MediaType JSON
-                        = MediaType.parse("application/json; charset=utf-8");
-
-                OkHttpClient client = new OkHttpClient();
-
-                //Get jsonobject from course
-                JSONObject json = JSONParser.assignmentToJSON(assignment);
-
-                RequestBody body = RequestBody.create(JSON, json.toString());
-                Request request = new Request.Builder()
-                        .url(url)
-                        .post(body)
-                        .build();
-                Response response = null;
-                try {
-                    response = client.newCall(request).execute();
-                    String result = response.body().string();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return "";
-            }
-        }.execute(url);
-    }
-
 
     public boolean canConnect() {
         ConnectivityManager connMgr = (ConnectivityManager)

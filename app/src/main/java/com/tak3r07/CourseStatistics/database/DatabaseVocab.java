@@ -30,7 +30,6 @@ public final class DatabaseVocab {
     public static final String KEY_IS_EXTRA_ASSIGNMENT = "is_extra_assignment";
     public static final String KEY_COURSE_ID = "course_id";
 
-
     //Table create statements
     public static final String CREATE_COURSE_TABLE = "CREATE TABLE " + TABLE_COURSES + "("
             + KEY_ID + " TEXT PRIMARY KEY,"

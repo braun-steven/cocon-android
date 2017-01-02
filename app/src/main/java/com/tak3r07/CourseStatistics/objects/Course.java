@@ -3,7 +3,6 @@ package com.tak3r07.CourseStatistics.objects;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -43,11 +42,9 @@ public abstract class Course implements Serializable {
         //Usually 50% necessary to pass the course
         necPercentToPass = 0.5d;
 
-        //Set date default to 0 and only set to Calendar.getInstance().getTimeInMillis(); when created /updated
-        date = 0;
+        updateDate();
 
         //Set random id
-        Random rand = new Random();
         this.id = UUID.randomUUID();
 
     }
@@ -201,8 +198,8 @@ public abstract class Course implements Serializable {
      * @param otherCourse
      * @return
      */
-    public boolean isOutdated(Course otherCourse){
-        return this.getDate() < otherCourse.getDate();
+    public boolean isNewerThan(Course otherCourse) {
+        return this.getDate() > otherCourse.getDate();
     }
 
     public void updateDate(){

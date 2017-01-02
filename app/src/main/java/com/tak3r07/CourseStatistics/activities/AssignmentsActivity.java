@@ -21,12 +21,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tak3r07.CourseStatistics.adapter.RecyclerViewAssignmentAdapter;
+import com.tak3r07.CourseStatistics.database.DataHelper;
+import com.tak3r07.CourseStatistics.database.DatabaseHelper;
 import com.tak3r07.CourseStatistics.objects.Assignment;
 import com.tak3r07.CourseStatistics.objects.Course;
 import com.tak3r07.CourseStatistics.sync.CourseNotifiable;
-import com.tak3r07.CourseStatistics.database.DataHelper;
-import com.tak3r07.CourseStatistics.database.DatabaseHelper;
-import com.tak3r07.CourseStatistics.adapter.RecyclerViewAssignmentAdapter;
 import com.tak3r07.unihelper.R;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
@@ -45,6 +45,16 @@ public class AssignmentsActivity extends AppCompatActivity implements CourseNoti
     private FloatingActionButton mFab;
     private DataHelper<AssignmentsActivity> dataHelper;
 
+    //Checks if a string is Numeric (Source: http://goo.gl/mGQ3Sp)
+    public static boolean isNumeric(String str) {
+        try {
+            double d = Double.parseDouble(str);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +69,8 @@ public class AssignmentsActivity extends AppCompatActivity implements CourseNoti
         Intent intent = getIntent();
 
         //position of the course which was opened
-        courseId = UUID.fromString(intent.getExtras().getString(COURSE_TAG_ID));
+        String string = intent.getExtras().getString(COURSE_TAG_ID);
+        courseId = UUID.fromString(string);
         mCurrentCourse = new DatabaseHelper(getApplicationContext())
                 .getCourse(courseId);
 
@@ -101,7 +112,6 @@ public class AssignmentsActivity extends AppCompatActivity implements CourseNoti
             }
         });
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -256,6 +266,7 @@ public class AssignmentsActivity extends AppCompatActivity implements CourseNoti
         mAssignmentAdapter.addAssignment(assignment);
         mCurrentCourse.addAssignment(assignment);
         mCurrentCourse.updateDate();
+        dataHelper.updateCourse(mCurrentCourse);
 
 
         //Store assignment
@@ -281,17 +292,6 @@ public class AssignmentsActivity extends AppCompatActivity implements CourseNoti
         }).show();
     }
 
-
-    //Checks if a string is Numeric (Source: http://goo.gl/mGQ3Sp)
-    public static boolean isNumeric(String str) {
-        try {
-            double d = Double.parseDouble(str);
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-        return true;
-    }
-
     public void onBackPressed() {
         //Set result and finish
         Intent data = new Intent();
@@ -305,7 +305,7 @@ public class AssignmentsActivity extends AppCompatActivity implements CourseNoti
         intent.setClass(getApplicationContext(), EditCourseActivity.class);
 
         //Add Course-Number
-        intent.putExtra(COURSE_TAG_ID, mCurrentCourse.getId());
+        intent.putExtra(COURSE_TAG_ID, mCurrentCourse.getId().toString());
         startActivityForResult(intent, 0);
     }
 
