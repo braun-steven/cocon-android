@@ -3,6 +3,7 @@ package com.tak3r07.CourseStatistics.objects;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * Created by tak3r07 on 11/9/14.
@@ -23,7 +24,7 @@ public class Assignment implements Serializable {
     //Boolean whether this is an extra-assignment or not
     private boolean isExtraAssignment = false;
 
-    private int id;
+    private UUID id;
 
     //Date of creation
     private long date;
@@ -39,7 +40,7 @@ public class Assignment implements Serializable {
      * @param achievedPoints achieved points in this assignment
      * @param course_id      reference to the course
      */
-    public Assignment(int id, int index, double maxPoints, double achievedPoints, int course_id) {
+    public Assignment(UUID id, int index, double maxPoints, double achievedPoints, int course_id) {
         setIndex(index);
         setMaxPoints(maxPoints);
         setAchievedPoints(achievedPoints);
@@ -47,10 +48,10 @@ public class Assignment implements Serializable {
 
 
         //Check if assignment comes from database or should be created as "new assignment"
-        if (id == -1) {
+        if (id == null) {
             //Set random id
             Random rand = new Random();
-            this.id = rand.nextInt(10000000);
+            this.id = UUID.randomUUID();
             setDate(Calendar.getInstance().getTimeInMillis());
         } else {
             setId(id);
@@ -79,11 +80,11 @@ public class Assignment implements Serializable {
     }
 
 
-    public void setId(int id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public int getId() {
+    public UUID getId() {
         return this.id;
     }
 

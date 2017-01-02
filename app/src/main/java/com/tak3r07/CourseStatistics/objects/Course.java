@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * Created by tak3r07 on 11/9/14.
@@ -22,7 +23,7 @@ public abstract class Course implements Serializable {
     private int numberOfAssignments;
 
     //Unique course-id
-    private int id;
+    private UUID id;
 
     //Item-Index in course-list
     private int index;
@@ -51,7 +52,7 @@ public abstract class Course implements Serializable {
 
         //Set random id
         Random rand = new Random();
-        this.id = rand.nextInt(10000000);
+        this.id = UUID.randomUUID();
 
     }
 
@@ -124,11 +125,11 @@ public abstract class Course implements Serializable {
         this.numberOfAssignments = numberOfAssignments;
     }
 
-    public int getId() {
+    public UUID getId() {
         return this.id;
     }
 
-    public void setId(int id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
