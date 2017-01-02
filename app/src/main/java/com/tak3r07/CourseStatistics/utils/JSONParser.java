@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Created by tak on 8/26/15.
@@ -28,7 +29,7 @@ public class JSONParser {
         try {
             JSONObject jsonCourse = new JSONObject(jsonString);
 
-            int id = jsonCourse.getInt(DatabaseHelper.KEY_ID);
+            UUID id = UUID.fromString(jsonCourse.getString(DatabaseHelper.KEY_ID));
             String courseName = jsonCourse.getString(DatabaseHelper.KEY_COURSENAME);
             int numberOfAssignments = jsonCourse.getInt(DatabaseHelper.KEY_NUMBER_OF_ASSIGNMENTS);
 
@@ -116,13 +117,13 @@ public class JSONParser {
             JSONObject jsonAssignment = new JSONObject(jsonString);
 
             //Get all properties from the JSONObject
-            int id = jsonAssignment.getInt(DatabaseHelper.KEY_ID);
+            UUID id = UUID.fromString(jsonAssignment.getString(DatabaseHelper.KEY_ID));
             int index = jsonAssignment.getInt(DatabaseHelper.KEY_ASSIGNMENT_INDEX);
             double maxPoints = jsonAssignment.getDouble(DatabaseHelper.KEY_MAX_POINTS);
             boolean isExtraAssignment = jsonAssignment.getBoolean(DatabaseHelper.KEY_IS_EXTRA_ASSIGNMENT);
             double achievedPoints = jsonAssignment.getDouble(DatabaseHelper.KEY_ACHIEVED_POINTS);
             long date = jsonAssignment.getLong(DatabaseHelper.KEY_DATE);
-            int course_id = jsonAssignment.getInt(DatabaseHelper.KEY_COURSE_ID);
+            UUID course_id = UUID.fromString(jsonAssignment.getString(DatabaseHelper.KEY_COURSE_ID));
 
             //Create assignment and set properties
             Assignment assignment = new Assignment(id, index, maxPoints, achievedPoints, course_id);

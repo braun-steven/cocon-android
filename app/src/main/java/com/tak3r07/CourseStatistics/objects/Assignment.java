@@ -29,7 +29,7 @@ public class Assignment implements Serializable {
     //Date of creation
     private long date;
 
-    private int course_id;
+    private UUID course_id;
 
     /**
      * Constructor for new Assignments
@@ -40,7 +40,7 @@ public class Assignment implements Serializable {
      * @param achievedPoints achieved points in this assignment
      * @param course_id      reference to the course
      */
-    public Assignment(UUID id, int index, double maxPoints, double achievedPoints, int course_id) {
+    public Assignment(UUID id, int index, double maxPoints, double achievedPoints, UUID course_id) {
         setIndex(index);
         setMaxPoints(maxPoints);
         setAchievedPoints(achievedPoints);
@@ -88,11 +88,11 @@ public class Assignment implements Serializable {
         return this.id;
     }
 
-    public void setCourse_id(int id) {
+    public void setCourse_id(UUID id) {
         this.course_id = id;
     }
 
-    public int getCourse_id() {
+    public UUID getCourse_id() {
         return course_id;
     }
 

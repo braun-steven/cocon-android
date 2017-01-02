@@ -19,6 +19,7 @@ import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.UUID;
 
 public class EditCourseActivity extends AppCompatActivity implements CourseNotifiable {
 
@@ -46,7 +47,7 @@ public class EditCourseActivity extends AppCompatActivity implements CourseNotif
 
         //Get intent data
         Intent intent = getIntent();
-        int courseId = intent.getExtras().getInt(COURSE_TAG_ID);
+        UUID courseId = UUID.fromString(intent.getExtras().getString(COURSE_TAG_ID));
 
         //Get datahelper instance
         dataHelper = new DataHelper<>(this);

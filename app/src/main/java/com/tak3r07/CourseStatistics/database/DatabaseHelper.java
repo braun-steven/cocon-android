@@ -13,6 +13,7 @@ import com.tak3r07.CourseStatistics.objects.FixedPointsCourse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by tak3r07 on 5/5/15.
@@ -55,7 +56,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //Table create statements
     private static final String CREATE_COURSE_TABLE = "CREATE TABLE " + TABLE_COURSES + "("
-            + KEY_ID + " INTEGER PRIMARY KEY,"
+            + KEY_ID + " TEXT PRIMARY KEY,"
             + KEY_COURSENAME + " TEXT,"
             + KEY_NUMBER_OF_ASSIGNMENTS + " INTEGER,"
             + KEY_REACHABLE_POINTS_PER_ASSIGNMENT + " REAL,"
@@ -65,11 +66,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_DATE + " INTEGER DEFAULT 0)";
 
     private static final String CREATE_ASSIGNMENT_TABLE = "CREATE TABLE " + TABLE_ASSIGNMENTS + "("
-            + KEY_ID + " INTEGER PRIMARY KEY,"
+            + KEY_ID + " TEXT PRIMARY KEY,"
             + KEY_ASSIGNMENT_INDEX + " INTEGER,"
             + KEY_MAX_POINTS + " REAL,"
             + KEY_IS_EXTRA_ASSIGNMENT + " INTEGER,"
-            + KEY_COURSE_ID + " INTEGER,"
+            + KEY_COURSE_ID + " TEXT,"
             + KEY_ACHIEVED_POINTS + " REAL,"
             + KEY_DATE + " INTEGER DEFAULT 0,"
             + "FOREIGN KEY(" + KEY_COURSE_ID + ") REFERENCES " + TABLE_COURSES + "(" + KEY_COURSE_ID + "))";
@@ -140,7 +141,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public Course getCourse(int id) {
+    public Course getCourse(UUID id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         //search for course with specific id
@@ -206,7 +207,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //Restores all assignments of a specific course
-    public ArrayList<Assignment> getAssignmentsOfCourse(int course_id) {
+    public ArrayList<Assignment> getAssignmentsOfCourse(UUID course_id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         ArrayList<Assignment> assignments = new ArrayList<>();
@@ -229,7 +230,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Use cursor to get all results from query
         if (cursor.moveToFirst()) {
             do {
-                int id = Integer.parseInt(cursor.getString(0));
+                UUID id = UUID.fromString(cursor.getString(0));
                 int index = Integer.parseInt(cursor.getString(1));
                 double maxPoints = Double.parseDouble(cursor.getString(2));
                 boolean isExtraAssignment = cursor.getInt(3) > 0;
@@ -275,10 +276,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
-        int id;
+        UUID id;
         if (cursor.moveToFirst()) {
             do {
-                id = Integer.parseInt(cursor.getString(0));
+                id = UUID.fromString(cursor.getString(0));
 
                 Course course = getCourse(id);
                 courses.add(course);
@@ -310,12 +311,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private ContentValues getAssignmentsContentValues(Assignment assignment) {
         //Put all members of assignment into contentvalues
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, assignment.getId());
+        values.put(KEY_ID, assignment.getId().toString());
         values.put(KEY_ASSIGNMENT_INDEX, assignment.getIndex());
         values.put(KEY_MAX_POINTS, assignment.getMaxPoints());
         values.put(KEY_ACHIEVED_POINTS, assignment.getAchievedPoints());
         values.put(KEY_IS_EXTRA_ASSIGNMENT, assignment.isExtraAssignment());
-        values.put(KEY_COURSE_ID, assignment.getCourse_id());
+        values.put(KEY_COURSE_ID, assignment.getCourse_id().toString());
         values.put(KEY_DATE, assignment.getDate());
         return values;
     }
@@ -344,7 +345,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, course.getId());
+        values.put(KEY_ID, course.getId().toString());
         values.put(KEY_COURSENAME, course.getCourseName());
         values.put(KEY_NUMBER_OF_ASSIGNMENTS, course.getNumberOfAssignments());
         values.put(KEY_COURSE_INDEX, course.getIndex());

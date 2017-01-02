@@ -31,6 +31,7 @@ import com.tak3r07.unihelper.R;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 
 public class AssignmentsActivity extends AppCompatActivity implements CourseNotifiable {
@@ -40,7 +41,7 @@ public class AssignmentsActivity extends AppCompatActivity implements CourseNoti
     private RecyclerViewAssignmentAdapter mAssignmentAdapter;
     private Course mCurrentCourse;
     private ArrayList<Assignment> mAssignments;
-    private int courseId;
+    private UUID courseId;
     private FloatingActionButton mFab;
     private DataHelper<AssignmentsActivity> dataHelper;
 
@@ -58,7 +59,7 @@ public class AssignmentsActivity extends AppCompatActivity implements CourseNoti
         Intent intent = getIntent();
 
         //position of the course which was opened
-        courseId = intent.getExtras().getInt(COURSE_TAG_ID);
+        courseId = UUID.fromString(intent.getExtras().getString(COURSE_TAG_ID));
         mCurrentCourse = new DatabaseHelper(getApplicationContext())
                 .getCourse(courseId);
 
@@ -205,7 +206,7 @@ public class AssignmentsActivity extends AppCompatActivity implements CourseNoti
                         }
 
 
-                        int NEW_ASSIGNMENT = -1;
+                        UUID NEW_ASSIGNMENT = null;
 
 
                         //Create new assignment from pulled data

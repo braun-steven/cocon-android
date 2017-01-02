@@ -11,6 +11,7 @@ import com.tak3r07.CourseStatistics.objects.Course;
 import com.tak3r07.CourseStatistics.utils.Vocab;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Created by tak on 8/27/15.
@@ -68,11 +69,11 @@ public class DataHelper<MyActivity extends Activity & CourseNotifiable> {
         if(SERVER_ON)serverHelper.updateAssignment(assignment);
     }
 
-    public Course getCourse(int courseId){
+    public Course getCourse(UUID courseId){
         return databaseHelper.getCourse(courseId);
     }
 
-    public ArrayList<Assignment> getAssignmentsOfCourse(int courseId){
+    public ArrayList<Assignment> getAssignmentsOfCourse(UUID courseId){
         return databaseHelper.getAssignmentsOfCourse(courseId);
     }
 
