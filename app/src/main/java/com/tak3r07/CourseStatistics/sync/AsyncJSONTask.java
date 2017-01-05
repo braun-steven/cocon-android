@@ -7,8 +7,8 @@ import android.os.AsyncTask;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.tak3r07.CourseStatistics.objects.Course;
-import com.tak3r07.CourseStatistics.utils.JSONParser;
+import objects.Course;
+import utils.JSONParser;
 
 import java.io.IOException;
 import java.util.ArrayList;

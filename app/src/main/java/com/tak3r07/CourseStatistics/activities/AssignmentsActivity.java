@@ -24,14 +24,15 @@ import android.widget.Toast;
 import com.tak3r07.CourseStatistics.adapter.RecyclerViewAssignmentAdapter;
 import com.tak3r07.CourseStatistics.database.DataHelper;
 import com.tak3r07.CourseStatistics.database.DatabaseHelper;
-import com.tak3r07.CourseStatistics.objects.Assignment;
-import com.tak3r07.CourseStatistics.objects.Course;
 import com.tak3r07.CourseStatistics.sync.CourseNotifiable;
 import com.tak3r07.unihelper.R;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.ArrayList;
 import java.util.UUID;
+
+import objects.Assignment;
+import objects.Course;
 
 
 public class AssignmentsActivity extends AppCompatActivity implements CourseNotifiable {

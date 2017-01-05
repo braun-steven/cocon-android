@@ -6,10 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.tak3r07.CourseStatistics.objects.Assignment;
-import com.tak3r07.CourseStatistics.objects.Course;
-import com.tak3r07.CourseStatistics.objects.DynamicPointsCourse;
-import com.tak3r07.CourseStatistics.objects.FixedPointsCourse;
+import objects.Assignment;
+import objects.Course;
+import objects.DynamicPointsCourse;
+import objects.FixedPointsCourse;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,22 +20,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.CREATE_ASSIGNMENT_TABLE;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.CREATE_COURSE_TABLE;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_ACHIEVED_POINTS;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_ASSIGNMENT_INDEX;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_COURSENAME;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_COURSE_ID;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_DATE;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_HAS_FIXED_POINTS;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_ID;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_IS_EXTRA_ASSIGNMENT;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_MAX_POINTS;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_NEC_PERCENT_TO_PASS;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_NUMBER_OF_ASSIGNMENTS;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.KEY_REACHABLE_POINTS_PER_ASSIGNMENT;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.TABLE_ASSIGNMENTS;
-import static com.tak3r07.CourseStatistics.database.DatabaseVocab.TABLE_COURSES;
+import static database.DatabaseVocab.CREATE_ASSIGNMENT_TABLE;
+import static database.DatabaseVocab.CREATE_COURSE_TABLE;
+import static database.DatabaseVocab.KEY_ACHIEVED_POINTS;
+import static database.DatabaseVocab.KEY_ASSIGNMENT_INDEX;
+import static database.DatabaseVocab.KEY_COURSENAME;
+import static database.DatabaseVocab.KEY_COURSE_ID;
+import static database.DatabaseVocab.KEY_DATE;
+import static database.DatabaseVocab.KEY_HAS_FIXED_POINTS;
+import static database.DatabaseVocab.KEY_ID;
+import static database.DatabaseVocab.KEY_IS_EXTRA_ASSIGNMENT;
+import static database.DatabaseVocab.KEY_MAX_POINTS;
+import static database.DatabaseVocab.KEY_NEC_PERCENT_TO_PASS;
+import static database.DatabaseVocab.KEY_NUMBER_OF_ASSIGNMENTS;
+import static database.DatabaseVocab.KEY_REACHABLE_POINTS_PER_ASSIGNMENT;
+import static database.DatabaseVocab.TABLE_ASSIGNMENTS;
+import static database.DatabaseVocab.TABLE_COURSES;
 
 /**
  * Created by tak3r07 on 5/5/15.

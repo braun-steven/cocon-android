@@ -16,11 +16,12 @@ import android.widget.Toast;
 import com.tak3r07.CourseStatistics.activities.AssignmentsActivity;
 import com.tak3r07.CourseStatistics.activities.MainActivity;
 import com.tak3r07.CourseStatistics.database.DataHelper;
-import com.tak3r07.CourseStatistics.objects.Course;
 import com.tak3r07.CourseStatistics.utils.MyLogger;
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
+
+import objects.Course;
 
 /**
  * Created by tak3r07 on 12/8/14.
@@ -187,8 +188,7 @@ public class RecyclerViewCourseAdapter
         public void onClick(View v) {
 
             Course course = mCourseAdapter.getmCourseArrayList().get(getLayoutPosition());
-            //Log course
-            MyLogger.logCourse(course);
+
             //Setup new Intent
             Intent intent = new Intent();
             intent.setClass(context, AssignmentsActivity.class);

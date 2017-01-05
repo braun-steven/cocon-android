@@ -2,8 +2,9 @@ package com.tak3r07.CourseStatistics.utils;
 
 import android.util.Log;
 
-import com.tak3r07.CourseStatistics.objects.Assignment;
-import com.tak3r07.CourseStatistics.objects.Course;
+import objects.Assignment;
+import objects.Course;
+import utils.JSONParser;
 
 /**
  * Created by tak on 9/25/15.

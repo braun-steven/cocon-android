@@ -3,13 +3,13 @@ apply plugin: 'com.google.gms.google-services'
 
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 25
     buildToolsVersion '22.0.1'
 
     defaultConfig {
         applicationId "com.tak3r07.unihelper"
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 168
         versionName "1.6.8"
     }
@@ -27,14 +27,15 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:support-v4:23.3.0'
-    compile 'com.android.support:recyclerview-v7:23.3.0'
-    compile 'com.android.support:cardview-v7:23.3.0'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:design:23.3.0'
+    compile 'com.android.support:support-v4:25.1.0'
+    compile 'com.android.support:recyclerview-v7:25.1.0'
+    compile 'com.android.support:cardview-v7:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:design:25.1.0'
     compile 'com.jjoe64:graphview:4.0.0'
     compile 'com.bartoszlipinski.recyclerviewheader:library:1.2.0'
     compile 'com.yqritc:recyclerview-flexibledivider:1.2.5'
     compile 'com.github.PhilJay:MPAndroidChart:v2.1.3'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
+    compile files('libs/cocon-base-1.0-SNAPSHOT.jar')
 }

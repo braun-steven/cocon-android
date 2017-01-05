@@ -30,14 +30,15 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.tak3r07.CourseStatistics.database.DataHelper;
 import com.tak3r07.CourseStatistics.activities.AssignmentsActivity;
-import com.tak3r07.CourseStatistics.objects.Assignment;
-import com.tak3r07.CourseStatistics.objects.Course;
-import com.tak3r07.CourseStatistics.objects.FixedPointsCourse;
 import com.tak3r07.unihelper.R;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import objects.Assignment;
+import objects.Course;
+import objects.FixedPointsCourse;
 
 /**
  * Created by tak3r07 on 12/8/14.

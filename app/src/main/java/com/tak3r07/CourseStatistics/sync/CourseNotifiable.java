@@ -1,6 +1,6 @@
 package com.tak3r07.CourseStatistics.sync;
 
-import com.tak3r07.CourseStatistics.objects.Course;
+import objects.Course;
 
 import java.util.ArrayList;
 

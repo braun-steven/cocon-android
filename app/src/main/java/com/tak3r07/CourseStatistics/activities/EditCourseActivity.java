@@ -12,13 +12,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.tak3r07.CourseStatistics.database.DataHelper;
-import com.tak3r07.CourseStatistics.objects.Assignment;
-import com.tak3r07.CourseStatistics.objects.Course;
 import com.tak3r07.CourseStatistics.sync.CourseNotifiable;
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;
 import java.util.UUID;
+
+import objects.Assignment;
+import objects.Course;
 
 public class EditCourseActivity extends AppCompatActivity implements CourseNotifiable {
 
@@ -91,16 +92,18 @@ public class EditCourseActivity extends AppCompatActivity implements CourseNotif
         }
 
     }
-    private void hideMaxPointsEdit(){
+
+    private void hideMaxPointsEdit() {
         mTextViewMaxPoints.setVisibility(View.GONE);
         mMaxPointsEditText.setVisibility(View.GONE);
     }
 
-    private void showMaxPointsEdit(){
+    private void showMaxPointsEdit() {
         mMaxPointsEditText.setVisibility(View.VISIBLE);
         mTextViewMaxPoints.setVisibility(View.VISIBLE);
 
     }
+
     private void toggleDynamicView() {
         if (hasFixedPoints) {
             hideMaxPointsEdit();
@@ -168,7 +171,7 @@ public class EditCourseActivity extends AppCompatActivity implements CourseNotif
                 double maxPoints = Double.parseDouble(mMaxPointsEditText.getText().toString());
                 course.toFPC().setMaxPoints(maxPoints);
                 dataHelper.updateCourse(course.toFPC());
-            }else {
+            } else {
                 dataHelper.updateCourse(course.toDPC());
             }
 

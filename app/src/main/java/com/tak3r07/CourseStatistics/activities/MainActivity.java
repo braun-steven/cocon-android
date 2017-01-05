@@ -23,11 +23,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.bartoszlipinski.recyclerviewheader.RecyclerViewHeader;
-import com.tak3r07.CourseStatistics.objects.Course;
 import com.tak3r07.CourseStatistics.sync.CourseNotifiable;
 import com.tak3r07.CourseStatistics.database.DataHelper;
-import com.tak3r07.CourseStatistics.objects.DynamicPointsCourse;
-import com.tak3r07.CourseStatistics.objects.FixedPointsCourse;
 import com.tak3r07.CourseStatistics.adapter.PathAdapter;
 import com.tak3r07.CourseStatistics.adapter.RecyclerViewCourseAdapter;
 import com.tak3r07.unihelper.R;
@@ -44,6 +41,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Locale;
+
+import objects.Course;
+import objects.DynamicPointsCourse;
+import objects.FixedPointsCourse;
 
 
 public class MainActivity extends AppCompatActivity implements CourseNotifiable {
