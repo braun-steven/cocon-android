@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.support.annotation.IntegerRes;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import android.view.ViewGroup;
 import android.view.ViewManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,8 +26,8 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
-import com.tak3r07.CourseStatistics.database.DataHelper;
 import com.tak3r07.CourseStatistics.activities.AssignmentsActivity;
+import com.tak3r07.CourseStatistics.database.DataHelper;
 import com.tak3r07.unihelper.R;
 
 import java.text.DecimalFormat;
@@ -232,28 +230,29 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
 
         List<Entry> entries = new ArrayList<Entry>();
         double avg = fpc.getAverage(true);
-        entries.add(new Entry((float)avg, 0));
-        entries.add(new Entry(100 - (float)avg, 1));
+        entries.add(new Entry((float) avg, 0));
+        entries.add(new Entry(100 - (float) avg, 1));
         PieDataSet dataset = new PieDataSet(entries, "");
         List<Integer> colors = new ArrayList<>();
         colors.add(context.getResources().getColor(R.color.light_green_400));
         colors.add(context.getResources().getColor(R.color.red_300));
         dataset.setColors(colors);
-        PieData dataSet = new PieData(new String[]{"",""}, dataset);
+        PieData dataSet = new PieData(new String[]{"", ""}, dataset);
         pc.setDescription("Average");
         pc.setData(dataSet);
         pc.invalidate();
     }
+
     private void setupPiChartOverall(VHHeader headerHolder, FixedPointsCourse fpc) {
         PieChart pc = headerHolder.pieChartOverall;
 
         List<Entry> entries = new ArrayList<Entry>();
         double progress = fpc.getProgress();
-        entries.add(new Entry((float)progress, 0));
+        entries.add(new Entry((float) progress, 0));
         double nec = fpc.getNecPercentToPass() * 100;
         float missing = (float) (nec - (float) progress);
         entries.add(new Entry(missing, 1));
-        float optional = (float) (missing > 0? 100 - nec : 100 - progress);
+        float optional = (float) (missing > 0 ? 100 - nec : 100 - progress);
         entries.add(new Entry(optional, 2));
         PieDataSet dataset = new PieDataSet(entries, "");
         List<Integer> colors = new ArrayList<>();
@@ -261,7 +260,7 @@ public class RecyclerViewAssignmentAdapter extends RecyclerView.Adapter<Recycler
         colors.add(context.getResources().getColor(R.color.orange_300));
         colors.add(context.getResources().getColor(R.color.grey_300));
         dataset.setColors(colors);
-        PieData dataSet = new PieData(new String[]{"Achieved","Missing","Optional"}, dataset);
+        PieData dataSet = new PieData(new String[]{"Achieved", "Missing", "Optional"}, dataset);
         pc.setDescription("Overall");
         pc.setData(dataSet);
         pc.invalidate();

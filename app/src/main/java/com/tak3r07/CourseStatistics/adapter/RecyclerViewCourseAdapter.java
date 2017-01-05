@@ -16,7 +16,6 @@ import android.widget.Toast;
 import com.tak3r07.CourseStatistics.activities.AssignmentsActivity;
 import com.tak3r07.CourseStatistics.activities.MainActivity;
 import com.tak3r07.CourseStatistics.database.DataHelper;
-import com.tak3r07.CourseStatistics.utils.MyLogger;
 import com.tak3r07.unihelper.R;
 
 import java.util.ArrayList;

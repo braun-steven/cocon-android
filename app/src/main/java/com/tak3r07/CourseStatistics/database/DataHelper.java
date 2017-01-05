@@ -3,8 +3,6 @@ package com.tak3r07.CourseStatistics.database;
 import android.app.Activity;
 import android.content.Context;
 
-import objects.Assignment;
-import objects.Course;
 import com.tak3r07.CourseStatistics.sync.CourseNotifiable;
 import com.tak3r07.CourseStatistics.sync.ServerHelper;
 import com.tak3r07.CourseStatistics.sync.SyncAllCoursesTask;
@@ -12,6 +10,9 @@ import com.tak3r07.CourseStatistics.utils.Vocab;
 
 import java.util.ArrayList;
 import java.util.UUID;
+
+import objects.Assignment;
+import objects.Course;
 
 /**
  * Created by tak on 8/27/15.

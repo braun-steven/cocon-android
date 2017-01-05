@@ -12,9 +12,6 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.tak3r07.CourseStatistics.database.DatabaseHelper;
-import objects.Assignment;
-import objects.Course;
-import utils.JSONParser;
 import com.tak3r07.CourseStatistics.utils.Vocab;
 
 import org.json.JSONException;
@@ -22,6 +19,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import objects.Assignment;
+import objects.Course;
+import utils.JSONParser;
 
 /**
  * Created by tak on 8/26/15.
@@ -118,34 +119,74 @@ public class ServerHelper {
     }
 
     public void deleteCourse(Course course) {
-        if (!canConnect()){
+        if (!canConnect()) {
             alertNoConnection();
             return;
         }
         String suffix = "/deleteCourse";
         String parameter = "?id=" + course.getId();
         String url = Vocab.URL_PREFIX + suffix + parameter;
-        delete(url);
+
+        JSONObject json = new JSONObject();
+        try {
+            json.put("userId", new DatabaseHelper(context).getUserUUID());
+            json.put("course", JSONParser.courseToJSON(course));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        delete(json, url);
     }
 
     public void deleteAssignment(Assignment assignment) {
-        if (!canConnect()){
+        if (!canConnect()) {
             alertNoConnection();
             return;
         }
         String suffix = "/deleteAssignment";
         String parameter = "?id=" + assignment.getId();
         String url = Vocab.URL_PREFIX + suffix + parameter;
-        delete(url);
+
+
+        JSONObject json = new JSONObject();
+        try {
+            json.put("userId", new DatabaseHelper(context).getUserUUID());
+            json.put("course", JSONParser.assignmentToJSON(assignment));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        delete(json, url);
     }
 
-    public void delete(String url){
-        new AsyncJSONTask(activity){
+    public void delete(final JSONObject job, final String url) {
+
+        new AsyncTask<String, Void, String>() {
             @Override
-            protected void onPostExecute(String jsonString) {
-                super.onPostExecute(jsonString);
+            protected String doInBackground(String... params) {
+                final MediaType JSON
+                        = MediaType.parse("application/json; charset=utf-8");
+
+                OkHttpClient client = new OkHttpClient();
+
+
+                RequestBody body = RequestBody.create(JSON, job.toString());
+                Request request = new Request.Builder()
+                        .url(url)
+                        .delete(body)
+                        .build();
+                Response response = null;
+                try {
+                    response = client.newCall(request).execute();
+                    String result = response.body().string();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return "";
             }
         }.execute(url);
+
     }
 
     public void postCourse(final Course course, final String url) {

@@ -346,5 +346,6 @@ public class AssignmentsActivity extends AppCompatActivity implements CourseNoti
     @Override
     public ArrayList<Course> getCourses() {
 
-        return dataHelper.getAllCourses();}
+        return dataHelper.getAllCourses();
+    }
 }

@@ -6,11 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import objects.Assignment;
-import objects.Course;
-import objects.DynamicPointsCourse;
-import objects.FixedPointsCourse;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,6 +14,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import objects.Assignment;
+import objects.Course;
+import objects.DynamicPointsCourse;
+import objects.FixedPointsCourse;
 
 import static database.DatabaseVocab.CREATE_ASSIGNMENT_TABLE;
 import static database.DatabaseVocab.CREATE_COURSE_TABLE;

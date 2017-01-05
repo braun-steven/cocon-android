@@ -7,23 +7,23 @@ import android.os.AsyncTask;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import objects.Course;
-import utils.JSONParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
+import objects.Course;
+import utils.JSONParser;
+
 /**
  * Created by tak on 8/26/15.
- *
+ * <p>
  * This class serves as a template to do different operations after it downloads all courses
  * from the server
- *
+ * <p>
  * Classes which inherit from this class only should implement onPostExecute(...) and use the
  * global coursesFromServer object
- *
+ * <p>
  * in onPostExecute(..) the super method super.onPostExecute(...) should always be called first!
- *
  */
 public abstract class AsyncJSONTask extends AsyncTask<String, Void, String> {
     protected Activity activity;
