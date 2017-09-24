@@ -42,12 +42,12 @@ import objects.FixedPointsCourse
  * Adapter for RecyclerView in MainActivity
  */
 class RecyclerViewAssignmentAdapter(private val context: Context,
-                                    private var currentCourse: Course?,
+                                    private var currentCourse: Course,
                                     private val assignmentsActivity: AssignmentsActivity) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var assignments: ArrayList<Assignment>? = null
 
     init {
-        this.assignments = currentCourse.getAssignments()
+        this.assignments = currentCourse.assignments
         if (assignments == null) {
             throw IllegalArgumentException("assignments ArrayList must not be null")
         }
@@ -72,7 +72,7 @@ class RecyclerViewAssignmentAdapter(private val context: Context,
             TYPE_HEADER -> {
                 //Get correct header for dynamic/fixed points
                 val layout: Int
-                if (currentCourse!!.hasFixedPoints()) {
+                if (currentCourse.hasFixedPoints()) {
                     layout = R.layout.assignments_header_fixed_points
                 } else {
                     layout = R.layout.assignments_header_dynamic_points
@@ -160,30 +160,13 @@ class RecyclerViewAssignmentAdapter(private val context: Context,
 
     fun setupFixedPointsHeaderHolder(headerHolder: VHHeader) {
 
-        val fpc = currentCourse as FixedPointsCourse?
-
-        /*
-        headerHolder.mTextViewOverall.setText(
-                fpc.getProgress().toString()
-                        + " % - "
-                        + fpc.getTotalPoints()
-                        + "/"
-                        + fpc.getNumberOfAssignments() * fpc.getMaxPoints()
-        );
-
-        //Average
-        headerHolder.mTextViewAverage.setText(
-                fpc.getAverage(true).toString()
-                        + " % - "
-                        + fpc.getAveragePointsPerAssignment(true)
-                        + "/" + fpc.getMaxPoints()
-        );*/
+        val fpc = currentCourse as FixedPointsCourse
 
         //Nedded Points per assignment until 50% is reached
-        headerHolder.mTextViewNecPoiPerAss.text = fpc!!.necessaryPointsPerAssignmentUntilFin!!.toString()
+        headerHolder.mTextViewNecPoiPerAss?.text = fpc.necessaryPointsPerAssignmentUntilFin!!.toString()
 
         //Number of assignments until 50% is reached
-        headerHolder.mTextViewAssUntilFin.text = fpc.numberOfAssUntilFin.toString()
+        headerHolder.mTextViewAssUntilFin?.text = fpc.numberOfAssUntilFin.toString()
 
         setupPiChartAverage(headerHolder, fpc)
         setupPiChartOverall(headerHolder, fpc)
@@ -205,9 +188,9 @@ class RecyclerViewAssignmentAdapter(private val context: Context,
         colors.add(context.resources.getColor(R.color.red_300))
         dataset.colors = colors
         val dataSet = PieData(arrayOf("", ""), dataset)
-        pc.setDescription("Average")
-        pc.data = dataSet
-        pc.invalidate()
+        pc?.setDescription("Average")
+        pc?.data = dataSet
+        pc?.invalidate()
     }
 
     private fun setupPiChartOverall(headerHolder: VHHeader, fpc: FixedPointsCourse) {
@@ -228,15 +211,12 @@ class RecyclerViewAssignmentAdapter(private val context: Context,
         colors.add(context.resources.getColor(R.color.grey_300))
         dataset.colors = colors
         val dataSet = PieData(arrayOf("Achieved", "Missing", "Optional"), dataset)
-        pc.setDescription("Overall")
-        pc.data = dataSet
-        pc.invalidate()
+        pc?.setDescription("Overall")
+        pc?.data = dataSet
+        pc?.invalidate()
     }
 
-    fun setupDynamicPointsHeaderHolder(headerHolder: VHHeader) {
-        headerHolder.mTextViewAverage!!.text = currentCourse!!.getAverage(true)!!.toString() + " %"
-        headerHolder.mTextViewProgress.text = currentCourse!!.progress!!.toString() + " %"
-
+    private fun setupDynamicPointsHeaderHolder(headerHolder: VHHeader) {
         setupBarGraph(headerHolder, currentCourse)
     }
 
@@ -403,26 +383,24 @@ class RecyclerViewAssignmentAdapter(private val context: Context,
     class VHHeader(view: View, internal var currentCourse: Course) : RecyclerView.ViewHolder(view) {
 
         //Refer to TextView objects
-        internal var mTextViewAverage: TextView? = null
-        internal var mTextViewNecPoiPerAss: TextView
-        internal var mTextViewAssUntilFin: TextView
-        internal var mTextViewOverall: TextView? = null
-        internal var mTextViewProgress: TextView
+        internal lateinit var mTextViewAverage: TextView
+        internal var mTextViewNecPoiPerAss: TextView?
+        internal var mTextViewAssUntilFin: TextView?
+        internal lateinit var mTextViewProgress: TextView
         internal var graph: BarChart
-        internal var pieChartAverage: PieChart
-        internal var pieChartOverall: PieChart
+        internal var pieChartAverage: PieChart?
+        internal var pieChartOverall: PieChart?
 
         init {
             //Refer to TextView objects
-            //mTextViewAverage = (TextView) view.findViewById(R.id.course_overview_average);
-            mTextViewNecPoiPerAss = view.findViewById<View>(R.id.course_overview_nec_pointspass) as TextView
-            mTextViewAssUntilFin = view.findViewById<View>(R.id.course_overview_assignments_until_finished) as TextView
+            mTextViewNecPoiPerAss = view.findViewById<TextView>(R.id.course_overview_nec_pointspass)
+            mTextViewAssUntilFin = view.findViewById<TextView>(R.id.course_overview_assignments_until_finished)
             //mTextViewOverall = (TextView) view.findViewById(R.id.course_overview_overall_percentage_text);
-            pieChartAverage = view.findViewById<View>(R.id.chart_pi_average) as PieChart
-            pieChartOverall = view.findViewById<View>(R.id.chart_pi_overall) as PieChart
-            graph = view.findViewById<View>(R.id.chart) as BarChart
+            pieChartAverage = view.findViewById<PieChart>(R.id.chart_pi_average)
+            pieChartOverall = view.findViewById<PieChart>(R.id.chart_pi_overall)
+            graph = view.findViewById<BarChart>(R.id.chart)
             if (!this.currentCourse.hasFixedPoints()) {
-                mTextViewProgress = view.findViewById<View>(R.id.textView_progress) as TextView
+                mTextViewProgress = view.findViewById<TextView>(R.id.textView_progress)
             }
         }
     }
@@ -469,13 +447,13 @@ class RecyclerViewAssignmentAdapter(private val context: Context,
             //Set positive button behaviour
             alert.setPositiveButton(context.getString(R.string.delete)) { dialog, whichButton ->
                 //Get current assignment
-                val currentAssignment = mAssignmentsAdapter.assignments.get(getItemPosition(position))
+                val currentAssignment = mAssignmentsAdapter.assignments?.get(getItemPosition(position))
 
                 //Delete assignment and notify
                 Toast.makeText(context, mTextViewTitle.text.toString() + context.getString(R.string.deleted), Toast.LENGTH_LONG).show()
 
                 //Save changes in Database
-                val result = dataHelper.deleteAssignment(currentAssignment)
+                val result = dataHelper.deleteAssignment(currentAssignment!!)
 
                 //Remove Assignment
                 mAssignmentsAdapter.removeAssignment(getItemPosition(position))
@@ -497,7 +475,7 @@ class RecyclerViewAssignmentAdapter(private val context: Context,
                 alert.setView(view)
 
                 //Get assignment reference
-                val currentAssignment = mAssignmentsAdapter.currentCourse!!.getAssignment(getItemPosition(position))
+                val currentAssignment = mAssignmentsAdapter.currentCourse.getAssignment(getItemPosition(position))
 
                 val mEditTextMaxPoints = view.findViewById<View>(R.id.editText_maxPoints) as EditText
                 val textView = view.findViewById<View>(R.id.textView_maxPoints) as TextView
@@ -541,7 +519,7 @@ class RecyclerViewAssignmentAdapter(private val context: Context,
 
                         val maxPoints: Double?
                         if (hasFixedPoints) {
-                            maxPoints = mAssignmentsAdapter.currentCourse!!.toFPC().maxPoints
+                            maxPoints = mAssignmentsAdapter.currentCourse.toFPC().maxPoints
                         } else {
                             maxPoints = java.lang.Double.parseDouble(maxPointsString)
                         }
@@ -554,7 +532,7 @@ class RecyclerViewAssignmentAdapter(private val context: Context,
                             // (else one could have 3 of 3 assignments and another extra
                             // assignment, then uncheck it and he will have 4 out of 3
                             // assignments which is not intended
-                            if (mAssignmentsAdapter.currentCourse!!.numberAssignmentsLeft() > 0) {
+                            if (mAssignmentsAdapter.currentCourse.numberAssignmentsLeft() > 0) {
                                 currentAssignment.isExtraAssignment(false)
                                 currentAssignment.maxPoints = maxPoints!!
                             } else {
@@ -616,8 +594,8 @@ class RecyclerViewAssignmentAdapter(private val context: Context,
 
         private val TYPE_HEADER = 0
         private val TYPE_ITEM = 1
-        private var dataHelper: DataHelper<AssignmentsActivity>
-        private var hasFixedPoints: Boolean
+        private lateinit var dataHelper: DataHelper<AssignmentsActivity>
+        private var hasFixedPoints: Boolean = false
 
         /**
          * Returns correct item position since first item is header

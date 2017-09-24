@@ -1,12 +1,16 @@
 package com.tak3r07.CourseStatistics.activities
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
@@ -52,9 +56,9 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
 
     var courseArrayList = ArrayList<Course>()
         private set
-    private var mCourseAdapter: RecyclerViewCourseAdapter? = null
-    private var mFab: FloatingActionButton? = null
-    private var dataHelper: DataHelper<MainActivity>? = null
+    private lateinit var mCourseAdapter: RecyclerViewCourseAdapter
+    private lateinit var mFab: FloatingActionButton
+    private lateinit var dataHelper: DataHelper<MainActivity>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,28 +68,9 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
         val toolbar = findViewById<View>(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
-
-        /*//Check if Google Playe Services is available
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext())
-                == ConnectionResult.SUCCESS) {
-*/
-
         //get datahelper instance
         dataHelper = DataHelper(this)
 
-        /*
-         *Dont use since onResume()  always refreshes data from server
-
-        if (savedInstanceState != null) {
-
-            //Get back Course-Arraylist from savedInstanceState
-            mCourseArrayList = (ArrayList<Course>) savedInstanceState.getSerializable(COURSE_ARRAY_LIST);
-
-        } else {
-            // Restore courses
-            mCourseArrayList = dataHelper.getAllCourses();
-        }
-        */
 
 
         //RecyclerView Setup
@@ -104,21 +89,16 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
         //Add header for column descriptions
         val header = RecyclerViewHeader.fromXml(applicationContext, R.layout.layout_courselist_header)
         header.attachTo(mRecyclerView)
-        mCourseAdapter!!.notifyDataSetChanged()
+        mCourseAdapter.notifyDataSetChanged()
 
 
         //Setup FAB
         setupFAB()
-
-        /*
-        } else {
-            //TODO: Show error dialog that google play services is not available
-        }*/
     }
 
     private fun setupFAB() {
-        mFab = findViewById<View>(R.id.fab_add_course) as FloatingActionButton
-        mFab!!.setOnClickListener { onClickAddCourse(null) }
+        mFab = findViewById<FloatingActionButton>(R.id.fab_add_course)
+        mFab.setOnClickListener { onClickAddCourse(null) }
     }
 
 
@@ -166,6 +146,7 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
         //Toggle Edittext on checkbox toggle
         mCheckBox.setOnClickListener {
             val isChecked = mCheckBox.isChecked
+
             //Toggle Eddittext
             mReachablePointsEditText.isEnabled = isChecked
         }
@@ -205,7 +186,7 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
     }
 
     //Adds a new course to the mCourseArrayList
-    fun addCourse(title: String, maxPoints: Double?, hasFixedPoints: Boolean) {
+    fun addCourse(title: String, maxPoints: Double, hasFixedPoints: Boolean) {
         //Check if string is empty
         if (!title.isEmpty()) {
 
@@ -227,19 +208,17 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
                         .show()
             } else {
                 //Add course
-                val index = courseArrayList.size
-
                 val date = Calendar.getInstance().timeInMillis
                 //If course has fixed points -> create instance of FixedPointsCourse
 
                 val course: Course
                 if (hasFixedPoints) {
-                    course = FixedPointsCourse(title, maxPoints!!)
-                    mCourseAdapter!!.addCourse(course)
+                    course = FixedPointsCourse(title, maxPoints)
+                    mCourseAdapter.addCourse(course)
                 } else {
                     //Else create instance of DynamicPointsCourse
                     course = DynamicPointsCourse(title)
-                    mCourseAdapter!!.addCourse(course)
+                    mCourseAdapter.addCourse(course)
                 }
 
                 course.date = date
@@ -252,7 +231,7 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
                 {
                     //Get last element of the list and remove it
                     val index = courseArrayList.size - 1
-                    mCourseAdapter!!.removeCourse(index)
+                    mCourseAdapter.removeCourse(index)
                 }.show()
             }
         } else {
@@ -290,11 +269,11 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
         val backupPaths = ArrayList<String>()
 
         //Create listview
-        val listView = view.findViewById<View>(R.id.listView_restore_dialog) as ListView
+        val listView = view.findViewById<ListView>(R.id.listView_restore_dialog)
 
 
         //Inflate Edittext
-        val editText = view.findViewById<View>(R.id.editText_restore_dialog) as EditText
+        val editText = view.findViewById<EditText>(R.id.editText_restore_dialog)
 
 
         //check if external storage is readable
@@ -360,14 +339,14 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
                 ois.close()
 
                 //Notify course adapter
-                mCourseAdapter!!.notifyDataSetChanged()
+                mCourseAdapter.notifyDataSetChanged()
 
                 //Notify user about completed restore
                 Toast.makeText(applicationContext, getString(R.string.restore_complete), Toast.LENGTH_LONG).show()
 
 
                 //Update data
-                dataHelper!!.updateAllCourses(courseArrayList)
+                dataHelper.updateAllCourses(courseArrayList)
 
             } catch (e: ClassNotFoundException) {
                 e.printStackTrace()
@@ -424,6 +403,18 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
         alert.setPositiveButton(getString(R.string.confirm)) { dialog, whichButton ->
             //Check for RW permissions
             if (isExternalStorageWritable) {
+
+                if (ContextCompat.checkSelfPermission(this@MainActivity,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+                        // No explanation needed, we can request the permission.
+                        ActivityCompat.requestPermissions(this@MainActivity,
+                                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),0);
+
+                }
+
+
                 val myFilesDir = backupDir
                 myFilesDir.mkdirs()
 
@@ -435,6 +426,7 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
                     val formattedDate = df.format(c.time)
 
                     Toast.makeText(applicationContext, formattedDate, Toast.LENGTH_LONG).show()
+                    val backupFile = File(myFilesDir.path + "/" + formattedDate + ".backup")
                     val fos = FileOutputStream(myFilesDir.path + "/" + formattedDate + ".backup")
                     val oos = ObjectOutputStream(fos)
                     oos.writeObject(courseArrayList)
@@ -463,9 +455,7 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
      * @return Path to file dir
      */
     private val backupDir: File
-        get() = File(Environment
-                .getExternalStorageDirectory()
-                .absolutePath + "/CourseStatistics/files")
+        get() = File(Environment.getExternalStorageDirectory().path + "/CourseStatistics/files")
 
     /* Checks if external storage is available for read and write */
     val isExternalStorageWritable: Boolean
@@ -484,17 +474,17 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
     //Restore data if resumed
     override fun onResume() {
         //Restore data
-        courseArrayList = dataHelper!!.allCourses
+        courseArrayList = dataHelper.allCourses
 
         //Notify Adapter
-        mCourseAdapter!!.setmCourseArrayList(courseArrayList)
-        mCourseAdapter!!.notifyDataSetChanged()
+        mCourseAdapter.setmCourseArrayList(courseArrayList)
+        mCourseAdapter.notifyDataSetChanged()
         super.onResume()
     }
 
     fun notifiyCoursesChanged() {
         //Restore data
-        mCourseAdapter!!.notifyDataSetChanged()
+        mCourseAdapter.notifyDataSetChanged()
     }
 
     override fun notifyDataChanged() {
@@ -502,6 +492,7 @@ class MainActivity : AppCompatActivity(), CourseNotifiable {
     }
 
     override fun getCourses(): ArrayList<Course> {
-        return courseArrayList
+        return dataHelper.allCourses
     }
+
 }

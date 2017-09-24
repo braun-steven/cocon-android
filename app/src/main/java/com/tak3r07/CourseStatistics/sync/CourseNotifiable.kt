@@ -4,11 +4,7 @@ import java.util.ArrayList
 
 import objects.Course
 
-/**
- * Created by tak on 8/27/15.
- */
 interface CourseNotifiable {
     fun notifyDataChanged()
-
-    val courses: ArrayList<Course>
+    fun getCourses():ArrayList<Course>
 }

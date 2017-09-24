@@ -47,8 +47,8 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        val DATABASE_ALTER_COURSE_ADD_NEC_PERCENT_TO_PASS = " ALTER TABLE "
-        +TABLE_COURSES + " ADD COLUMN " + KEY_NEC_PERCENT_TO_PASS + " REAL DEFAULT 0.5;"
+        val DATABASE_ALTER_COURSE_ADD_NEC_PERCENT_TO_PASS = " ALTER TABLE " +
+         TABLE_COURSES + " ADD COLUMN " + KEY_NEC_PERCENT_TO_PASS + " REAL DEFAULT 0.5;"
 
         //Add necessary percent to pass value to course table
         if (oldVersion < 9) {
@@ -203,9 +203,9 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         get() {
             val courses = ArrayList<Course>()
             val db = this.readableDatabase
-            val selectQuery = "SELECT " + KEY_ID
-            +" FROM " + TABLE_COURSES
-            +" ORDER BY " + KEY_COURSENAME + " ASC"
+            val selectQuery = "SELECT " + KEY_ID +
+            " FROM " + TABLE_COURSES +
+            " ORDER BY " + KEY_COURSENAME + " ASC"
 
             val cursor = db.rawQuery(selectQuery, null)
 

@@ -128,7 +128,7 @@ class DataHelper<MyActivity : Activity>(private val activity: MyActivity) where 
         //For each course on the server check if it exists local, if not -> add locally
         for (serverCourse in coursesFromServer) {
             var isLocal = false
-            for (localCourse in activity.courses) {
+            for (localCourse in activity.getCourses()) {
                 if (serverCourse.id == localCourse.id) {
                     isLocal = true
                 }

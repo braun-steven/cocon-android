@@ -29,8 +29,8 @@ import utils.JSONParser
  * in onPostExecute(..) the super method super.onPostExecute(...) should always be called first!
  */
 abstract class AsyncJSONTask(protected var activity: Activity) : AsyncTask<String, Void, String>() {
-    protected var dialog: ProgressDialog
-    protected var coursesFromServer: ArrayList<Course>
+    protected lateinit var dialog: ProgressDialog
+    protected lateinit var coursesFromServer: ArrayList<Course>
 
     override fun onPreExecute() {
         dialog = ProgressDialog(activity)

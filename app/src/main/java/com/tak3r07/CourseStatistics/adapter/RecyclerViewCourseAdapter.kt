@@ -26,14 +26,11 @@ import objects.Course
  * Created by tak3r07 on 12/8/14.
  * Adapter for RecyclerView in MainActivity
  */
-class RecyclerViewCourseAdapter(activity: MainActivity, private val context: Context, private var mCourseArrayList: ArrayList<Course>?) : RecyclerView.Adapter<RecyclerViewCourseAdapter.ViewHolder>() {
+class RecyclerViewCourseAdapter(activity: MainActivity, private val context: Context, private var mCourseArrayList: ArrayList<Course>) : RecyclerView.Adapter<RecyclerViewCourseAdapter.ViewHolder>() {
     private val dataHelper: DataHelper<MainActivity>
 
     init {
         dataHelper = DataHelper(activity)
-        if (mCourseArrayList == null) {
-            throw IllegalArgumentException("courses ArrayList must not be null")
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -49,7 +46,7 @@ class RecyclerViewCourseAdapter(activity: MainActivity, private val context: Con
 
     //Sets up the view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val course = mCourseArrayList!![position]
+        val course = mCourseArrayList[position]
         //Set text
         holder.mTextViewName.text = course.courseName
         holder.mTextViewProgress.text = course.getAverage(true)!!.toString().split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
@@ -61,13 +58,13 @@ class RecyclerViewCourseAdapter(activity: MainActivity, private val context: Con
     }
 
     override fun getItemCount(): Int {
-        return mCourseArrayList!!.size
+        return mCourseArrayList.size
     }
 
     /**
      * This method receives a percentage and retrieves a color
      */
-    fun getDrawableColorForPercentage(percentage: Double?): Drawable {
+    fun getDrawableColorForPercentage(percentage: Double): Drawable {
 
         if (percentage < 30)
             return context.resources.getDrawable(R.drawable.circular_shape_red)

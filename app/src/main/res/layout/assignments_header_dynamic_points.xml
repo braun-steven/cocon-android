@@ -102,7 +102,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:layout_margin="16dp"
-        card_view:cardCornerRadius="4dp"
+        card_view:cardCornerRadius="24dp"
         card_view:cardElevation="2dp">
 
         <RelativeLayout

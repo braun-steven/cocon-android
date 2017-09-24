@@ -1,5 +1,6 @@
 package com.tak3r07.CourseStatistics.activities
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity

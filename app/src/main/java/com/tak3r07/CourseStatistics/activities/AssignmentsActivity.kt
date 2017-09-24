@@ -1,5 +1,6 @@
 package com.tak3r07.CourseStatistics.activities
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -36,13 +37,11 @@ import objects.Course
 
 
 class AssignmentsActivity : AppCompatActivity(), CourseNotifiable {
-
-
     private val COURSE_TAG_ID = "COURSE_TAG_ID"
     private var mAssignmentAdapter: RecyclerViewAssignmentAdapter? = null
-    private var mCurrentCourse: Course? = null
+    private lateinit var mCurrentCourse: Course
     private var mAssignments: ArrayList<Assignment>? = null
-    private var courseId: UUID? = null
+    private lateinit var courseId: UUID
     private var mFab: FloatingActionButton? = null
     private var dataHelper: DataHelper<AssignmentsActivity>? = null
 
@@ -66,11 +65,11 @@ class AssignmentsActivity : AppCompatActivity(), CourseNotifiable {
 
 
         //Get assignments
-        mAssignments = mCurrentCourse!!.assignments
+        mAssignments = mCurrentCourse.assignments
 
 
         //Set activity title
-        this.title = mCurrentCourse!!.courseName
+        this.title = mCurrentCourse.courseName
 
 
         //RecyclerView Setup
@@ -120,7 +119,7 @@ class AssignmentsActivity : AppCompatActivity(), CourseNotifiable {
         return super.onOptionsItemSelected(item)
     }
 
-    fun onClickAddAssignment() {
+    private fun onClickAddAssignment() {
         val alert = AlertDialog.Builder(this)
 
         alert.setTitle(getString(R.string.new_assignment))
@@ -134,7 +133,7 @@ class AssignmentsActivity : AppCompatActivity(), CourseNotifiable {
         val textView = view.findViewById<View>(R.id.textView_maxPoints) as TextView
 
         //If this course has fixed Points, dont show the possibilities of setting maxPoints
-        if (mCurrentCourse!!.hasFixedPoints()) {
+        if (mCurrentCourse.hasFixedPoints()) {
             val viewManager = mEditTextMaxPoints.parent as ViewManager
             viewManager.removeView(mEditTextMaxPoints)
             viewManager.removeView(textView)
@@ -150,15 +149,15 @@ class AssignmentsActivity : AppCompatActivity(), CourseNotifiable {
 
             val mCheckBox = view.findViewById<View>(R.id.checkBox_extra_assignment) as CheckBox
 
-            if (mCurrentCourse!!.numberOfAssignments - (mAssignments!!.size - countExtraAssignments) > 0 || mCheckBox.isChecked) {
+            if (mCurrentCourse.numberOfAssignments - (mAssignments!!.size - countExtraAssignments) > 0 || mCheckBox.isChecked) {
                 //Get EditText views
-                val mEditTextAchievedPoints = view.findViewById<View>(R.id.editText_achievedPoints) as EditText
-                val mEditTextMaxPoints = view.findViewById<View>(R.id.editText_maxPoints) as EditText
+                val mEditTextAchievedPoints = view.findViewById<EditText>(R.id.editText_achievedPoints)
+                val mEditTextMaxPoints = view.findViewById<EditText>(R.id.editText_maxPoints)
 
                 //Get data from edittexts
                 val achievedPointsString = mEditTextAchievedPoints.text.toString().replace(',', '.')
                 var maxPointsString = ""
-                if (!mCurrentCourse!!.hasFixedPoints()) {
+                if (!mCurrentCourse.hasFixedPoints()) {
                     maxPointsString = mEditTextMaxPoints.text.toString().replace(',', '.')
                 }
 
@@ -168,8 +167,8 @@ class AssignmentsActivity : AppCompatActivity(), CourseNotifiable {
 
                     val achievedPoints = java.lang.Double.parseDouble(achievedPointsString)
                     val maxPoints: Double?
-                    if (mCurrentCourse!!.hasFixedPoints()) {
-                        maxPoints = mCurrentCourse!!.toFPC().maxPoints
+                    if (mCurrentCourse.hasFixedPoints()) {
+                        maxPoints = mCurrentCourse.toFPC().maxPoints
                     } else {
 
                         maxPoints = java.lang.Double.parseDouble(maxPointsString)
@@ -198,7 +197,7 @@ class AssignmentsActivity : AppCompatActivity(), CourseNotifiable {
                             index,
                             maxPoints!!,
                             achievedPoints,
-                            mCurrentCourse!!.id)
+                            mCurrentCourse.id)
 
                     //Check if this is an extra assignment
                     if (mCheckBox.isChecked) {
@@ -234,9 +233,9 @@ class AssignmentsActivity : AppCompatActivity(), CourseNotifiable {
     fun addAssignment(assignment: Assignment) {
         //TODO: Check if "double" adding is necessary?
         mAssignmentAdapter!!.addAssignment(assignment)
-        mCurrentCourse!!.addAssignment(assignment)
-        mCurrentCourse!!.updateDate()
-        dataHelper!!.updateCourse(mCurrentCourse!!)
+        mCurrentCourse.addAssignment(assignment)
+        mCurrentCourse.updateDate()
+        dataHelper!!.updateCourse(mCurrentCourse)
 
 
         //Store assignment
@@ -271,23 +270,23 @@ class AssignmentsActivity : AppCompatActivity(), CourseNotifiable {
         intent.setClass(applicationContext, EditCourseActivity::class.java)
 
         //Add Course-Number
-        intent.putExtra(COURSE_TAG_ID, mCurrentCourse!!.id.toString())
+        intent.putExtra(COURSE_TAG_ID, mCurrentCourse.id.toString())
         startActivityForResult(intent, 0)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
 
 
             // Restore from storage
-            mCurrentCourse = dataHelper!!.getCourse(courseId!!)
+            mCurrentCourse = dataHelper!!.getCourse(courseId)
 
             mAssignmentAdapter!!.setCurrentCourse(mCurrentCourse)
-            mAssignments = mCurrentCourse!!.assignments
-            mAssignmentAdapter!!.assignments = mCurrentCourse!!.assignments
+            mAssignments = mCurrentCourse.assignments
+            mAssignmentAdapter!!.assignments = mCurrentCourse.assignments
             //Set new Title
 
-            title = mCurrentCourse!!.courseName
+            title = mCurrentCourse.courseName
 
             //Notify adapter for changes
             mAssignmentAdapter!!.notifyDataSetChanged()
@@ -297,17 +296,12 @@ class AssignmentsActivity : AppCompatActivity(), CourseNotifiable {
     //Restore data if resumed
     override fun onResume() {
         // Restore
-        mCurrentCourse = dataHelper!!.getCourse(courseId!!)
+        mCurrentCourse = dataHelper!!.getCourse(courseId)
         super.onResume()
     }
 
     override fun notifyDataChanged() {
         mAssignmentAdapter!!.notifyDataSetChanged()
-    }
-
-    override fun getCourses(): ArrayList<Course> {
-
-        return dataHelper!!.allCourses
     }
 
     companion object {
@@ -323,4 +317,9 @@ class AssignmentsActivity : AppCompatActivity(), CourseNotifiable {
             return true
         }
     }
+
+    override fun getCourses(): ArrayList<Course> {
+        return dataHelper!!.allCourses
+    }
+
 }
