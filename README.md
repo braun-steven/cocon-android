@@ -9,6 +9,3 @@ Save your courses and assignmentresults and let the app get you a comprehensive 
 - Assignmentoverview for every course
 - Backup & Restore
 - More to come
-
-### Contact
-If you have problems or questions, contact me at: tak3r07@gmail.com
