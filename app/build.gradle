@@ -5,14 +5,14 @@ apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "com.tak3r07.unihelper"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 170
-        versionName "1.7.0"
+        versionCode 171
+        versionName "1.7.1"
     }
     buildTypes {
         release {
@@ -30,11 +30,11 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:support-v4:26.0.2'
-    compile 'com.android.support:recyclerview-v7:26.0.2'
-    compile 'com.android.support:cardview-v7:26.0.2'
-    compile 'com.android.support:appcompat-v7:26.0.2'
-    compile 'com.android.support:design:26.0.2'
+    compile 'com.android.support:support-v4:26.1.0'
+    compile 'com.android.support:recyclerview-v7:26.1.0'
+    compile 'com.android.support:cardview-v7:26.1.0'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:design:26.1.0'
     compile 'com.jjoe64:graphview:4.0.0'
     compile 'com.bartoszlipinski.recyclerviewheader:library:1.2.0'
     compile 'com.yqritc:recyclerview-flexibledivider:1.2.5'
