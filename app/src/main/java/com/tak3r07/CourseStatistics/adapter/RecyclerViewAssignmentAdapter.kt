@@ -217,6 +217,9 @@ class RecyclerViewAssignmentAdapter(private val context: Context,
     }
 
     private fun setupDynamicPointsHeaderHolder(headerHolder: VHHeader) {
+        headerHolder.mTextViewAverage.text = currentCourse.getAverage(true).toString() + " %"
+        headerHolder.mTextViewAverage.text = currentCourse.getAverage(true).toString() + " %"
+        headerHolder.mTextViewProgress.text = currentCourse.getProgress().toString() + " %"
         setupBarGraph(headerHolder, currentCourse)
     }
 
@@ -393,6 +396,8 @@ class RecyclerViewAssignmentAdapter(private val context: Context,
 
         init {
             //Refer to TextView objects
+
+            mTextViewAverage = view.findViewById<TextView>(R.id.course_overview_average);
             mTextViewNecPoiPerAss = view.findViewById<TextView>(R.id.course_overview_nec_pointspass)
             mTextViewAssUntilFin = view.findViewById<TextView>(R.id.course_overview_assignments_until_finished)
             //mTextViewOverall = (TextView) view.findViewById(R.id.course_overview_overall_percentage_text);
